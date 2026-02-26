@@ -1,0 +1,21 @@
+{
+  "name": "rootly",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --stream dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+
+    "dev:web": "pnpm --filter @rootly/web dev",
+    "dev:api": "pnpm --filter @rootly/api dev",
+
+    "build:web": "pnpm --filter @rootly/web build",
+    "build:api": "pnpm --filter @rootly/api build"
+  }
+}

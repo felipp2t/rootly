@@ -1,0 +1,25 @@
+{
+	"name": "@rootly/api",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"lint": "biome check",
+		"format": "biome format --write"
+	},
+	"dependencies": {
+		"fastify": "^5.3.2",
+		"@fastify/cors": "^10.0.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0",
+		"@rootly/biome": "workspace:*",
+		"@rootly/tsconfig": "workspace:*",
+		"@types/node": "^22",
+		"tsx": "^4.19.2",
+		"typescript": "^5"
+	}
+}

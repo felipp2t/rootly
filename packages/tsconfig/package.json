@@ -1,0 +1,15 @@
+{
+  "name": "@rootly/tsconfig",
+  "version": "0.0.1",
+  "private": true,
+  "keywords": [
+    "typescript",
+    "biome"
+  ],
+  "exports": {
+    "./base": "./base.json",
+    "./node": "./node.json",
+    "./vite-node": "./vite-node.json",
+    "./vite-app": "./vite-app.json"
+  }
+}

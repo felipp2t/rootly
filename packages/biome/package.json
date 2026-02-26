@@ -1,0 +1,13 @@
+{
+	"name": "@rootly/biome",
+	"version": "0.0.1",
+	"private": true,
+	"exports": {
+		"./base": "./base.json",
+		"./vite": "./vite.json",
+		"./node": "./node.json"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0"
+	}
+}
