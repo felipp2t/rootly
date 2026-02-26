@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@rootly/tsconfig": "workspace:*",
-    "@rootly/biome": "workspace:*",
     "@biomejs/biome": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

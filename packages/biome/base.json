@@ -18,10 +18,10 @@
   },
   "javascript": {
     "formatter": {
+      "enabled": true,
       "quoteStyle": "single",
       "jsxQuoteStyle": "single",
-      "semicolons": "asNeeded",
-      "lineWidth": 80
+      "semicolons": "asNeeded"
     }
   },
   "formatter": {
