@@ -43,8 +43,24 @@ describe('CreateFolder', () => {
       InvalidFolderNameError,
     )
   })
-  
-  it('should be possible to create a folder with 32 characters', async () => {
+
+  it('should be able create a folder with 32 characters', async () => {
     await expect(sut.execute({ name: 'a'.repeat(32) })).resolves.toBeTruthy()
+  })
+
+  it('should be able create a folder into a parent folder', async () => {
+    const parentFolder = Folder.create({ name: 'Parent Folder' })
+    await folderRepository.save(parentFolder)
+
+    const response = await sut.execute({
+      name: 'Child Folder',
+      parentId: parentFolder.id.toString(),
+    })
+
+    expect(response.folderId).toBeTruthy()
+    expect(folderRepository.folders.length).toBe(2)
+    expect(folderRepository.folders[1].parentId).toEqual(
+      folderRepository.folders[0].id.toString(),
+    )
   })
 })
