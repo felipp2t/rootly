@@ -1,6 +1,5 @@
-import { db } from '@/db/index.ts'
 import { app } from './app.ts'
-import { env } from './env.ts'
+import { env } from './infra/env/index.ts'
 
 export async function start() {
   try {

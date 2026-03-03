@@ -1,7 +1,7 @@
-import { env } from '@/env.ts'
 import 'dotenv/config'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
+import { env } from '../env/index.ts'
 import { schema } from './schema/index.ts'
 
 console.info(env.DATABASE_URL)
