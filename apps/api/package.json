@@ -12,13 +12,18 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
     "fastify": "^5.3.2",
+    "pg": "^8.19.0",
     "zod": "4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
     "@rootly/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@types/pg": "^8.18.0",
+    "drizzle-kit": "^0.31.9",
     "tsx": "^4.19.2",
     "typescript": "catalog:"
   }
