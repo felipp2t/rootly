@@ -5,7 +5,7 @@ import { validateTypeAndContent } from '../validators/item-type-validator.ts'
 
 export type ItemType = 'link' | 'document' | 'secret' | 'text'
 
-interface ItemProps {
+export interface ItemProps {
   folderId: string
   type: ItemType
   title: string
