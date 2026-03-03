@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@faker-js/faker": "10.3.0",
     "@rootly/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/pg": "^8.18.0",

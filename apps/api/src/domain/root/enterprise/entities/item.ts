@@ -1,6 +1,7 @@
 import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { validateTypeAndContent } from '../validators/item-type-validator.ts'
 
 export type ItemType = 'link' | 'document' | 'secret' | 'text'
 
@@ -56,6 +57,8 @@ export class Item extends Entity<ItemProps> {
     props: Optional<ItemProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
   ) {
+    validateTypeAndContent(props.type, props.content)
+
     return new Item(
       {
         ...props,
