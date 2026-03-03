@@ -21,6 +21,7 @@
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "fastify": "^5.3.2",
+    "fastify-type-provider-zod": "^6.1.0",
     "nanoid": "5.1.6",
     "pg": "^8.19.0",
     "zod": "4.3.6"
