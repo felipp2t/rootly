@@ -2,9 +2,11 @@ import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
+export type ItemType = 'link' | 'document' | 'secret' | 'text'
+
 interface ItemProps {
   folderId: string
-  type: 'link' | 'document' | 'secret' | 'text'
+  type: ItemType
   title: string
   content?: string
   createdAt: Date
