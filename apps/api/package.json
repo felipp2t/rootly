@@ -11,7 +11,10 @@
     "format": "biome format --write",
     "db:generate": "npx drizzle-kit generate",
     "db:migrate": "npx drizzle-kit migrate",
-    "db:studio": "npx drizzle-kit studio"
+    "db:studio": "npx drizzle-kit studio",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
@@ -27,8 +30,11 @@
     "@rootly/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/pg": "^8.18.0",
+    "@vitest/coverage-v8": "4.0.18",
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.19.2",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite-tsconfig-paths": "6.1.1",
+    "vitest": "4.0.18"
   }
 }
