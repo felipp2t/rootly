@@ -1,5 +1,7 @@
 import { Folder } from '../../enterprise/entities/folder.ts'
 import type { FolderRepository } from '../repositories/folder-repository.ts'
+import { FolderAlreadyExistsError } from './_errors/folder-already-exists-error.ts'
+import { InvalidFolderNameError } from './_errors/invalid-folder-name-error.ts'
 
 interface CreateFolderUseCaseRequest {
   name: string
@@ -13,17 +15,15 @@ export class CreateFolderUseCase {
     const folder = await this.folderRepositoy.findByName(name)
 
     if (folder && folder.name === name && folder.parentId === parentId) {
-      throw new Error(
-        'Folder with the same name already exists in the same parent folder',
-      )
+      throw new FolderAlreadyExistsError()
     }
 
     if (typeof name === 'string' && name.length < 3) {
-      throw new Error('Folder name must be at least 3 characters long')
+      throw new InvalidFolderNameError()
     }
 
     if (typeof name === 'string' && name.length > 32) {
-      throw new Error('Folder name must be less than 32 characters long')
+      throw new InvalidFolderNameError()
     }
 
     const newFolder = Folder.create({
