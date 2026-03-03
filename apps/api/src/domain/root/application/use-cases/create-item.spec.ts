@@ -1,4 +1,3 @@
-
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
 import { InvalidItemTypeError } from '../../enterprise/validators/_errors/invalid-item-type.ts'
 import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
@@ -25,13 +24,12 @@ describe('CreateFolder', () => {
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
       title: 'Test Item',
-      type: 'text'
+      type: 'text',
     })
 
     expect(response.itemId).toBeTruthy()
     expect(itemRepository.items.length).toBe(1)
     expect(itemRepository.items[0].content).toBeUndefined()
-
   })
 
   it('should be able create a item with text type and defined content', async () => {
@@ -41,7 +39,7 @@ describe('CreateFolder', () => {
       folderId: folderRepository.folders[0].id.toString(),
       title: 'Test Item',
       type: 'text',
-      content: 'This is a test item'
+      content: 'This is a test item',
     })
 
     expect(response.itemId).toBeTruthy()
@@ -56,7 +54,7 @@ describe('CreateFolder', () => {
       folderId: folderRepository.folders[0].id.toString(),
       title: 'Test Item',
       type: 'link',
-      content: 'https://www.example.com'
+      content: 'https://www.example.com',
     })
 
     expect(response.itemId).toBeTruthy()
@@ -67,12 +65,14 @@ describe('CreateFolder', () => {
   it('should not be able create a item with link type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(sut.execute({
-      folderId: folderRepository.folders[0].id.toString(),
-      title: 'Test Item',
-      type: 'link',
-      content: 'www.example.com'
-    })).rejects.toBeInstanceOf(InvalidItemTypeError)
+    expect(
+      sut.execute({
+        folderId: folderRepository.folders[0].id.toString(),
+        title: 'Test Item',
+        type: 'link',
+        content: 'www.example.com',
+      }),
+    ).rejects.toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should be able create a item with document type', async () => {
@@ -82,7 +82,7 @@ describe('CreateFolder', () => {
       folderId: folderRepository.folders[0].id.toString(),
       title: 'Test Item',
       type: 'document',
-      content: 'a'.repeat(10_000)
+      content: 'a'.repeat(10_000),
     })
 
     expect(response.itemId).toBeTruthy()
@@ -92,12 +92,14 @@ describe('CreateFolder', () => {
   it('should not be able create a item with document type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(sut.execute({
-      folderId: folderRepository.folders[0].id.toString(),
-      title: 'Test Item',
-      type: 'document',
-      content: 'a'.repeat(50_001)
-    })).rejects.toBeInstanceOf(InvalidItemTypeError)
+    expect(
+      sut.execute({
+        folderId: folderRepository.folders[0].id.toString(),
+        title: 'Test Item',
+        type: 'document',
+        content: 'a'.repeat(50_001),
+      }),
+    ).rejects.toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should be able create a item with secret type', async () => {
@@ -107,7 +109,7 @@ describe('CreateFolder', () => {
       folderId: folderRepository.folders[0].id.toString(),
       title: 'Test Item',
       type: 'secret',
-      content: '12345678'
+      content: '12345678',
     })
 
     expect(response.itemId).toBeTruthy()
@@ -117,12 +119,14 @@ describe('CreateFolder', () => {
   it('should not be able create a item with secret type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(sut.execute({
-      folderId: folderRepository.folders[0].id.toString(),
-      title: 'Test Item',
-      type: 'secret',
-      content: '123'
-    })).rejects.toBeInstanceOf(InvalidItemTypeError)
+    expect(
+      sut.execute({
+        folderId: folderRepository.folders[0].id.toString(),
+        title: 'Test Item',
+        type: 'secret',
+        content: '123',
+      }),
+    ).rejects.toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should not be able create a item with the same title in the same folder', async () => {
@@ -132,12 +136,14 @@ describe('CreateFolder', () => {
     const item = makeItem({ folderId: folder.id.toString() })
     itemRepository.save(item)
 
-    expect(sut.execute({
-      folderId: folder.id.toString(),
-      title: item.title,
-      type: 'secret',
-      content: '123'
-    })).rejects.toBeInstanceOf(ItemAlreadyExistsError)
+    expect(
+      sut.execute({
+        folderId: folder.id.toString(),
+        title: item.title,
+        type: 'secret',
+        content: '123',
+      }),
+    ).rejects.toBeInstanceOf(ItemAlreadyExistsError)
   })
 
   it('should not be possible to create a item with title fewer than 3 characters', async () => {
@@ -147,8 +153,8 @@ describe('CreateFolder', () => {
   })
 
   it('should not be possible to create a item with title more than 32 characters', async () => {
-    await expect(sut.execute(makeItem({ title: 'a'.repeat(33) }))).rejects.toBeInstanceOf(
-      InvalidItemTitleError,
-    )
+    await expect(
+      sut.execute(makeItem({ title: 'a'.repeat(33) })),
+    ).rejects.toBeInstanceOf(InvalidItemTitleError)
   })
 })

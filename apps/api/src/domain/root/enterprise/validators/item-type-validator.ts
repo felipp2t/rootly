@@ -1,12 +1,9 @@
-import type { ItemType } from "../entities/item.ts"
-import { InvalidItemTypeError } from "./_errors/invalid-item-type.ts"
+import type { ItemType } from '../entities/item.ts'
+import { InvalidItemTypeError } from './_errors/invalid-item-type.ts'
 
 const allowedTypes: ItemType[] = ['link', 'document', 'secret', 'text']
 
-export function validateTypeAndContent(
-  type: ItemType,
-  content?: string,
-): void {
+export function validateTypeAndContent(type: ItemType, content?: string): void {
   if (!allowedTypes.includes(type)) {
     throw new InvalidItemTypeError('Invalid item type')
   }
@@ -54,13 +51,12 @@ export function validateTypeAndContent(
       }
 
       if (trimmedContent.length < 8) {
-        throw new InvalidItemTypeError(
-          'Secret must be at least 8 characters',
-        )
+        throw new InvalidItemTypeError('Secret must be at least 8 characters')
       }
 
       break
     }
-    default: break
+    default:
+      break
   }
 }

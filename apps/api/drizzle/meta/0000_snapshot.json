@@ -40,12 +40,8 @@
           "name": "folders_parent_id_fkey",
           "tableFrom": "folders",
           "tableTo": "folders",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -105,12 +101,8 @@
           "name": "items_folder_id_fkey",
           "tableFrom": "items",
           "tableTo": "folders",
-          "columnsFrom": [
-            "folder_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["folder_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -126,12 +118,7 @@
     "public.item_type": {
       "name": "item_type",
       "schema": "public",
-      "values": [
-        "link",
-        "document",
-        "secret",
-        "text"
-      ]
+      "values": ["link", "document", "secret", "text"]
     }
   },
   "schemas": {},

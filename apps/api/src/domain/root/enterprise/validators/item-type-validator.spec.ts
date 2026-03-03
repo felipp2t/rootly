@@ -5,23 +5,23 @@ import { InvalidItemTypeError } from './_errors/invalid-item-type.ts'
 describe('ItemTypeValidator', () => {
   describe('invalid type', () => {
     it('should throw if type is invalid', () => {
-      expect(() =>
-        validateTypeAndContent('invalid' as any, 'content'),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('invalid' as any, 'content')).toThrow(
+        InvalidItemTypeError,
+      )
     })
   })
 
   describe('link type', () => {
     it('should throw if content is missing', () => {
-      expect(() =>
-        validateTypeAndContent('link', undefined),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('link', undefined)).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should throw if url is invalid', () => {
-      expect(() =>
-        validateTypeAndContent('link', 'not-a-url'),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('link', 'not-a-url')).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should throw if not https', () => {
@@ -39,17 +39,17 @@ describe('ItemTypeValidator', () => {
 
   describe('document type', () => {
     it('should throw if content is missing', () => {
-      expect(() =>
-        validateTypeAndContent('document', undefined),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('document', undefined)).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should throw if document is too large', () => {
       const big = 'a'.repeat(50_001)
 
-      expect(() =>
-        validateTypeAndContent('document', big),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('document', big)).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should not throw for valid document', () => {
@@ -61,15 +61,15 @@ describe('ItemTypeValidator', () => {
 
   describe('secret type', () => {
     it('should throw if content is missing', () => {
-      expect(() =>
-        validateTypeAndContent('secret', undefined),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('secret', undefined)).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should throw if secret is too short', () => {
-      expect(() =>
-        validateTypeAndContent('secret', '123'),
-      ).toThrow(InvalidItemTypeError)
+      expect(() => validateTypeAndContent('secret', '123')).toThrow(
+        InvalidItemTypeError,
+      )
     })
 
     it('should not throw for valid secret', () => {
@@ -81,15 +81,11 @@ describe('ItemTypeValidator', () => {
 
   describe('text type', () => {
     it('should allow empty content', () => {
-      expect(() =>
-        validateTypeAndContent('text', undefined),
-      ).not.toThrow()
+      expect(() => validateTypeAndContent('text', undefined)).not.toThrow()
     })
 
     it('should not throw for valid text', () => {
-      expect(() =>
-        validateTypeAndContent('text', 'hello'),
-      ).not.toThrow()
+      expect(() => validateTypeAndContent('text', 'hello')).not.toThrow()
     })
   })
 })
