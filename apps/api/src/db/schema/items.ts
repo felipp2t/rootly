@@ -6,7 +6,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core'
 import { nanoid } from '@/lib/nanoid.ts'
-import { now } from '../utils/now.ts'
+import { now } from '../helpers/now.ts'
 import { folders } from './folders.ts'
 
 export const itemTypeEnum = pgEnum('item_type', [
