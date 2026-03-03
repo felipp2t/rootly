@@ -6,6 +6,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core'
 import { nanoid } from '@/lib/nanoid.ts'
+import { now } from '../utils/now.ts'
 import { folders } from './folders.ts'
 
 export const itemTypeEnum = pgEnum('item_type', [
@@ -28,6 +29,7 @@ export const items = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdate(now),
   },
   (table) => [
     foreignKey({
