@@ -1,4 +1,4 @@
-import { nanoid } from '@/lib/nanoid.ts'
+import { nanoid } from '@/infra/lib/nanoid.ts'
 
 export class UniqueEntityID {
   private value: string
