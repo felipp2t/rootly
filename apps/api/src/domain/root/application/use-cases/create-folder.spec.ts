@@ -1,8 +1,8 @@
-import { InMemoryFolderRepository } from '../../../../../test/repositories/in-memory-folder-repository.ts'
-import { Folder } from '../../enterprise/entities/folder.ts'
+import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { FolderAlreadyExistsError } from './_errors/folder-already-exists-error.ts'
 import { InvalidFolderNameError } from './_errors/invalid-folder-name-error.ts'
 import { CreateFolderUseCase } from './create-folder.ts'
+import { Folder } from '../../enterprise/entities/folder.ts'
 
 let folderRepository: InMemoryFolderRepository
 let sut: CreateFolderUseCase
