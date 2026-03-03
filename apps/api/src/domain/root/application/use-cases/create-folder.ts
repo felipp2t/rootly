@@ -18,11 +18,11 @@ export class CreateFolderUseCase {
       throw new FolderAlreadyExistsError()
     }
 
-    if (typeof name === 'string' && name.length < 3) {
+    if (typeof name === 'string' && name.trim().length < 3) {
       throw new InvalidFolderNameError()
     }
 
-    if (typeof name === 'string' && name.length > 32) {
+    if (typeof name === 'string' && name.trim().length > 32) {
       throw new InvalidFolderNameError()
     }
 
