@@ -3,7 +3,6 @@ import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
 interface ItemProps {
-  name: string
   folderId: string
   type: 'link' | 'document' | 'secret' | 'text'
   title: string
@@ -13,15 +12,6 @@ interface ItemProps {
 }
 
 export class Item extends Entity<ItemProps> {
-  get name() {
-    return this.props.name
-  }
-
-  set name(value: string) {
-    this.props.name = value
-    this.touch()
-  }
-
   get folderId() {
     return this.props.folderId
   }
