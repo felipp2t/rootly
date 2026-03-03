@@ -1,3 +1,4 @@
+import { db } from '@/db/index.ts'
 import { app } from './app.ts'
 import { env } from './env.ts'
 
