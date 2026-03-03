@@ -1,7 +1,7 @@
 import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 
-export class ItemRepositoryInMemory implements ItemRepository {
+export class InMemoryItemRepository implements ItemRepository {
   items: Item[] = []
 
   async findById(id: string): Promise<Item | null> {

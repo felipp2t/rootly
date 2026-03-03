@@ -1,7 +1,7 @@
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 
-export class FolderRepositoryInMemory implements FolderRepository {
+export class InMemoryFolderRepository implements FolderRepository {
   folders: Folder[] = []
 
   async findById(id: string): Promise<Folder | null> {
