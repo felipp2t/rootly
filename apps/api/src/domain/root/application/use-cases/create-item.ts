@@ -1,3 +1,5 @@
+import type { BaseError } from '@/core/errors/base-error.ts'
+import { type Either, left, right } from '@/core/types/either.ts'
 import { Item, type ItemType } from '../../enterprise/entities/item.ts'
 import type { ItemRepository } from '../repositories/item-repository.ts'
 import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
@@ -10,22 +12,29 @@ interface CreateItemUseCaseRequest {
   content?: string
 }
 
+type CreateItemUseCaseResponse = Either<BaseError, { itemId: string }>
+
 export class CreateItemUseCase {
   constructor(private readonly itemRepository: ItemRepository) {}
 
-  async execute({ folderId, title, type, content }: CreateItemUseCaseRequest) {
+  async execute({
+    folderId,
+    title,
+    type,
+    content,
+  }: CreateItemUseCaseRequest): Promise<CreateItemUseCaseResponse> {
     const item = await this.itemRepository.findByTitle(title)
 
     if (item && item.title === title && item.folderId === folderId) {
-      throw new ItemAlreadyExistsError()
+      return left(new ItemAlreadyExistsError())
     }
 
     if (typeof title === 'string' && title.trim().length < 3) {
-      throw new InvalidItemTitleError()
+      return left(new InvalidItemTitleError())
     }
 
     if (typeof title === 'string' && title.trim().length > 32) {
-      throw new InvalidItemTitleError()
+      return left(new InvalidItemTitleError())
     }
 
     const newItem = Item.create({
@@ -37,8 +46,8 @@ export class CreateItemUseCase {
 
     await this.itemRepository.save(newItem)
 
-    return {
-      itemId: newItem.id,
-    }
+    return right({
+      itemId: newItem.id.toString(),
+    })
   }
 }
