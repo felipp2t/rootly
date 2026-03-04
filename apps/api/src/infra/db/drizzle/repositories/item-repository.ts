@@ -2,11 +2,12 @@ import { eq } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
+import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleItemMapper } from '../mappers/drizzle-item-mapper.ts'
 import { schema } from '../schema/index.ts'
 
 export class DrizzleItemRepository implements ItemRepository {
-  constructor(private readonly db: NodePgDatabase) {}
+  constructor(private readonly db: DrizzleDatabase) {}
 
   async findById(id: string): Promise<Item | null> {
     const items = await this.db

@@ -1,12 +1,12 @@
 import { eq } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
+import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleFolderMapper } from '../mappers/drizzle-folder-mapper.ts'
 import { schema } from '../schema/index.ts'
 
 export class DrizzleFolderRepository implements FolderRepository {
-  constructor(private readonly db: NodePgDatabase) {}
+  constructor(private readonly db: DrizzleDatabase) {}
 
   async findById(id: string): Promise<Folder | null> {
     const folders = await this.db

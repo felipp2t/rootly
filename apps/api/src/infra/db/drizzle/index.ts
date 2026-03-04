@@ -22,3 +22,5 @@ export const db = drizzle({
   casing: 'snake_case',
   schema,
 })
+
+export type DrizzleDatabase = typeof db
