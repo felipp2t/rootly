@@ -1,5 +1,6 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
+import { safeEither } from '@/core/utils/safe-execute.ts'
 import { Item, type ItemType } from '../../enterprise/entities/item.ts'
 import type { ItemRepository } from '../repositories/item-repository.ts'
 import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
@@ -37,17 +38,18 @@ export class CreateItemUseCase {
       return left(new InvalidItemTitleError())
     }
 
-    const newItem = Item.create({
-      folderId,
-      type,
-      title,
-      content,
-    })
+    const newItem = await safeEither(() =>
+      Item.create({ folderId, type, title, content }),
+    )
 
-    await this.itemRepository.save(newItem)
+    if (newItem.isLeft()) {
+      return left(newItem.value)
+    }
+
+    await this.itemRepository.save(newItem.value)
 
     return right({
-      itemId: newItem.id.toString(),
+      itemId: newItem.value.id.toString(),
     })
   }
 }

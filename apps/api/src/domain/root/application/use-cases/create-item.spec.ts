@@ -1,11 +1,11 @@
+import { makeFolder } from '@test/factories/make-folder.ts'
+import { makeItem } from '@test/factories/make-item.ts'
+import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
 import { InvalidItemTypeError } from '../../enterprise/validators/_errors/invalid-item-type.ts'
 import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
 import { ItemAlreadyExistsError } from './_errors/item-already-exists-error.ts'
 import { CreateItemUseCase } from './create-item.ts'
-import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
-import { makeFolder } from '@test/factories/make-folder.ts'
-import { makeItem } from '@test/factories/make-item.ts'
 
 let itemRepository: InMemoryItemRepository
 let folderRepository: InMemoryFolderRepository
@@ -27,7 +27,8 @@ describe('CreateFolder', () => {
       type: 'text',
     })
 
-    expect(response.itemId).toBeTruthy()
+    expect(response.isRight()).toBe(true)
+    expect(response.value).toMatchObject({ itemId: expect.any(String) })
     expect(itemRepository.items.length).toBe(1)
     expect(itemRepository.items[0].content).toBeUndefined()
   })
@@ -42,7 +43,8 @@ describe('CreateFolder', () => {
       content: 'This is a test item',
     })
 
-    expect(response.itemId).toBeTruthy()
+    expect(response.isRight()).toBe(true)
+    expect(response.value).toMatchObject({ itemId: expect.any(String) })
     expect(itemRepository.items.length).toBe(1)
     expect(itemRepository.items[0].content).toBe('This is a test item')
   })
@@ -57,7 +59,8 @@ describe('CreateFolder', () => {
       content: 'https://www.example.com',
     })
 
-    expect(response.itemId).toBeTruthy()
+    expect(response.isRight()).toBe(true)
+    expect(response.value).toMatchObject({ itemId: expect.any(String) })
     expect(itemRepository.items.length).toBe(1)
     expect(itemRepository.items[0].content).toBe('https://www.example.com')
   })
@@ -65,14 +68,15 @@ describe('CreateFolder', () => {
   it('should not be able create a item with link type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(
-      sut.execute({
-        folderId: folderRepository.folders[0].id.toString(),
-        title: 'Test Item',
-        type: 'link',
-        content: 'www.example.com',
-      }),
-    ).rejects.toBeInstanceOf(InvalidItemTypeError)
+    const response = await sut.execute({
+      folderId: folderRepository.folders[0].id.toString(),
+      title: 'Test Item',
+      type: 'link',
+      content: 'www.example.com',
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should be able create a item with document type', async () => {
@@ -85,21 +89,23 @@ describe('CreateFolder', () => {
       content: 'a'.repeat(10_000),
     })
 
-    expect(response.itemId).toBeTruthy()
+    expect(response.isRight()).toBe(true)
+    expect(response.value).toMatchObject({ itemId: expect.any(String) })
     expect(itemRepository.items.length).toBe(1)
   })
 
   it('should not be able create a item with document type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(
-      sut.execute({
-        folderId: folderRepository.folders[0].id.toString(),
-        title: 'Test Item',
-        type: 'document',
-        content: 'a'.repeat(50_001),
-      }),
-    ).rejects.toBeInstanceOf(InvalidItemTypeError)
+    const response = await sut.execute({
+      folderId: folderRepository.folders[0].id.toString(),
+      title: 'Test Item',
+      type: 'document',
+      content: 'a'.repeat(50_001),
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should be able create a item with secret type', async () => {
@@ -112,21 +118,23 @@ describe('CreateFolder', () => {
       content: '12345678',
     })
 
-    expect(response.itemId).toBeTruthy()
+    expect(response.isRight()).toBe(true)
+    expect(response.value).toMatchObject({ itemId: expect.any(String) })
     expect(itemRepository.items.length).toBe(1)
   })
 
   it('should not be able create a item with secret type with invalid content', async () => {
     folderRepository.save(makeFolder())
 
-    expect(
-      sut.execute({
-        folderId: folderRepository.folders[0].id.toString(),
-        title: 'Test Item',
-        type: 'secret',
-        content: '123',
-      }),
-    ).rejects.toBeInstanceOf(InvalidItemTypeError)
+    const response = await sut.execute({
+      folderId: folderRepository.folders[0].id.toString(),
+      title: 'Test Item',
+      type: 'secret',
+      content: '123',
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
   it('should not be able create a item with the same title in the same folder', async () => {
@@ -136,25 +144,28 @@ describe('CreateFolder', () => {
     const item = makeItem({ folderId: folder.id.toString() })
     itemRepository.save(item)
 
-    expect(
-      sut.execute({
-        folderId: folder.id.toString(),
-        title: item.title,
-        type: 'secret',
-        content: '123',
-      }),
-    ).rejects.toBeInstanceOf(ItemAlreadyExistsError)
+    const response = await sut.execute({
+      folderId: folder.id.toString(),
+      title: item.title,
+      type: 'secret',
+      content: '123',
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(ItemAlreadyExistsError)
   })
 
   it('should not be possible to create a item with title fewer than 3 characters', async () => {
-    await expect(sut.execute(makeItem({ title: '' }))).rejects.toBeInstanceOf(
-      InvalidItemTitleError,
-    )
+    const response = await sut.execute(makeItem({ title: '' }))
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidItemTitleError)
   })
 
   it('should not be possible to create a item with title more than 32 characters', async () => {
-    await expect(
-      sut.execute(makeItem({ title: 'a'.repeat(33) })),
-    ).rejects.toBeInstanceOf(InvalidItemTitleError)
+    const response = await sut.execute(makeItem({ title: 'a'.repeat(33) }))
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidItemTitleError)
   })
 })
