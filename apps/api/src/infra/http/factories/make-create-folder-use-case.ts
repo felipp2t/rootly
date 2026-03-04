@@ -4,8 +4,6 @@ import { DrizzleFolderRepository } from '@/infra/db/drizzle/repositories/folder-
 
 export function makeCreateFolderUseCase() {
   const folderRepository = new DrizzleFolderRepository(db)
-
   const useCase = new CreateFolderUseCase(folderRepository)
-
   return useCase
 }
