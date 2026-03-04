@@ -1,4 +1,6 @@
-export class InvalidItemTitleError extends Error {
+import type { BaseError } from '@/core/errors/base-error.ts'
+
+export class InvalidItemTitleError extends Error implements BaseError {
   constructor(message?: string) {
     super(
       message ??

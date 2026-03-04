@@ -1,4 +1,6 @@
-export class InvalidFolderNameError extends Error {
+import type { BaseError } from '@/core/errors/base-error.ts'
+
+export class InvalidFolderNameError extends Error implements BaseError {
   constructor(message?: string) {
     super(
       message ??
