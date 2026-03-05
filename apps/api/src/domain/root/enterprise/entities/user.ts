@@ -2,7 +2,7 @@ import { Entity } from '@/core/entities/entity.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
-interface UserProps {
+export interface UserProps {
   email: string
   name: string
   passwordHash: string
