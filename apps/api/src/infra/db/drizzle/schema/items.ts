@@ -5,7 +5,7 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
-import { nanoid } from '@/infra/lib/nanoid.ts'
+import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 import { now } from '../helpers/now.ts'
 import { folders } from './folders.ts'
 

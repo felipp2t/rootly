@@ -1,4 +1,4 @@
-import { nanoid } from '@/infra/lib/nanoid.ts'
+import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 
 export class UniqueEntityID {
   private value: string
