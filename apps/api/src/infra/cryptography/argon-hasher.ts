@@ -2,7 +2,7 @@ import { hash, verify } from 'argon2'
 import type { HashComparer } from '@/domain/root/application/cryptography/hash-comparer.ts'
 import type { HashGenerator } from '@/domain/root/application/cryptography/hash-generator.ts'
 
-export class BcryptHasher implements HashGenerator, HashComparer {
+export class ArgonHasher implements HashGenerator, HashComparer {
   private HASH_SALT_LENGTH = 8
 
   hash(plain: string): Promise<string> {
