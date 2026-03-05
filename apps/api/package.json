@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
+    "argon2": "0.44.0",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "fastify": "^5.3.2",
