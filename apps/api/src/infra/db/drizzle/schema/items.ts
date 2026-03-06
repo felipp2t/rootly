@@ -21,6 +21,7 @@ export const items = pgTable(
   {
     id: text('id')
       .primaryKey()
+      .notNull()
       .$defaultFn(() => nanoid()),
     folderId: text('folder_id').notNull(),
     type: itemTypeEnum('type').notNull(),

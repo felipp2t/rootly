@@ -8,6 +8,7 @@ export const workspaces = pgTable(
   {
     id: text('id')
       .primaryKey()
+      .notNull()
       .$defaultFn(() => nanoid()),
     userId: text('user_id').notNull(),
     name: text('name').notNull(),

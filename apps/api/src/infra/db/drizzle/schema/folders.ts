@@ -8,6 +8,7 @@ export const folders = pgTable(
   {
     id: text('id')
       .primaryKey()
+      .notNull()
       .$defaultFn(() => nanoid()),
     workspaceId: text('workspace_id').notNull(),
     name: text('name').notNull(),
