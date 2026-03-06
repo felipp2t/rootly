@@ -1,6 +1,6 @@
 import { foreignKey, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
-import { now } from '@/infra/db/drizzle/helpers/now.ts'
 import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
+import { now } from '@/infra/db/drizzle/helpers/now.ts'
 
 export const folders = pgTable(
   'folders',
