@@ -14,6 +14,6 @@ export class ArgonHasher implements HashGenerator, HashComparer {
   }
 
   compare(plain: string, hash: string): Promise<boolean> {
-    return verify(plain, hash)
+    return verify(hash, plain)
   }
 }
