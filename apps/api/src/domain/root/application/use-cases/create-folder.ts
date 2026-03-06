@@ -8,6 +8,7 @@ import { InvalidFolderNameError } from './_errors/invalid-folder-name-error.ts'
 interface CreateFolderUseCaseRequest {
   name: string
   parentId?: string
+  workspaceId: string
 }
 
 type CreateFolderUseCaseResponse = Either<BaseError, { folderId: string }>
@@ -18,6 +19,7 @@ export class CreateFolderUseCase {
   async execute({
     name,
     parentId,
+    workspaceId,
   }: CreateFolderUseCaseRequest): Promise<CreateFolderUseCaseResponse> {
     const folder = await this.folderRepositoy.findByName(name)
 
@@ -36,6 +38,7 @@ export class CreateFolderUseCase {
     const newFolder = Folder.create({
       name,
       parentId,
+      workspaceId,
     })
 
     await this.folderRepositoy.save(newFolder)

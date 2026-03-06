@@ -5,6 +5,7 @@ import type { Optional } from '@/core/types/optional.ts'
 export interface FolderProps {
   name: string
   parentId?: string
+  workspaceId: string
   createdAt: Date
   updatedAt: Date
 }
@@ -21,6 +22,10 @@ export class Folder extends Entity<FolderProps> {
 
   get parentId() {
     return this.props.parentId
+  }
+  
+  get workspaceId() {
+    return this.props.workspaceId
   }
 
   get createdAt() {
