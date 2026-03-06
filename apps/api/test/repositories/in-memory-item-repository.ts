@@ -20,6 +20,16 @@ export class InMemoryItemRepository implements ItemRepository {
     this.items.push(item)
   }
 
+  async update(item: Item): Promise<void> {
+    const itemIndex = this.items.findIndex(
+      (i) => i.id.toString() === item.id.toString(),
+    )
+
+    if (itemIndex !== -1) {
+      this.items[itemIndex] = item
+    }
+  }
+
   async delete(id: string): Promise<void> {
     const itemIndex = this.items.findIndex((item) => item.id.toString() === id)
 

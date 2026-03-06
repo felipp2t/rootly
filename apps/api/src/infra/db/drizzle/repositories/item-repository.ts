@@ -44,6 +44,13 @@ export class DrizzleItemRepository implements ItemRepository {
     await this.db.insert(schema.items).values(DrizzleItemMapper.toDrizzle(item))
   }
 
+  async update(item: Item): Promise<void> {
+    await this.db
+      .update(schema.items)
+      .set(DrizzleItemMapper.toDrizzle(item))
+      .where(eq(schema.items.id, item.id.toString()))
+  }
+
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.items).where(eq(schema.items.id, id))
   }

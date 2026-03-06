@@ -46,6 +46,13 @@ export class DrizzleFolderRepository implements FolderRepository {
       .values(DrizzleFolderMapper.toDrizzle(folder))
   }
 
+  async update(folder: Folder): Promise<void> {
+    await this.db
+      .update(schema.folders)
+      .set(DrizzleFolderMapper.toDrizzle(folder))
+      .where(eq(schema.folders.id, folder.id.toString()))
+  }
+
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.folders).where(eq(schema.folders.id, id))
   }
