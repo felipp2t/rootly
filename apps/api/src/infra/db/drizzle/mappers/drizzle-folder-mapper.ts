@@ -14,6 +14,7 @@ export class DrizzleFolderMapper {
         createdAt: raw.createdAt,
         parentId: raw.parentId ?? undefined,
         updatedAt: raw.updatedAt ?? undefined,
+        workspaceId: raw.workspaceId,
       },
       new UniqueEntityID(raw.id),
     )
@@ -26,6 +27,7 @@ export class DrizzleFolderMapper {
       createdAt: folder.createdAt,
       parentId: folder.parentId ?? null,
       updatedAt: folder.updatedAt ?? null,
+      workspaceId: folder.workspaceId,
     }
   }
 }
