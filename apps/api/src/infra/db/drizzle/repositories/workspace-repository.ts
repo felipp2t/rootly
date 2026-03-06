@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
-import type { WorkspaceRepository } from '@/domain/root/application/repositories/Workspace-repository.ts'
-import type { Workspace } from '@/domain/root/enterprise/entities/Workspace.ts'
+import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
+import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
 import type { DrizzleDatabase } from '../index.ts'
-import { DrizzleWorkspaceMapper } from '../mappers/drizzle-Workspace-mapper.ts'
+import { DrizzleWorkspaceMapper } from '../mappers/drizzle-workspace-mapper.ts'
 import { schema } from '../schema/index.ts'
 
 export class DrizzleWorkspaceRepository implements WorkspaceRepository {
