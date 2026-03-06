@@ -1,3 +1,5 @@
+import { makeUser } from '@test/factories/make-user.ts'
+import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { Folder } from '../../enterprise/entities/folder.ts'
 import { FolderAlreadyExistsError } from './_errors/folder-already-exists-error.ts'
@@ -14,8 +16,12 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a folder', async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
     const response = await sut.execute({
       name: 'Test Folder',
+      workspaceId: workspace.id.toString(),
     })
 
     expect(response.isRight()).toBe(true)
@@ -24,44 +30,73 @@ describe('CreateFolder', () => {
   })
 
   it('should not be able to create a folder with the same name in the same parent folder', async () => {
-    const parentFolder = Folder.create({ name: 'Parent Folder' })
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const parentFolder = Folder.create({
+      name: 'Parent Folder',
+      workspaceId: workspace.id.toString(),
+    })
 
     await folderRepository.save(parentFolder)
 
-    const response = await sut.execute({ name: 'Parent Folder' })
+    const response = await sut.execute({
+      name: 'Parent Folder',
+      workspaceId: workspace.id.toString(),
+    })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(FolderAlreadyExistsError)
   })
 
   it('should not be possible to create a folder with fewer than 3 characters', async () => {
-    const response = await sut.execute({ name: 'vi' })
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const response = await sut.execute({
+      name: 'vi',
+      workspaceId: workspace.id.toString(),
+    })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(InvalidFolderNameError)
   })
 
   it('should not be possible to create a folder with more than 32 characters', async () => {
-    const response = await sut.execute({ name: 'a'.repeat(33) })
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const response = await sut.execute({
+      name: 'a'.repeat(33),
+      workspaceId: workspace.id.toString(),
+    })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(InvalidFolderNameError)
   })
 
   it('should be able create a folder with 32 characters', async () => {
-    const response = await sut.execute({ name: 'a'.repeat(32) })
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const response = await sut.execute({
+      name: 'a'.repeat(32),
+      workspaceId: workspace.id.toString(),
+    })
 
     expect(response.isRight()).toBe(true)
     expect(response.value).toMatchObject({ folderId: expect.any(String) })
   })
 
   it('should be able create a folder into a parent folder', async () => {
-    const parentFolder = Folder.create({ name: 'Parent Folder' })
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const parentFolder = Folder.create({
+      name: 'Parent Folder',
+      workspaceId: workspace.id.toString(),
+    })
     await folderRepository.save(parentFolder)
 
     const response = await sut.execute({
       name: 'Child Folder',
       parentId: parentFolder.id.toString(),
+      workspaceId: workspace.id.toString(),
     })
 
     expect(response.value).toMatchObject({ folderId: expect.any(String) })
