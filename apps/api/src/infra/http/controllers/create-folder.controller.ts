@@ -12,16 +12,21 @@ export const createFolderController: FastifyPluginCallbackZod = async (app) => {
         tags: ['Folders'],
         body: z.object({
           name: z.string(),
+          workspaceId: z.string(),
           parentId: z.string().optional(),
         }),
       },
     },
     async (request, reply) => {
-      const { name, parentId } = request.body
+      const { name, parentId, workspaceId } = request.body
 
       const createFolderUseCase = makeCreateFolderUseCase()
 
-      const result = await createFolderUseCase.execute({ name, parentId })
+      const result = await createFolderUseCase.execute({
+        name,
+        parentId,
+        workspaceId,
+      })
 
       if (result.isLeft()) {
         const error = result.value
