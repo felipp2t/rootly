@@ -1,8 +1,10 @@
 import { FakeHasher } from '@test/cryptography/faker-hasher.ts'
 import { InMemoryUserRepository } from '@test/repositories/in-memory-user-repository.ts'
+import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { RegisterUserUseCase } from './register-user.ts'
 
 let inMemoryUserRepository: InMemoryUserRepository
+let inMemoryWorkspaceRepository: InMemoryWorkspaceRepository
 let fakeHasher: FakeHasher
 
 let sut: RegisterUserUseCase
@@ -10,9 +12,14 @@ let sut: RegisterUserUseCase
 describe('Register User', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository()
+    inMemoryWorkspaceRepository = new InMemoryWorkspaceRepository()
     fakeHasher = new FakeHasher()
 
-    sut = new RegisterUserUseCase(inMemoryUserRepository, fakeHasher)
+    sut = new RegisterUserUseCase(
+      inMemoryUserRepository,
+      inMemoryWorkspaceRepository,
+      fakeHasher,
+    )
   })
 
   it('should be able to register a new user', async () => {

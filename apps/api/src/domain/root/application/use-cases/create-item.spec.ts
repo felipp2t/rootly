@@ -1,5 +1,7 @@
 import { makeFolder } from '@test/factories/make-folder.ts'
 import { makeItem } from '@test/factories/make-item.ts'
+import { makeUser } from '@test/factories/make-user.ts'
+import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
 import { InvalidItemTypeError } from '../../enterprise/validators/_errors/invalid-item-type.ts'
@@ -19,7 +21,9 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a item with text type without content', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -34,7 +38,9 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a item with text type and defined content', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -50,7 +56,9 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a item with link type', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -66,7 +74,9 @@ describe('CreateFolder', () => {
   })
 
   it('should not be able create a item with link type with invalid content', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -80,7 +90,9 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a item with document type', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -95,7 +107,9 @@ describe('CreateFolder', () => {
   })
 
   it('should not be able create a item with document type with invalid content', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -109,7 +123,9 @@ describe('CreateFolder', () => {
   })
 
   it('should be able create a item with secret type', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -124,7 +140,9 @@ describe('CreateFolder', () => {
   })
 
   it('should not be able create a item with secret type with invalid content', async () => {
-    folderRepository.save(makeFolder())
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -138,7 +156,9 @@ describe('CreateFolder', () => {
   })
 
   it('should not be able create a item with the same title in the same folder', async () => {
-    const folder = makeFolder()
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const folder = makeFolder({ workspaceId: workspace.id.toString() })
     folderRepository.save(folder)
 
     const item = makeItem({ folderId: folder.id.toString() })
@@ -156,14 +176,24 @@ describe('CreateFolder', () => {
   })
 
   it('should not be possible to create a item with title fewer than 3 characters', async () => {
-    const response = await sut.execute(makeItem({ title: '' }))
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const folder = makeFolder({ workspaceId: workspace.id.toString() })
+    const response = await sut.execute(
+      makeItem({ title: '', folderId: folder.id.toString() }),
+    )
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(InvalidItemTitleError)
   })
 
   it('should not be possible to create a item with title more than 32 characters', async () => {
-    const response = await sut.execute(makeItem({ title: 'a'.repeat(33) }))
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const folder = makeFolder({ workspaceId: workspace.id.toString() })
+    const response = await sut.execute(
+      makeItem({ title: 'a'.repeat(33), folderId: folder.id.toString() }),
+    )
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(InvalidItemTitleError)
