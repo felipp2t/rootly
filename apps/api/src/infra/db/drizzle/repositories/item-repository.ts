@@ -40,11 +40,11 @@ export class DrizzleItemRepository implements ItemRepository {
     return items.map(DrizzleItemMapper.toDomain)
   }
 
-  async save(item: Item): Promise<void> {
+  async create(item: Item): Promise<void> {
     await this.db.insert(schema.items).values(DrizzleItemMapper.toDrizzle(item))
   }
 
-  async update(item: Item): Promise<void> {
+  async save(item: Item): Promise<void> {
     await this.db
       .update(schema.items)
       .set(DrizzleItemMapper.toDrizzle(item))

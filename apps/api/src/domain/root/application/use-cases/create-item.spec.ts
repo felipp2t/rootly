@@ -23,7 +23,7 @@ describe('CreateFolder', () => {
   it('should be able create a item with text type without content', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -40,7 +40,7 @@ describe('CreateFolder', () => {
   it('should be able create a item with text type and defined content', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -58,7 +58,7 @@ describe('CreateFolder', () => {
   it('should be able create a item with link type', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -76,7 +76,7 @@ describe('CreateFolder', () => {
   it('should not be able create a item with link type with invalid content', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -92,7 +92,7 @@ describe('CreateFolder', () => {
   it('should be able create a item with document type', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -109,7 +109,7 @@ describe('CreateFolder', () => {
   it('should not be able create a item with document type with invalid content', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -125,7 +125,7 @@ describe('CreateFolder', () => {
   it('should be able create a item with secret type', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -142,7 +142,7 @@ describe('CreateFolder', () => {
   it('should not be able create a item with secret type with invalid content', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    folderRepository.save(makeFolder({ workspaceId: workspace.id.toString() }))
+    folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
 
     const response = await sut.execute({
       folderId: folderRepository.folders[0].id.toString(),
@@ -159,10 +159,10 @@ describe('CreateFolder', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
-    folderRepository.save(folder)
+    folderRepository.create(folder)
 
     const item = makeItem({ folderId: folder.id.toString() })
-    itemRepository.save(item)
+    itemRepository.create(item)
 
     const response = await sut.execute({
       folderId: folder.id.toString(),

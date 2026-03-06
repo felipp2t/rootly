@@ -28,7 +28,7 @@ export class CreateTagUseCase {
 
     const tag = Tag.create({ name, color, workspaceId })
 
-    await this.tagRepository.save(tag)
+    await this.tagRepository.create(tag)
 
     return right({ tagId: tag.id.toString() })
   }

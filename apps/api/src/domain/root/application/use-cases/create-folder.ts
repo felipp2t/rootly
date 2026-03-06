@@ -41,7 +41,7 @@ export class CreateFolderUseCase {
       workspaceId,
     })
 
-    await this.folderRepositoy.save(newFolder)
+    await this.folderRepositoy.create(newFolder)
 
     return right({
       folderId: newFolder.id.toString(),

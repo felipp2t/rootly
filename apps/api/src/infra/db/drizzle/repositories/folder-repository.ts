@@ -40,13 +40,13 @@ export class DrizzleFolderRepository implements FolderRepository {
     return folders.map(DrizzleFolderMapper.toDomain)
   }
 
-  async save(folder: Folder): Promise<void> {
+  async create(folder: Folder): Promise<void> {
     await this.db
       .insert(schema.folders)
       .values(DrizzleFolderMapper.toDrizzle(folder))
   }
 
-  async update(folder: Folder): Promise<void> {
+  async save(folder: Folder): Promise<void> {
     await this.db
       .update(schema.folders)
       .set(DrizzleFolderMapper.toDrizzle(folder))

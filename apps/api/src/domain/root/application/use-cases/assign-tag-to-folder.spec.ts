@@ -25,8 +25,8 @@ describe('AssignTagToFolder', () => {
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await folderRepository.save(folder)
-    await tagRepository.save(tag)
+    await folderRepository.create(folder)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       folderId: folder.id.toString(),
@@ -44,9 +44,9 @@ describe('AssignTagToFolder', () => {
     const tagA = makeTag({ workspaceId: workspace.id.toString() })
     const tagB = makeTag({ workspaceId: workspace.id.toString() })
 
-    await folderRepository.save(folder)
-    await tagRepository.save(tagA)
-    await tagRepository.save(tagB)
+    await folderRepository.create(folder)
+    await tagRepository.create(tagA)
+    await tagRepository.create(tagB)
 
     await sut.execute({
       folderId: folder.id.toString(),
@@ -68,8 +68,8 @@ describe('AssignTagToFolder', () => {
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await folderRepository.save(folder)
-    await tagRepository.save(tag)
+    await folderRepository.create(folder)
+    await tagRepository.create(tag)
 
     await sut.execute({
       folderId: folder.id.toString(),
@@ -89,7 +89,7 @@ describe('AssignTagToFolder', () => {
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await tagRepository.save(tag)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       folderId: 'non-existing-folder-id',
@@ -105,7 +105,7 @@ describe('AssignTagToFolder', () => {
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
 
-    await folderRepository.save(folder)
+    await folderRepository.create(folder)
 
     const response = await sut.execute({
       folderId: folder.id.toString(),

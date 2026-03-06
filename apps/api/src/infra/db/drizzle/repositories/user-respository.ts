@@ -33,7 +33,7 @@ export class DrizzleUserRepository implements UserRepository {
     return DrizzleUserMapper.toDomain(users[0])
   }
 
-  async save(user: User): Promise<void> {
+  async create(user: User): Promise<void> {
     await this.db.insert(schema.users).values(DrizzleUserMapper.toDrizzle(user))
   }
 }

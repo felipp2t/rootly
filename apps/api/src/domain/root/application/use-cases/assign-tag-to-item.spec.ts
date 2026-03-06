@@ -27,8 +27,8 @@ describe('AssignTagToItem', () => {
     const item = makeItem({ folderId: folder.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await itemRepository.save(item)
-    await tagRepository.save(tag)
+    await itemRepository.create(item)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       itemId: item.id.toString(),
@@ -47,9 +47,9 @@ describe('AssignTagToItem', () => {
     const tagA = makeTag({ workspaceId: workspace.id.toString() })
     const tagB = makeTag({ workspaceId: workspace.id.toString() })
 
-    await itemRepository.save(item)
-    await tagRepository.save(tagA)
-    await tagRepository.save(tagB)
+    await itemRepository.create(item)
+    await tagRepository.create(tagA)
+    await tagRepository.create(tagB)
 
     await sut.execute({ itemId: item.id.toString(), tagId: tagA.id.toString() })
     await sut.execute({ itemId: item.id.toString(), tagId: tagB.id.toString() })
@@ -66,8 +66,8 @@ describe('AssignTagToItem', () => {
     const item = makeItem({ folderId: folder.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await itemRepository.save(item)
-    await tagRepository.save(tag)
+    await itemRepository.create(item)
+    await tagRepository.create(tag)
 
     await sut.execute({ itemId: item.id.toString(), tagId: tag.id.toString() })
     const response = await sut.execute({
@@ -84,7 +84,7 @@ describe('AssignTagToItem', () => {
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
-    await tagRepository.save(tag)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       itemId: 'non-existing-item-id',
@@ -101,7 +101,7 @@ describe('AssignTagToItem', () => {
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
     const item = makeItem({ folderId: folder.id.toString() })
 
-    await itemRepository.save(item)
+    await itemRepository.create(item)
 
     const response = await sut.execute({
       itemId: item.id.toString(),

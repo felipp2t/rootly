@@ -37,7 +37,7 @@ describe('CreateFolder', () => {
       workspaceId: workspace.id.toString(),
     })
 
-    await folderRepository.save(parentFolder)
+    await folderRepository.create(parentFolder)
 
     const response = await sut.execute({
       name: 'Parent Folder',
@@ -91,7 +91,7 @@ describe('CreateFolder', () => {
       name: 'Parent Folder',
       workspaceId: workspace.id.toString(),
     })
-    await folderRepository.save(parentFolder)
+    await folderRepository.create(parentFolder)
 
     const response = await sut.execute({
       name: 'Child Folder',

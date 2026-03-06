@@ -12,7 +12,7 @@ export class InMemoryUserRepository implements UserRepository {
     return this.items.find((user) => user.email === email) ?? null
   }
 
-  async save(user: User): Promise<void> {
+  async create(user: User): Promise<void> {
     this.items.push(user)
   }
 }

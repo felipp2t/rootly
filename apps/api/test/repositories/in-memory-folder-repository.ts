@@ -16,11 +16,11 @@ export class InMemoryFolderRepository implements FolderRepository {
     return this.folders
   }
 
-  async save(folder: Folder): Promise<void> {
+  async create(folder: Folder): Promise<void> {
     this.folders.push(folder)
   }
 
-  async update(folder: Folder): Promise<void> {
+  async save(folder: Folder): Promise<void> {
     const folderIndex = this.folders.findIndex(
       (f) => f.id.toString() === folder.id.toString(),
     )

@@ -40,7 +40,7 @@ export class AssignTagToFolderUseCase {
 
     folder.tagIds = [...folder.tagIds, tagId]
 
-    await this.folderRepository.update(folder)
+    await this.folderRepository.save(folder)
 
     return right(undefined)
   }

@@ -16,11 +16,11 @@ export class InMemoryItemRepository implements ItemRepository {
     return this.items
   }
 
-  async save(item: Item): Promise<void> {
+  async create(item: Item): Promise<void> {
     this.items.push(item)
   }
 
-  async update(item: Item): Promise<void> {
+  async save(item: Item): Promise<void> {
     const itemIndex = this.items.findIndex(
       (i) => i.id.toString() === item.id.toString(),
     )

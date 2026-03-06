@@ -37,7 +37,7 @@ describe('CreateTag', () => {
       workspaceId: workspace.id.toString(),
       name: 'My Tag',
     })
-    await tagRepository.save(tag)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       name: 'My Tag',
@@ -58,7 +58,7 @@ describe('CreateTag', () => {
       workspaceId: workspaceA.id.toString(),
       name: 'My Tag',
     })
-    await tagRepository.save(tag)
+    await tagRepository.create(tag)
 
     const response = await sut.execute({
       name: 'My Tag',

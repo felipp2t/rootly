@@ -46,14 +46,14 @@ export class RegisterUserUseCase {
       passwordHash: hashedPassword,
     })
 
-    await this.userRepository.save(user)
+    await this.userRepository.create(user)
 
     const workspace = Workspace.create({
       userId: user.id.toString(),
       name: 'My Workspace',
     })
 
-    this.workspaceRepository.save(workspace)
+    this.workspaceRepository.create(workspace)
 
     return right({
       userId: user.id.toString(),

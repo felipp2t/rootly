@@ -46,7 +46,7 @@ export class CreateItemUseCase {
       return left(newItem.value)
     }
 
-    await this.itemRepository.save(newItem.value)
+    await this.itemRepository.create(newItem.value)
 
     return right({
       itemId: newItem.value.id.toString(),

@@ -18,7 +18,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return this.items
   }
 
-  async save(Workspace: Workspace): Promise<void> {
+  async create(Workspace: Workspace): Promise<void> {
     this.items.push(Workspace)
   }
   async delete(id: string): Promise<void> {

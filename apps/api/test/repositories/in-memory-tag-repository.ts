@@ -16,7 +16,7 @@ export class InMemoryTagRepository implements TagRepository {
     return this.tags
   }
 
-  async save(tag: Tag): Promise<void> {
+  async create(tag: Tag): Promise<void> {
     this.tags.push(tag)
   }
 

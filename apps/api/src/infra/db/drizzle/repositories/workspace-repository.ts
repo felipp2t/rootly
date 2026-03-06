@@ -40,7 +40,7 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
     return workspaces.map(DrizzleWorkspaceMapper.toDomain)
   }
 
-  async save(workspace: Workspace): Promise<void> {
+  async create(workspace: Workspace): Promise<void> {
     await this.db
       .insert(schema.workspaces)
       .values(DrizzleWorkspaceMapper.toDrizzle(workspace))

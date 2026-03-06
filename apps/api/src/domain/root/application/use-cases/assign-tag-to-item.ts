@@ -40,7 +40,7 @@ export class AssignTagToItemUseCase {
 
     item.tagIds = [...item.tagIds, tagId]
 
-    await this.itemRepository.update(item)
+    await this.itemRepository.save(item)
 
     return right(undefined)
   }
