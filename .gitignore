@@ -74,7 +74,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Editors / IDE
-.vscode/*
 !.vscode/extensions.json
 .idea
 .vscode-test
