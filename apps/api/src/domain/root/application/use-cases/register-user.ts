@@ -1,8 +1,10 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import { User } from '../../enterprise/entities/user.ts'
+import { Workspace } from '../../enterprise/entities/workspace.ts'
 import type { HashGenerator } from '../cryptography/hash-generator.ts'
 import type { UserRepository } from '../repositories/user-repository.ts'
+import type { WorkspaceRepository } from '../repositories/workspace-repository.ts'
 import { UserAlreadyExistsError } from './_errors/user-already-exists-error.ts'
 
 interface RegisterUserUseCaseRequest {
@@ -21,6 +23,7 @@ type RegisterUserUseCaseResponse = Either<
 export class RegisterUserUseCase {
   constructor(
     private userRepository: UserRepository,
+    private workspaceRepository: WorkspaceRepository,
     private hashGenerator: HashGenerator,
   ) {}
 
@@ -44,6 +47,13 @@ export class RegisterUserUseCase {
     })
 
     await this.userRepository.save(user)
+
+    const workspace = Workspace.create({
+      userId: user.id.toString(),
+      name: 'My Workspace',
+    })
+
+    this.workspaceRepository.save(workspace)
 
     return right({
       userId: user.id.toString(),
