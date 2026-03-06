@@ -19,6 +19,10 @@ export class Workspace extends Entity<WorkspaceProps> {
     this.touch()
   }
 
+  get userId() {
+    return this.props.userId
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
