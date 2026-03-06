@@ -53,7 +53,7 @@ export class RegisterUserUseCase {
       name: 'My Workspace',
     })
 
-    this.workspaceRepository.create(workspace)
+    await this.workspaceRepository.create(workspace)
 
     return right({
       userId: user.id.toString(),
