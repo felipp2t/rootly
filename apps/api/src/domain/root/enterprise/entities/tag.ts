@@ -35,6 +35,10 @@ export class Tag extends Entity<TagProps> {
     return this.props.createdAt
   }
 
+  get workspaceId() {
+    return this.props.workspaceId
+  }
+
   get updatedAt() {
     return this.props.updatedAt
   }
