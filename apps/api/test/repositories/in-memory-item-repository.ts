@@ -17,7 +17,11 @@ export class InMemoryItemRepository implements ItemRepository {
   }
 
   async findByParentId(folderId: string | null): Promise<Item[]> {
-    return this.items.filter((folder) => folder.folderId === folderId) ?? null
+    return this.items.filter((item) =>
+      folderId === null
+        ? item.folderId === undefined
+        : item.folderId === folderId,
+    )
   }
 
   async create(item: Item): Promise<void> {
