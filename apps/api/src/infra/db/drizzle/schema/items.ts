@@ -8,6 +8,7 @@ import {
 import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 import { now } from '../helpers/now.ts'
 import { folders } from './folders.ts'
+import { workspaces } from './workspaces.ts'
 
 export const itemTypeEnum = pgEnum('item_type', [
   'link',
@@ -23,7 +24,8 @@ export const items = pgTable(
       .primaryKey()
       .notNull()
       .$defaultFn(() => nanoid()),
-    folderId: text('folder_id').notNull(),
+    workspaceId: text('workspace_id').notNull(),
+    folderId: text('folder_id'),
     type: itemTypeEnum('type').notNull(),
     title: text('title').notNull(),
     content: text('content'),
@@ -34,9 +36,14 @@ export const items = pgTable(
   },
   (table) => [
     foreignKey({
+      name: 'items_workspace_id_fkey',
+      columns: [table.workspaceId],
+      foreignColumns: [workspaces.id],
+    }).onDelete('cascade'),
+    foreignKey({
       name: 'items_folder_id_fkey',
       columns: [table.folderId],
       foreignColumns: [folders.id],
-    }),
+    }).onDelete('cascade'),
   ],
 )
