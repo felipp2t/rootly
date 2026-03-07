@@ -11,7 +11,7 @@ export class GetItemsUseCase {
   constructor(private readonly itemRepository: ItemRepository) {}
 
   async execute({ parentId }: GetItemsRequest): Promise<GetItemsResponse> {
-    const items = await this.itemRepository.findByParentId(parentId ?? null)
+    const items = await this.itemRepository.findManyByParentId(parentId ?? null)
 
     return right({
       items,

@@ -11,7 +11,9 @@ export class GetFoldersUseCase {
   constructor(private readonly folderRepository: FolderRepository) {}
 
   async execute({ parentId }: GetFoldersRequest): Promise<GetFoldersResponse> {
-    const folders = await this.folderRepository.findByParentId(parentId ?? null)
+    const folders = await this.folderRepository.findManyByParentId(
+      parentId ?? null,
+    )
 
     return right({
       folders,

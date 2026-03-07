@@ -50,19 +50,7 @@ export class DrizzleItemRepository implements ItemRepository {
     return DrizzleItemMapper.toDomain(rows[0], tagsByItem[rows[0].id] ?? [])
   }
 
-  async findAll(): Promise<Item[]> {
-    const rows = await this.db.select().from(schema.items)
-
-    if (rows.length === 0) return []
-
-    const tagsByItem = await this.loadTagIdsByItemIds(rows.map((r) => r.id))
-
-    return rows.map((row) =>
-      DrizzleItemMapper.toDomain(row, tagsByItem[row.id] ?? []),
-    )
-  }
-
-  async findByParentId(folderId: string | null): Promise<Item[]> {
+  async findManyByParentId(folderId: string | null): Promise<Item[]> {
     const rows = await this.db
       .select()
       .from(schema.items)

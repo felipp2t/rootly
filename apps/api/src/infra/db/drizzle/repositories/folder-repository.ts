@@ -50,19 +50,7 @@ export class DrizzleFolderRepository implements FolderRepository {
     return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[rows[0].id] ?? [])
   }
 
-  async findAll(): Promise<Folder[]> {
-    const rows = await this.db.select().from(schema.folders)
-
-    if (rows.length === 0) return []
-
-    const tagsByFolder = await this.loadTagIdsByFolderIds(rows.map((r) => r.id))
-
-    return rows.map((row) =>
-      DrizzleFolderMapper.toDomain(row, tagsByFolder[row.id] ?? []),
-    )
-  }
-
-  async findByParentId(parentId: string | null): Promise<Folder[]> {
+  async findManyByParentId(parentId: string | null): Promise<Folder[]> {
     const rows = await this.db
       .select()
       .from(schema.folders)
