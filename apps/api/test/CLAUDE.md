@@ -124,6 +124,50 @@ Implements `Encrypter`.
 
 - `encrypt(payload)` → returns `JSON.stringify(payload)`
 
+## E2E Tests
+
+E2E tests live alongside controllers at `src/infra/http/controllers/*.e2e.spec.ts` and hit the real Fastify app via `app.inject()`.
+
+### Convention
+
+- **Happy path only** — e2e tests cover only success scenarios (2xx responses). Error cases (4xx/5xx) belong in unit tests (`.spec.ts`) for the corresponding use case.
+- Each test file maps 1:1 to a controller.
+- `beforeAll` calls `await app.ready()`.
+- `afterEach` deletes all rows from affected tables in **dependency order** (children before parents: `items` → `folders` → `workspaces` → `users`).
+- When setup requires chained requests (e.g. creating a user to get a `workspaceId`), extract those into private `async` helper functions inside the `describe` block.
+
+### Pattern
+
+```typescript
+import { app } from '@/app.ts'
+import { db } from '@/infra/db/drizzle/index.ts'
+import { schema } from '@/infra/db/drizzle/schema/index.ts'
+
+describe('POST /resource', () => {
+  beforeAll(async () => {
+    await app.ready()
+  })
+
+  afterEach(async () => {
+    await db.delete(schema.items)
+    await db.delete(schema.folders)
+    await db.delete(schema.workspaces)
+    await db.delete(schema.users)
+  })
+
+  it('should create a resource and return 201 with resourceId', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/resource',
+      payload: { ... },
+    })
+
+    expect(response.statusCode).toBe(201)
+    expect(response.json()).toMatchObject({ resourceId: expect.any(String) })
+  })
+})
+```
+
 ## E2E Setup (`setup-e2e.ts`)
 
 Used as `globalSetup` / `globalTeardown` in the Vitest e2e config. Spins up a real PostgreSQL instance using **Testcontainers** (`@testcontainers/postgresql`) and runs all Drizzle migrations against it before the test suite starts.
