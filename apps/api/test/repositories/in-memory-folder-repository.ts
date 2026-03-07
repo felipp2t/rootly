@@ -2,48 +2,44 @@ import type { FolderRepository } from '@/domain/root/application/repositories/fo
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 
 export class InMemoryFolderRepository implements FolderRepository {
-  folders: Folder[] = []
+  items: Folder[] = []
 
   async findById(id: string): Promise<Folder | null> {
-    return this.folders.find((folder) => folder.id.toString() === id) ?? null
+    return this.items.find((folder) => folder.id.toString() === id) ?? null
   }
 
   async findByName(name: string): Promise<Folder | null> {
-    return this.folders.find((folder) => folder.name === name) ?? null
+    return this.items.find((folder) => folder.name === name) ?? null
   }
 
   async findAll(): Promise<Folder[]> {
-    return this.folders
+    return this.items
   }
 
   async findByParentId(parentId: string | null): Promise<Folder[]> {
-    return (
-      this.folders.filter(
-        (folder) => folder.parentId === parentId,
-      ) ?? null
-    )
+    return this.items.filter((folder) => folder.parentId === parentId) ?? null
   }
 
   async create(folder: Folder): Promise<void> {
-    this.folders.push(folder)
+    this.items.push(folder)
   }
 
   async save(folder: Folder): Promise<void> {
-    const folderIndex = this.folders.findIndex(
+    const folderIndex = this.items.findIndex(
       (f) => f.id.toString() === folder.id.toString(),
     )
 
     if (folderIndex !== -1) {
-      this.folders[folderIndex] = folder
+      this.items[folderIndex] = folder
     }
   }
   async delete(id: string): Promise<void> {
-    const folderIndex = this.folders.findIndex(
+    const folderIndex = this.items.findIndex(
       (folder) => folder.id.toString() === id,
     )
 
     if (folderIndex !== -1) {
-      this.folders.splice(folderIndex, 1)
+      this.items.splice(folderIndex, 1)
     }
   }
 }

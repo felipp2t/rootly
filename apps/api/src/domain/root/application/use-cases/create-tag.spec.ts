@@ -26,7 +26,7 @@ describe('CreateTag', () => {
 
     expect(response.isRight()).toBe(true)
     expect(response.value).toMatchObject({ tagId: expect.any(String) })
-    expect(tagRepository.tags.length).toBe(1)
+    expect(tagRepository.items.length).toBe(1)
   })
 
   it('should not be able to create a tag with the same name in the same workspace', async () => {
@@ -67,7 +67,7 @@ describe('CreateTag', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(tagRepository.tags.length).toBe(2)
+    expect(tagRepository.items.length).toBe(2)
   })
 
   it('should be able to create tags with different colors', async () => {
@@ -93,6 +93,6 @@ describe('CreateTag', () => {
       expect(response.isRight()).toBe(true)
     }
 
-    expect(tagRepository.tags.length).toBe(colors.length)
+    expect(tagRepository.items.length).toBe(colors.length)
   })
 })

@@ -34,7 +34,7 @@ describe('AssignTagToFolder', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(folderRepository.folders[0].tagIds).toContain(tag.id.toString())
+    expect(folderRepository.items[0].tagIds).toContain(tag.id.toString())
   })
 
   it('should be able to assign multiple tags to a folder', async () => {
@@ -57,9 +57,9 @@ describe('AssignTagToFolder', () => {
       tagId: tagB.id.toString(),
     })
 
-    expect(folderRepository.folders[0].tagIds).toHaveLength(2)
-    expect(folderRepository.folders[0].tagIds).toContain(tagA.id.toString())
-    expect(folderRepository.folders[0].tagIds).toContain(tagB.id.toString())
+    expect(folderRepository.items[0].tagIds).toHaveLength(2)
+    expect(folderRepository.items[0].tagIds).toContain(tagA.id.toString())
+    expect(folderRepository.items[0].tagIds).toContain(tagB.id.toString())
   })
 
   it('should be idempotent when assigning the same tag twice', async () => {
@@ -81,7 +81,7 @@ describe('AssignTagToFolder', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(folderRepository.folders[0].tagIds).toHaveLength(1)
+    expect(folderRepository.items[0].tagIds).toHaveLength(1)
   })
 
   it('should not be able to assign a tag to a non-existing folder', async () => {
