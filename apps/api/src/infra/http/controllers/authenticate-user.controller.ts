@@ -2,7 +2,9 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeAuthenticateUserUseCase } from '../factories/make-authenticate-user-use-case.ts'
 
-export const authenticateUserController: FastifyPluginCallbackZod = async (app) => {
+export const authenticateUserController: FastifyPluginCallbackZod = async (
+  app,
+) => {
   app.post(
     '/sessions',
     {

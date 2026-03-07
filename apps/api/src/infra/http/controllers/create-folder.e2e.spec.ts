@@ -1,7 +1,7 @@
+import { eq } from 'drizzle-orm'
 import { app } from '@/app.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { schema } from '@/infra/db/drizzle/schema/index.ts'
-import { eq } from 'drizzle-orm'
 
 describe('POST /folders', () => {
   beforeAll(async () => {
@@ -18,7 +18,11 @@ describe('POST /folders', () => {
     const accountResponse = await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'John Doe', email: 'john@example.com', password: '123456' },
+      payload: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: '123456',
+      },
     })
 
     const { userId } = accountResponse.json<{ userId: string }>()

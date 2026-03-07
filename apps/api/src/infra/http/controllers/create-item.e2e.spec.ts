@@ -1,7 +1,7 @@
+import { eq } from 'drizzle-orm'
 import { app } from '@/app.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { schema } from '@/infra/db/drizzle/schema/index.ts'
-import { eq } from 'drizzle-orm'
 
 describe('POST /items', () => {
   beforeAll(async () => {
@@ -18,7 +18,11 @@ describe('POST /items', () => {
     const accountResponse = await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'John Doe', email: 'john@example.com', password: '123456' },
+      payload: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: '123456',
+      },
     })
 
     const { userId } = accountResponse.json<{ userId: string }>()
@@ -45,7 +49,12 @@ describe('POST /items', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/items',
-      payload: { title: 'My Link', folderId, type: 'link', content: 'https://example.com' },
+      payload: {
+        title: 'My Link',
+        folderId,
+        type: 'link',
+        content: 'https://example.com',
+      },
     })
 
     expect(response.statusCode).toBe(201)
@@ -58,13 +67,23 @@ describe('POST /items', () => {
     await app.inject({
       method: 'POST',
       url: '/items',
-      payload: { title: 'My Link', folderId, type: 'link', content: 'https://example.com' },
+      payload: {
+        title: 'My Link',
+        folderId,
+        type: 'link',
+        content: 'https://example.com',
+      },
     })
 
     const response = await app.inject({
       method: 'POST',
       url: '/items',
-      payload: { title: 'My Link', folderId, type: 'link', content: 'https://example.com' },
+      payload: {
+        title: 'My Link',
+        folderId,
+        type: 'link',
+        content: 'https://example.com',
+      },
     })
 
     expect(response.statusCode).toBe(409)
@@ -88,7 +107,12 @@ describe('POST /items', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/items',
-      payload: { title: 'My Link', folderId, type: 'link', content: 'not-a-url' },
+      payload: {
+        title: 'My Link',
+        folderId,
+        type: 'link',
+        content: 'not-a-url',
+      },
     })
 
     expect(response.statusCode).toBe(400)
@@ -98,9 +122,24 @@ describe('POST /items', () => {
     const folderId = await createFolderAndGetId()
 
     const payloads = [
-      { title: 'My link', folderId, type: 'link', content: 'https://example.com' },
-      { title: 'My document', folderId, type: 'document', content: 'Some document content' },
-      { title: 'My secret', folderId, type: 'secret', content: 'supersecret123' },
+      {
+        title: 'My link',
+        folderId,
+        type: 'link',
+        content: 'https://example.com',
+      },
+      {
+        title: 'My document',
+        folderId,
+        type: 'document',
+        content: 'Some document content',
+      },
+      {
+        title: 'My secret',
+        folderId,
+        type: 'secret',
+        content: 'supersecret123',
+      },
       { title: 'My text', folderId, type: 'text' },
     ] as const
 

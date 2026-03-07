@@ -17,7 +17,11 @@ describe('POST /sessions', () => {
     await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'John Doe', email: 'john@example.com', password: '123456' },
+      payload: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: '123456',
+      },
     })
 
     const response = await app.inject({
@@ -34,7 +38,11 @@ describe('POST /sessions', () => {
     await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'John Doe', email: 'john@example.com', password: '123456' },
+      payload: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: '123456',
+      },
     })
 
     const response = await app.inject({

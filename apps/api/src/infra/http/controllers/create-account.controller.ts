@@ -2,7 +2,9 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeRegisterUserUseCase } from '../factories/make-register-user-use-case.ts'
 
-export const createAccountController: FastifyPluginCallbackZod = async (app) => {
+export const createAccountController: FastifyPluginCallbackZod = async (
+  app,
+) => {
   app.post(
     '/accounts',
     {

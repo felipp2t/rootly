@@ -32,13 +32,21 @@ describe('POST /accounts', () => {
     await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'John Doe', email: 'john@example.com', password: '123456' },
+      payload: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: '123456',
+      },
     })
 
     const response = await app.inject({
       method: 'POST',
       url: '/accounts',
-      payload: { name: 'Jane Doe', email: 'john@example.com', password: '654321' },
+      payload: {
+        name: 'Jane Doe',
+        email: 'john@example.com',
+        password: '654321',
+      },
     })
 
     expect(response.statusCode).toBe(409)
