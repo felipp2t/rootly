@@ -5,10 +5,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
-import { authenticateUserController } from './infra/http/controllers/authenticate-user.controller.ts'
-import { createAccountController } from './infra/http/controllers/create-account.controller.ts'
-import { createFolderController } from './infra/http/controllers/create-folder.controller.ts'
-import { createItemsController } from './infra/http/controllers/create-item.controller.ts'
+import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -23,9 +20,6 @@ app.get('/health', async () => {
   return { status: 'ok' }
 })
 
-app.register(createAccountController)
-app.register(authenticateUserController)
-app.register(createFolderController)
-app.register(createItemsController)
+app.register(routes, { prefix: '/api' })
 
 export { app }
