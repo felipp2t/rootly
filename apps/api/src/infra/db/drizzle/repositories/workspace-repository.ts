@@ -34,8 +34,11 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
     return DrizzleWorkspaceMapper.toDomain(workspaces[0])
   }
 
-  async findAll(): Promise<Workspace[]> {
-    const workspaces = await this.db.select().from(schema.workspaces)
+  async findManyByUserId(userId: string): Promise<Workspace[]> {
+    const workspaces = await this.db
+      .select()
+      .from(schema.workspaces)
+      .where(eq(schema.workspaces.userId, userId))
 
     return workspaces.map(DrizzleWorkspaceMapper.toDomain)
   }
