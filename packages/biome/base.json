@@ -40,6 +40,9 @@
       },
       "complexity": {
         "noStaticOnlyClass": "off"
+      },
+      "suspicious": {
+        "noConfusingVoidType": "off"
       }
     }
   },
