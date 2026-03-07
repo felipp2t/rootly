@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql'
+import {
+  PostgreSqlContainer,
+  type StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql'
 import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
@@ -9,7 +12,9 @@ let container: StartedPostgreSqlContainer
 export async function setup() {
   config({ path: '.env.test' })
 
-  container = await new PostgreSqlContainer('postgres:16-alpine').start()
+  container = await new PostgreSqlContainer('postgres:16-alpine')
+    .withDatabase('rootly')
+    .start()
 
   const connectionUri = container.getConnectionUri()
 
