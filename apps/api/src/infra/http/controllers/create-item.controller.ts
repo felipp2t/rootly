@@ -14,18 +14,20 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
         body: z.object({
           title: z.string(),
           folderId: z.string(),
+          workspaceId: z.string(),
           type: z.enum(['link', 'document', 'text', 'secret']),
           content: z.string().optional(),
         }),
       },
     },
     async (request, reply) => {
-      const { folderId, title, type, content } = request.body
+      const { folderId, title, type, content, workspaceId } = request.body
 
       const createItemUseCase = makeCreateItemUseCase()
 
       const result = await createItemUseCase.execute({
         folderId,
+        workspaceId,
         title,
         type,
         content,
