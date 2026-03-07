@@ -1,4 +1,4 @@
-import { eq, inArray, isNull } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -50,14 +50,12 @@ export class DrizzleItemRepository implements ItemRepository {
     return DrizzleItemMapper.toDomain(rows[0], tagsByItem[rows[0].id] ?? [])
   }
 
-  async findManyByParentId(folderId: string | null): Promise<Item[]> {
+  async findMany(parentId?: string): Promise<Item[]> {
     const rows = await this.db
       .select()
       .from(schema.items)
       .where(
-        folderId === null
-          ? isNull(schema.items.folderId)
-          : eq(schema.items.folderId, folderId),
+        parentId !== undefined ? eq(schema.items.folderId, parentId) : undefined,
       )
 
     if (rows.length === 0) return []

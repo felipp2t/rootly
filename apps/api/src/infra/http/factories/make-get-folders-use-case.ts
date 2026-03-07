@@ -1,4 +1,4 @@
-import { GetFoldersUseCase } from '@/domain/root/application/use-cases/get-folders-by-parent.ts'
+import { GetFoldersUseCase } from '@/domain/root/application/use-cases/get-folders.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { DrizzleFolderRepository } from '@/infra/db/drizzle/repositories/folder-repository.ts'
 

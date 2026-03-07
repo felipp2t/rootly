@@ -2,7 +2,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetFoldersUseCase } from '../factories/make-get-folders-use-case.ts'
 
-export const getFoldersByParentController: FastifyPluginCallbackZod = async (
+export const getFoldersController: FastifyPluginCallbackZod = async (
   app,
 ) => {
   app.get(
@@ -11,8 +11,8 @@ export const getFoldersByParentController: FastifyPluginCallbackZod = async (
       schema: {
         summary: 'Get Folders',
         description:
-          'List folders by parent. Omit parentId to get root folders.',
-        operationId: 'getFoldersByParent',
+          'List folders. Optionally filter by parentId.',
+        operationId: 'getFolders',
         tags: ['Folders'],
         querystring: z.object({
           parentId: z.string().optional(),

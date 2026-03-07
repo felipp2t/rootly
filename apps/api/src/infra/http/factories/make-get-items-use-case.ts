@@ -1,4 +1,4 @@
-import { GetItemsUseCase } from '@/domain/root/application/use-cases/get-items-by-parent.ts'
+import { GetItemsUseCase } from '@/domain/root/application/use-cases/get-items.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { DrizzleItemRepository } from '@/infra/db/drizzle/repositories/item-repository.ts'
 

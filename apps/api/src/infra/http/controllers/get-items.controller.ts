@@ -2,7 +2,7 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetItemsUseCase } from '../factories/make-get-items-use-case.ts'
 
-export const getItemsByParentController: FastifyPluginCallbackZod = async (
+export const getItemsController: FastifyPluginCallbackZod = async (
   app,
 ) => {
   app.get(
@@ -10,8 +10,8 @@ export const getItemsByParentController: FastifyPluginCallbackZod = async (
     {
       schema: {
         summary: 'Get Items',
-        description: 'List items by parent folder. Omit parentId to get root items.',
-        operationId: 'getItemsByParent',
+        description: 'List items. Optionally filter by parentId.',
+        operationId: 'getItems',
         tags: ['Items'],
         querystring: z.object({
           parentId: z.string().optional(),

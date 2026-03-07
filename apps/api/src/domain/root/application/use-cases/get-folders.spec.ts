@@ -2,18 +2,18 @@ import { makeFolder } from '@test/factories/make-folder.ts'
 import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
-import { GetFoldersUseCase } from './get-folders-by-parent.ts'
+import { GetFoldersUseCase } from './get-folders.ts'
 
 let folderRepository: InMemoryFolderRepository
 let sut: GetFoldersUseCase
 
-describe('GetFoldersByParent', () => {
+describe('GetFolders', () => {
   beforeEach(() => {
     folderRepository = new InMemoryFolderRepository()
     sut = new GetFoldersUseCase(folderRepository)
   })
 
-  it('should return root folders when no parentId is provided', async () => {
+  it('should return all folders when no parentId is provided', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -114,7 +114,7 @@ describe('GetFoldersByParent', () => {
     }
   })
 
-  it('should return an empty list when there are no root folders', async () => {
+  it('should return an empty list when there are no folders', async () => {
     const response = await sut.execute({})
 
     expect(response.isRight()).toBe(true)

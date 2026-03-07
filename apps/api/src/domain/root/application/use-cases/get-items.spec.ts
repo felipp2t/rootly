@@ -3,12 +3,12 @@ import { makeItem } from '@test/factories/make-item.ts'
 import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
-import { GetItemsUseCase } from './get-items-by-parent.ts'
+import { GetItemsUseCase } from './get-items.ts'
 
 let itemRepository: InMemoryItemRepository
 let sut: GetItemsUseCase
 
-describe('GetItemsByParent', () => {
+describe('GetItems', () => {
   beforeEach(() => {
     itemRepository = new InMemoryItemRepository()
     sut = new GetItemsUseCase(itemRepository)
@@ -73,7 +73,7 @@ describe('GetItemsByParent', () => {
     }
   })
 
-  it('should return items without a folder when parentId is not provided', async () => {
+  it('should return all items when parentId is not provided', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -91,8 +91,7 @@ describe('GetItemsByParent', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.items).toHaveLength(1)
-      expect(response.value.items[0].folderId).toBeUndefined()
+      expect(response.value.items).toHaveLength(2)
     }
   })
 

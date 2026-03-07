@@ -7,8 +7,8 @@ import { createFolderController } from './controllers/create-folder.controller.t
 import { createItemsController } from './controllers/create-item.controller.ts'
 import { createTagController } from './controllers/create-tag.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
-import { getFoldersByParentController } from './controllers/get-folders-by-parent.controller.ts'
-import { getItemsByParentController } from './controllers/get-items-by-parent.controller.ts'
+import { getFoldersController } from './controllers/get-folders.controller.ts'
+import { getItemsController } from './controllers/get-items.controller.ts'
 
 export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(authenticateUserController)
@@ -19,6 +19,6 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(createWorkspaceController)
   app.register(assignTagToFolderController)
   app.register(assignTagToItemController)
-  app.register(getFoldersByParentController)
-  app.register(getItemsByParentController)
+  app.register(getFoldersController)
+  app.register(getItemsController)
 }

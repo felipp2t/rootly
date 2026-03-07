@@ -1,4 +1,4 @@
-import { eq, inArray, isNull } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -50,14 +50,12 @@ export class DrizzleFolderRepository implements FolderRepository {
     return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[rows[0].id] ?? [])
   }
 
-  async findManyByParentId(parentId: string | null): Promise<Folder[]> {
+  async findMany(parentId?: string): Promise<Folder[]> {
     const rows = await this.db
       .select()
       .from(schema.folders)
       .where(
-        parentId === null
-          ? isNull(schema.folders.parentId)
-          : eq(schema.folders.parentId, parentId),
+        parentId !== undefined ? eq(schema.folders.parentId, parentId) : undefined,
       )
 
     if (rows.length === 0) return []
