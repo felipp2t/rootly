@@ -61,7 +61,7 @@ export const someController: FastifyPluginCallbackZod = async (app) => {
 ### Error → HTTP Status mapping
 
 | Scenario | Status |
-|---|---|
+|----------|--------|
 | Resource already exists | `409 Conflict` |
 | Invalid input / business rule violation | `400 Bad Request` |
 | Wrong credentials / unauthorized | `401 Unauthorized` |
@@ -93,12 +93,3 @@ export function makeSomeUseCase() {
 - One file per use case, named `make-<use-case-name>.ts`.
 - Always pass `db` (the Drizzle client) to repository constructors.
 - For auth use cases, pass `ArgonHasher` for hashing and `JwtEncrypter` for token generation.
-
-### Existing Factories
-
-| Factory | Use Case | Dependencies |
-|---|---|---|
-| `makeRegisterUserUseCase` | `RegisterUserUseCase` | `DrizzleUserRepository`, `ArgonHasher` |
-| `makeAuthenticateUserUseCase` | `AuthenticateUserUseCase` | `DrizzleUserRepository`, `ArgonHasher`, `JwtEncrypter` |
-| `makeCreateFolderUseCase` | `CreateFolderUseCase` | `DrizzleFolderRepository` |
-| `makeCreateItemUseCase` | `CreateItemUseCase` | `DrizzleItemRepository` |
