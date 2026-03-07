@@ -10,7 +10,8 @@ export class DrizzleItemMapper {
   static toDomain(raw: DrizzleItem): Item {
     return Item.create(
       {
-        folderId: raw.folderId,
+        workspaceId: raw.workspaceId,
+        folderId: raw.folderId ?? undefined,
         title: raw.title,
         type: raw.type,
         content: raw.content ?? undefined,
@@ -23,7 +24,8 @@ export class DrizzleItemMapper {
 
   static toDrizzle(item: Item): DrizzleItemInsert {
     return {
-      folderId: item.folderId,
+      workspaceId: item.workspaceId,
+      folderId: item.folderId ?? null,
       id: item.id.toString(),
       title: item.title,
       type: item.type,
