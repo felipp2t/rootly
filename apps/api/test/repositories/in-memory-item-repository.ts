@@ -12,11 +12,7 @@ export class InMemoryItemRepository implements ItemRepository {
     return this.items.find((item) => item.title === title) ?? null
   }
 
-  async findAll(): Promise<Item[]> {
-    return this.items
-  }
-
-  async findByParentId(folderId: string | null): Promise<Item[]> {
+  async findManyByParentId(folderId: string | null): Promise<Item[]> {
     return this.items.filter((item) =>
       folderId === null
         ? item.folderId === undefined

@@ -14,8 +14,8 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return this.items.find((Workspace) => Workspace.name === name) ?? null
   }
 
-  async findAll(): Promise<Workspace[]> {
-    return this.items
+  async findManyByUserId(userId: string): Promise<Workspace[]> {
+    return this.items.filter((Workspace) => Workspace.userId === userId)
   }
 
   async create(Workspace: Workspace): Promise<void> {
