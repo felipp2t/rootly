@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm'
 import { app } from '@/app.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { schema } from '@/infra/db/drizzle/schema/index.ts'
@@ -29,12 +28,13 @@ describe('PATCH /items/:itemId/tags/:tagId', () => {
 
     const { userId } = accountResponse.json<{ userId: string }>()
 
-    const [workspace] = await db
-      .select()
-      .from(schema.workspaces)
-      .where(eq(schema.workspaces.userId, userId))
+    const workspaceResponse = await app.inject({
+      method: 'POST',
+      url: '/api/workspaces',
+      payload: { name: 'My Workspace', userId },
+    })
 
-    return workspace.id
+    return workspaceResponse.json<{ workspaceId: string }>().workspaceId
   }
 
   async function createTag(workspaceId: string) {
