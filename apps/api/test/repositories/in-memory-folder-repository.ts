@@ -16,10 +16,10 @@ export class InMemoryFolderRepository implements FolderRepository {
     return this.folders
   }
 
-  async findByParentId(parentId: string): Promise<Folder[]> {
+  async findByParentId(parentId: string | null): Promise<Folder[]> {
     return (
       this.folders.filter(
-        (folder) => folder.parentId?.toString() === parentId,
+        (folder) => folder.parentId === parentId,
       ) ?? null
     )
   }

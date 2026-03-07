@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -40,11 +40,15 @@ export class DrizzleFolderRepository implements FolderRepository {
     return folders.map(DrizzleFolderMapper.toDomain)
   }
 
-  async findByParentId(parentId: string): Promise<Folder[]> {
+  async findByParentId(parentId: string | null): Promise<Folder[]> {
     const folders = await this.db
       .select()
       .from(schema.folders)
-      .where(eq(schema.folders.parentId, parentId))
+      .where(
+        parentId === null
+          ? isNull(schema.folders.parentId)
+          : eq(schema.folders.parentId, parentId),
+      )
 
     return folders.map(DrizzleFolderMapper.toDomain)
   }
