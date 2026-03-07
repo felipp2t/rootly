@@ -6,7 +6,15 @@ import { routeTree } from './route-tree.gen.ts'
 
 const router = createRouter({
   routeTree,
+  defaultPreload: 'intent',
+  defaultPreloadDelay: 500,
 })
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
