@@ -1,10 +1,5 @@
 {
   "root": false,
   "$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
-  "extends": ["../../packages/biome/base.json"],
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  }
+  "extends": ["../../packages/biome/base.json"]
 }
