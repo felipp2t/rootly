@@ -1,4 +1,4 @@
-import { foreignKey, json, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { foreignKey, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 import { now } from '@/infra/db/drizzle/helpers/now.ts'
 import { workspaces } from './workspaces.ts'
