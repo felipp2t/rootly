@@ -6,6 +6,7 @@ import { createAccountController } from './controllers/create-account.controller
 import { createFolderController } from './controllers/create-folder.controller.ts'
 import { createItemsController } from './controllers/create-item.controller.ts'
 import { createTagController } from './controllers/create-tag.controller.ts'
+import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
 import { getFoldersByParentController } from './controllers/get-folders-by-parent.controller.ts'
 import { getItemsByParentController } from './controllers/get-items-by-parent.controller.ts'
 
@@ -15,6 +16,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(createFolderController)
   app.register(createItemsController)
   app.register(createTagController)
+  app.register(createWorkspaceController)
   app.register(assignTagToFolderController)
   app.register(assignTagToItemController)
   app.register(getFoldersByParentController)
