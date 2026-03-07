@@ -10,7 +10,8 @@ export const getFoldersByParentController: FastifyPluginCallbackZod = async (
     {
       schema: {
         summary: 'Get Folders',
-        description: 'List folders by parent. Omit parentId to get root folders.',
+        description:
+          'List folders by parent. Omit parentId to get root folders.',
         operationId: 'getFoldersByParent',
         tags: ['Folders'],
         querystring: z.object({
@@ -23,6 +24,10 @@ export const getFoldersByParentController: FastifyPluginCallbackZod = async (
 
       const useCase = makeGetFoldersUseCase()
       const result = await useCase.execute({ parentId })
+
+      if (result.isLeft()) {
+        return reply.status(500).send({ message: 'Internal Server Error' })
+      }
 
       return reply.status(200).send({
         folders: result.value.folders.map((folder) => ({

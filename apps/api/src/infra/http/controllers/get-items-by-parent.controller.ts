@@ -24,6 +24,10 @@ export const getItemsByParentController: FastifyPluginCallbackZod = async (
       const useCase = makeGetItemsUseCase()
       const result = await useCase.execute({ parentId })
 
+      if (result.isLeft()) {
+        return reply.status(500).send({ message: 'Internal Server Error' })
+      }
+      
       return reply.status(200).send({
         items: result.value.items.map((item) => ({
           id: item.id.toString(),
