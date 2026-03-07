@@ -13,7 +13,7 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
         tags: ['Items'],
         body: z.object({
           title: z.string(),
-          folderId: z.string(),
+          folderId: z.string().optional(),
           workspaceId: z.string(),
           type: z.enum(['link', 'document', 'text', 'secret']),
           content: z.string().optional(),

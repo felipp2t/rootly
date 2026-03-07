@@ -10,11 +10,12 @@ describe('POST /items', () => {
 
   afterEach(async () => {
     await db.delete(schema.items)
+    await db.delete(schema.folders)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
   })
 
-  async function createFolderAndGetId() {
+  async function createUserAndGetWorkspaceId() {
     const accountResponse = await app.inject({
       method: 'POST',
       url: '/api/accounts',
@@ -32,10 +33,14 @@ describe('POST /items', () => {
       .from(schema.workspaces)
       .where(eq(schema.workspaces.userId, userId))
 
+    return workspace.id
+  }
+
+  async function createFolderAndGetId(workspaceId: string) {
     const folderResponse = await app.inject({
       method: 'POST',
       url: '/api/folders',
-      payload: { name: 'My Folder', workspaceId: workspace.id },
+      payload: { name: 'My Folder', workspaceId },
     })
 
     const { folderId } = folderResponse.json<{ folderId: string }>()
@@ -43,14 +48,16 @@ describe('POST /items', () => {
     return folderId
   }
 
-  it('should create an item and return 201 with itemId', async () => {
-    const folderId = await createFolderAndGetId()
+  it('should create an item inside a folder and return 201 with itemId', async () => {
+    const workspaceId = await createUserAndGetWorkspaceId()
+    const folderId = await createFolderAndGetId(workspaceId)
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/items',
       payload: {
         title: 'My Link',
+        workspaceId,
         folderId,
         type: 'link',
         content: 'https://example.com',
@@ -61,14 +68,34 @@ describe('POST /items', () => {
     expect(response.json()).toMatchObject({ itemId: expect.any(String) })
   })
 
+  it('should create an item without a folder and return 201 with itemId', async () => {
+    const workspaceId = await createUserAndGetWorkspaceId()
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/items',
+      payload: {
+        title: 'My Link',
+        workspaceId,
+        type: 'link',
+        content: 'https://example.com',
+      },
+    })
+
+    expect(response.statusCode).toBe(201)
+    expect(response.json()).toMatchObject({ itemId: expect.any(String) })
+  })
+
   it('should return 409 when item with the same title already exists in the same folder', async () => {
-    const folderId = await createFolderAndGetId()
+    const workspaceId = await createUserAndGetWorkspaceId()
+    const folderId = await createFolderAndGetId(workspaceId)
 
     await app.inject({
       method: 'POST',
       url: '/api/items',
       payload: {
         title: 'My Link',
+        workspaceId,
         folderId,
         type: 'link',
         content: 'https://example.com',
@@ -80,6 +107,7 @@ describe('POST /items', () => {
       url: '/api/items',
       payload: {
         title: 'My Link',
+        workspaceId,
         folderId,
         type: 'link',
         content: 'https://example.com',
@@ -90,25 +118,33 @@ describe('POST /items', () => {
   })
 
   it('should return 400 when item type is invalid', async () => {
-    const folderId = await createFolderAndGetId()
+    const workspaceId = await createUserAndGetWorkspaceId()
+    const folderId = await createFolderAndGetId(workspaceId)
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/items',
-      payload: { title: 'My Item', folderId, type: 'invalid-type' },
+      payload: {
+        title: 'My Item',
+        workspaceId,
+        folderId,
+        type: 'invalid-type',
+      },
     })
 
     expect(response.statusCode).toBe(400)
   })
 
   it('should return 400 when link content is not a valid HTTPS URL', async () => {
-    const folderId = await createFolderAndGetId()
+    const workspaceId = await createUserAndGetWorkspaceId()
+    const folderId = await createFolderAndGetId(workspaceId)
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/items',
       payload: {
         title: 'My Link',
+        workspaceId,
         folderId,
         type: 'link',
         content: 'not-a-url',
@@ -119,28 +155,37 @@ describe('POST /items', () => {
   })
 
   it('should create items of all valid types', async () => {
-    const folderId = await createFolderAndGetId()
+    const workspaceId = await createUserAndGetWorkspaceId()
+    const folderId = await createFolderAndGetId(workspaceId)
 
     const payloads = [
       {
         title: 'My link',
+        workspaceId,
         folderId,
         type: 'link',
         content: 'https://example.com',
       },
       {
         title: 'My document',
+        workspaceId,
         folderId,
         type: 'document',
         content: 'Some document content',
       },
       {
         title: 'My secret',
+        workspaceId,
         folderId,
         type: 'secret',
         content: 'supersecret123',
       },
-      { title: 'My text', folderId, type: 'text' },
+      {
+        title: 'My text',
+        workspaceId,
+        folderId,
+        type: 'text',
+      },
     ] as const
 
     for (const payload of payloads) {
