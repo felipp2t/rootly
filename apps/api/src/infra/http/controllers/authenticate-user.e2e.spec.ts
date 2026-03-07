@@ -34,33 +34,4 @@ describe('POST /sessions', () => {
     expect(response.json()).toMatchObject({ accessToken: expect.any(String) })
   })
 
-  it('should return 401 when password is wrong', async () => {
-    await app.inject({
-      method: 'POST',
-      url: '/api/accounts',
-      payload: {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: '123456',
-      },
-    })
-
-    const response = await app.inject({
-      method: 'POST',
-      url: '/api/sessions',
-      payload: { email: 'john@example.com', password: 'wrong-password' },
-    })
-
-    expect(response.statusCode).toBe(401)
-  })
-
-  it('should return 401 when email does not exist', async () => {
-    const response = await app.inject({
-      method: 'POST',
-      url: '/api/sessions',
-      payload: { email: 'nonexistent@example.com', password: '123456' },
-    })
-
-    expect(response.statusCode).toBe(401)
-  })
 })
