@@ -1,12 +1,22 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-  import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
-  import { createAccountController } from './controllers/create-account.controller.ts'
-  import { createFolderController } from './controllers/create-folder.controller.ts'
-  import { createItemsController } from './controllers/create-item.controller.ts'
+import { assignTagToFolderController } from './controllers/assign-tag-to-folder.controller.ts'
+import { assignTagToItemController } from './controllers/assign-tag-to-item.controller.ts'
+import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
+import { createAccountController } from './controllers/create-account.controller.ts'
+import { createFolderController } from './controllers/create-folder.controller.ts'
+import { createItemsController } from './controllers/create-item.controller.ts'
+import { createTagController } from './controllers/create-tag.controller.ts'
+import { getFoldersByParentController } from './controllers/get-folders-by-parent.controller.ts'
+import { getItemsByParentController } from './controllers/get-items-by-parent.controller.ts'
 
-  export const routes: FastifyPluginCallbackZod = async (app) => {
-    app.register(authenticateUserController)
-    app.register(createAccountController)
-    app.register(createFolderController)
-    app.register(createItemsController)
-  }
+export const routes: FastifyPluginCallbackZod = async (app) => {
+  app.register(authenticateUserController)
+  app.register(createAccountController)
+  app.register(createFolderController)
+  app.register(createItemsController)
+  app.register(createTagController)
+  app.register(assignTagToFolderController)
+  app.register(assignTagToItemController)
+  app.register(getFoldersByParentController)
+  app.register(getItemsByParentController)
+}
