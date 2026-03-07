@@ -40,6 +40,15 @@ export class DrizzleFolderRepository implements FolderRepository {
     return folders.map(DrizzleFolderMapper.toDomain)
   }
 
+  async findByParentId(parentId: string): Promise<Folder[]> {
+    const folders = await this.db
+      .select()
+      .from(schema.folders)
+      .where(eq(schema.folders.parentId, parentId))
+
+    return folders.map(DrizzleFolderMapper.toDomain)
+  }
+
   async create(folder: Folder): Promise<void> {
     await this.db
       .insert(schema.folders)
