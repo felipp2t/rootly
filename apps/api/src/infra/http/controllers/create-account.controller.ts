@@ -11,6 +11,7 @@ export const createAccountController: FastifyPluginCallbackZod = async (
       schema: {
         summary: 'Register User',
         description: 'Register a new user',
+        operationId: 'createAccount',
         tags: ['Auth'],
         body: z.object({
           name: z.string(),

@@ -11,6 +11,7 @@ export const authenticateUserController: FastifyPluginCallbackZod = async (
       schema: {
         summary: 'Authenticate User',
         description: 'Authenticate a user and return a JWT token',
+        operationId: 'authenticateUser',
         tags: ['Auth'],
         body: z.object({
           email: z.email(),

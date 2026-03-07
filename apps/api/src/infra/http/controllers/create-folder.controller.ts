@@ -9,6 +9,7 @@ export const createFolderController: FastifyPluginCallbackZod = async (app) => {
       schema: {
         summary: 'Create Folder',
         description: 'Create a new folder',
+        operationId: 'createFolder',
         tags: ['Folders'],
         body: z.object({
           name: z.string(),

@@ -9,6 +9,7 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
       schema: {
         summary: 'Create Item',
         description: 'Create a new item',
+        operationId: 'createItem',
         tags: ['Items'],
         body: z.object({
           title: z.string(),
