@@ -17,7 +17,7 @@ describe('POST /items', () => {
   async function createFolderAndGetId() {
     const accountResponse = await app.inject({
       method: 'POST',
-      url: '/accounts',
+      url: '/api/accounts',
       payload: {
         name: 'John Doe',
         email: 'john@example.com',
@@ -34,7 +34,7 @@ describe('POST /items', () => {
 
     const folderResponse = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'My Folder', workspaceId: workspace.id },
     })
 
@@ -48,7 +48,7 @@ describe('POST /items', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/items',
+      url: '/api/items',
       payload: {
         title: 'My Link',
         folderId,
@@ -66,7 +66,7 @@ describe('POST /items', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/items',
+      url: '/api/items',
       payload: {
         title: 'My Link',
         folderId,
@@ -77,7 +77,7 @@ describe('POST /items', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/items',
+      url: '/api/items',
       payload: {
         title: 'My Link',
         folderId,
@@ -94,7 +94,7 @@ describe('POST /items', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/items',
+      url: '/api/items',
       payload: { title: 'My Item', folderId, type: 'invalid-type' },
     })
 
@@ -106,7 +106,7 @@ describe('POST /items', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/items',
+      url: '/api/items',
       payload: {
         title: 'My Link',
         folderId,
@@ -146,7 +146,7 @@ describe('POST /items', () => {
     for (const payload of payloads) {
       const response = await app.inject({
         method: 'POST',
-        url: '/items',
+        url: '/api/items',
         payload,
       })
 

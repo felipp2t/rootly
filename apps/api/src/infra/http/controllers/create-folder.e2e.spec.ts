@@ -17,7 +17,7 @@ describe('POST /folders', () => {
   async function createUserAndGetWorkspaceId() {
     const accountResponse = await app.inject({
       method: 'POST',
-      url: '/accounts',
+      url: '/api/accounts',
       payload: {
         name: 'John Doe',
         email: 'john@example.com',
@@ -40,7 +40,7 @@ describe('POST /folders', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'My Folder', workspaceId },
     })
 
@@ -53,13 +53,13 @@ describe('POST /folders', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'My Folder', workspaceId },
     })
 
     const response = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'My Folder', workspaceId },
     })
 
@@ -71,7 +71,7 @@ describe('POST /folders', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'ab', workspaceId },
     })
 
@@ -83,7 +83,7 @@ describe('POST /folders', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'a'.repeat(33), workspaceId },
     })
 
@@ -95,7 +95,7 @@ describe('POST /folders', () => {
 
     const parentResponse = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'Parent', workspaceId },
     })
 
@@ -103,7 +103,7 @@ describe('POST /folders', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/folders',
+      url: '/api/folders',
       payload: { name: 'Child', workspaceId, parentId },
     })
 

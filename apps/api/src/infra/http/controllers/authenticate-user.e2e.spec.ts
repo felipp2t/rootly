@@ -16,7 +16,7 @@ describe('POST /sessions', () => {
   it('should authenticate and return 201 with accessToken', async () => {
     await app.inject({
       method: 'POST',
-      url: '/accounts',
+      url: '/api/accounts',
       payload: {
         name: 'John Doe',
         email: 'john@example.com',
@@ -26,7 +26,7 @@ describe('POST /sessions', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/sessions',
+      url: '/api/sessions',
       payload: { email: 'john@example.com', password: '123456' },
     })
 
@@ -37,7 +37,7 @@ describe('POST /sessions', () => {
   it('should return 401 when password is wrong', async () => {
     await app.inject({
       method: 'POST',
-      url: '/accounts',
+      url: '/api/accounts',
       payload: {
         name: 'John Doe',
         email: 'john@example.com',
@@ -47,7 +47,7 @@ describe('POST /sessions', () => {
 
     const response = await app.inject({
       method: 'POST',
-      url: '/sessions',
+      url: '/api/sessions',
       payload: { email: 'john@example.com', password: 'wrong-password' },
     })
 
@@ -57,7 +57,7 @@ describe('POST /sessions', () => {
   it('should return 401 when email does not exist', async () => {
     const response = await app.inject({
       method: 'POST',
-      url: '/sessions',
+      url: '/api/sessions',
       payload: { email: 'nonexistent@example.com', password: '123456' },
     })
 
