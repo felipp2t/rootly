@@ -7,7 +7,7 @@ type DrizzleFolder = InferSelectModel<typeof schema.folders>
 type DrizzleFolderInsert = InferInsertModel<typeof schema.folders>
 
 export class DrizzleFolderMapper {
-  static toDomain(raw: DrizzleFolder): Folder {
+  static toDomain(raw: DrizzleFolder, tagIds: string[] = []): Folder {
     return Folder.create(
       {
         name: raw.name,
@@ -15,6 +15,7 @@ export class DrizzleFolderMapper {
         parentId: raw.parentId ?? undefined,
         updatedAt: raw.updatedAt ?? undefined,
         workspaceId: raw.workspaceId,
+        tagIds,
       },
       new UniqueEntityID(raw.id),
     )

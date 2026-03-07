@@ -7,7 +7,7 @@ type DrizzleItem = InferSelectModel<typeof schema.items>
 type DrizzleItemInsert = InferInsertModel<typeof schema.items>
 
 export class DrizzleItemMapper {
-  static toDomain(raw: DrizzleItem): Item {
+  static toDomain(raw: DrizzleItem, tagIds: string[] = []): Item {
     return Item.create(
       {
         workspaceId: raw.workspaceId,
@@ -17,6 +17,7 @@ export class DrizzleItemMapper {
         content: raw.content ?? undefined,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt ?? undefined,
+        tagIds,
       },
       new UniqueEntityID(raw.id),
     )
