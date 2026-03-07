@@ -4,7 +4,7 @@ import type { WithRequired } from '@/core/types/with-required.ts'
 import { Item, type ItemProps } from '@/domain/root/enterprise/entities/item.ts'
 
 export function makeItem(
-  override: WithRequired<ItemProps, 'folderId'>,
+  override: WithRequired<ItemProps, 'workspaceId'>,
   id?: UniqueEntityID,
 ) {
   const item = Item.create(

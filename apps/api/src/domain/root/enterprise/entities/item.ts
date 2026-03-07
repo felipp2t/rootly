@@ -6,7 +6,8 @@ import { validateTypeAndContent } from '../validators/item-type-validator.ts'
 export type ItemType = 'link' | 'document' | 'secret' | 'text'
 
 export interface ItemProps {
-  folderId: string
+  folderId?: string
+  workspaceId: string
   type: ItemType
   title: string
   content?: string
@@ -18,6 +19,10 @@ export interface ItemProps {
 export class Item extends Entity<ItemProps> {
   get folderId() {
     return this.props.folderId
+  }
+
+  get workspaceId() {
+    return this.props.workspaceId
   }
 
   get type() {
@@ -64,7 +69,10 @@ export class Item extends Entity<ItemProps> {
   }
 
   static create(
-    props: Optional<ItemProps, 'createdAt' | 'updatedAt' | 'tagIds'>,
+    props: Optional<
+      ItemProps,
+      'createdAt' | 'updatedAt' | 'tagIds' | 'folderId'
+    >,
     id?: UniqueEntityID,
   ) {
     validateTypeAndContent(props.type, props.content)

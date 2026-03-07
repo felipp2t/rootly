@@ -26,7 +26,7 @@ describe('CreateFolder', () => {
 
     expect(response.isRight()).toBe(true)
     expect(response.value).toMatchObject({ folderId: expect.any(String) })
-    expect(folderRepository.folders.length).toBe(1)
+    expect(folderRepository.items.length).toBe(1)
   })
 
   it('should not be able to create a folder with the same name in the same parent folder', async () => {
@@ -100,9 +100,9 @@ describe('CreateFolder', () => {
     })
 
     expect(response.value).toMatchObject({ folderId: expect.any(String) })
-    expect(folderRepository.folders.length).toBe(2)
-    expect(folderRepository.folders[1].parentId).toEqual(
-      folderRepository.folders[0].id.toString(),
+    expect(folderRepository.items.length).toBe(2)
+    expect(folderRepository.items[1].parentId).toEqual(
+      folderRepository.items[0].id.toString(),
     )
   })
 })

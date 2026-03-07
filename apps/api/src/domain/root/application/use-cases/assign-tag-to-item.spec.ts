@@ -24,7 +24,10 @@ describe('AssignTagToItem', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
-    const item = makeItem({ folderId: folder.id.toString() })
+    const item = makeItem({
+      workspaceId: workspace.id.toString(),
+      folderId: folder.id.toString(),
+    })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
     await itemRepository.create(item)
@@ -43,7 +46,10 @@ describe('AssignTagToItem', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
-    const item = makeItem({ folderId: folder.id.toString() })
+    const item = makeItem({
+      workspaceId: workspace.id.toString(),
+      folderId: folder.id.toString(),
+    })
     const tagA = makeTag({ workspaceId: workspace.id.toString() })
     const tagB = makeTag({ workspaceId: workspace.id.toString() })
 
@@ -63,7 +69,10 @@ describe('AssignTagToItem', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
-    const item = makeItem({ folderId: folder.id.toString() })
+    const item = makeItem({
+      workspaceId: workspace.id.toString(),
+      folderId: folder.id.toString(),
+    })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
 
     await itemRepository.create(item)
@@ -98,8 +107,7 @@ describe('AssignTagToItem', () => {
   it('should not be able to assign a non-existing tag to an item', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
-    const folder = makeFolder({ workspaceId: workspace.id.toString() })
-    const item = makeItem({ folderId: folder.id.toString() })
+    const item = makeItem({ workspaceId: workspace.id.toString() })
 
     await itemRepository.create(item)
 

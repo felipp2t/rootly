@@ -7,7 +7,8 @@ import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
 import { ItemAlreadyExistsError } from './_errors/item-already-exists-error.ts'
 
 interface CreateItemUseCaseRequest {
-  folderId: string
+  workspaceId: string
+  folderId?: string
   type: ItemType
   title: string
   content?: string
@@ -19,6 +20,7 @@ export class CreateItemUseCase {
   constructor(private readonly itemRepository: ItemRepository) {}
 
   async execute({
+    workspaceId,
     folderId,
     title,
     type,
@@ -39,7 +41,7 @@ export class CreateItemUseCase {
     }
 
     const newItem = await safeEither(() =>
-      Item.create({ folderId, type, title, content }),
+      Item.create({ workspaceId, folderId, type, title, content }),
     )
 
     if (newItem.isLeft()) {
