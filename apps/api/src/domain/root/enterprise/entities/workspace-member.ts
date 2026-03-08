@@ -1,6 +1,7 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { MemberInvitedEvent } from '../events/member-invited-event.ts'
 
 export interface WorkspaceMemberProps {
   userId: string
@@ -44,7 +45,7 @@ export class WorkspaceMember extends AggregateRoot<WorkspaceMemberProps> {
     props: Optional<WorkspaceMemberProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
   ) {
-    return new WorkspaceMember(
+    const member = new WorkspaceMember(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -52,5 +53,12 @@ export class WorkspaceMember extends AggregateRoot<WorkspaceMemberProps> {
       },
       id,
     )
+
+    const isNew = !id
+    if (isNew) {
+      member.addDomainEvent(new MemberInvitedEvent(member))
+    }
+
+    return member
   }
 }
