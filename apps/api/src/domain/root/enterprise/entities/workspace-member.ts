@@ -1,4 +1,4 @@
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
@@ -10,7 +10,7 @@ export interface WorkspaceMemberProps {
   updatedAt: Date
 }
 
-export class WorkspaceMember extends Entity<WorkspaceMemberProps> {
+export class WorkspaceMember extends AggregateRoot<WorkspaceMemberProps> {
   get userId() {
     return this.props.userId
   }
