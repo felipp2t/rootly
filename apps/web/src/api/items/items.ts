@@ -4,10 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,17 +17,11 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
-import type {
-  CreateItemBody,
-  GetItemsByParentParams
-} from '../model';
-
-
-
-
+import type { CreateItemBody, GetItemsByParentParams } from '../model'
 
 /**
  * Create a new item
@@ -41,87 +32,104 @@ export type createItemResponse200 = {
   status: 200
 }
 
-export type createItemResponseSuccess = (createItemResponse200) & {
-  headers: Headers;
-};
-;
+export type createItemResponseSuccess = createItemResponse200 & {
+  headers: Headers
+}
 
-export type createItemResponse = (createItemResponseSuccess)
+export type createItemResponse = createItemResponseSuccess
 
 export const getCreateItemUrl = () => {
-
-
-  
-
   return `http://localhost:3000/api/items`
 }
 
-export const createItem = async (createItemBody: CreateItemBody, options?: RequestInit): Promise<createItemResponse> => {
-  
-  const res = await fetch(getCreateItemUrl(),
-  {      
+export const createItem = async (
+  createItemBody: CreateItemBody,
+  options?: RequestInit,
+): Promise<createItemResponse> => {
+  const res = await fetch(getCreateItemUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createItemBody,)
-  }
-)
+    body: JSON.stringify(createItemBody),
+  })
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
   const data: createItemResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createItemResponse
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createItemResponse
 }
-  
 
+export const getCreateItemMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createItem>>,
+    TError,
+    { data: CreateItemBody },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createItem>>,
+  TError,
+  { data: CreateItemBody },
+  TContext
+> => {
+  const mutationKey = ['createItem']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createItem>>,
+    { data: CreateItemBody }
+  > = (props) => {
+    const { data } = props ?? {}
 
-export const getCreateItemMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext> => {
+    return createItem(data, fetchOptions)
+  }
 
-const mutationKey = ['createItem'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+  return { mutationFn, ...mutationOptions }
+}
 
-      
+export type CreateItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createItem>>
+>
+export type CreateItemMutationBody = CreateItemBody
+export type CreateItemMutationError = unknown
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createItem>>, {data: CreateItemBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createItem(data,fetchOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateItemMutationResult = NonNullable<Awaited<ReturnType<typeof createItem>>>
-    export type CreateItemMutationBody = CreateItemBody
-    export type CreateItemMutationError = unknown
-
-    /**
+/**
  * @summary Create Item
  */
-export const useCreateItem = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createItem>>,
-        TError,
-        {data: CreateItemBody},
-        TContext
-      > => {
-      return useMutation(getCreateItemMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateItem = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createItem>>,
+      TError,
+      { data: CreateItemBody },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createItem>>,
+  TError,
+  { data: CreateItemBody },
+  TContext
+> => {
+  return useMutation(getCreateItemMutationOptions(options), queryClient)
+}
+/**
  * List items by parent folder. Omit parentId to get root items.
  * @summary Get Items
  */
@@ -130,120 +138,197 @@ export type getItemsByParentResponse200 = {
   status: 200
 }
 
-export type getItemsByParentResponseSuccess = (getItemsByParentResponse200) & {
-  headers: Headers;
-};
-;
+export type getItemsByParentResponseSuccess = getItemsByParentResponse200 & {
+  headers: Headers
+}
 
-export type getItemsByParentResponse = (getItemsByParentResponseSuccess)
+export type getItemsByParentResponse = getItemsByParentResponseSuccess
 
-export const getGetItemsByParentUrl = (params?: GetItemsByParentParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getGetItemsByParentUrl = (params?: GetItemsByParentParams) => {
+  const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  });
+  })
 
-  const stringifiedParams = normalizedParams.toString();
+  const stringifiedParams = normalizedParams.toString()
 
-  return stringifiedParams.length > 0 ? `http://localhost:3000/api/items?${stringifiedParams}` : `http://localhost:3000/api/items`
+  return stringifiedParams.length > 0
+    ? `http://localhost:3000/api/items?${stringifiedParams}`
+    : `http://localhost:3000/api/items`
 }
 
-export const getItemsByParent = async (params?: GetItemsByParentParams, options?: RequestInit): Promise<getItemsByParentResponse> => {
-  
-  const res = await fetch(getGetItemsByParentUrl(params),
-  {      
+export const getItemsByParent = async (
+  params?: GetItemsByParentParams,
+  options?: RequestInit,
+): Promise<getItemsByParentResponse> => {
+  const res = await fetch(getGetItemsByParentUrl(params), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-)
+    method: 'GET',
+  })
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
   const data: getItemsByParentResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getItemsByParentResponse
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getItemsByParentResponse
 }
-  
 
-
-
-
-export const getGetItemsByParentQueryKey = (params?: GetItemsByParentParams,) => {
-    return [
-    `http://localhost:3000/api/items`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getGetItemsByParentQueryOptions = <TData = Awaited<ReturnType<typeof getItemsByParent>>, TError = unknown>(params?: GetItemsByParentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData>>, fetch?: RequestInit}
+export const getGetItemsByParentQueryKey = (
+  params?: GetItemsByParentParams,
 ) => {
-
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetItemsByParentQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getItemsByParent>>> = ({ signal }) => getItemsByParent(params, { signal, ...fetchOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+  return [
+    `http://localhost:3000/api/items`,
+    ...(params ? [params] : []),
+  ] as const
 }
 
-export type GetItemsByParentQueryResult = NonNullable<Awaited<ReturnType<typeof getItemsByParent>>>
+export const getGetItemsByParentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getItemsByParent>>,
+  TError = unknown,
+>(
+  params?: GetItemsByParentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getItemsByParent>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetItemsByParentQueryKey(params)
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getItemsByParent>>
+  > = ({ signal }) => getItemsByParent(params, { signal, ...fetchOptions })
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getItemsByParent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetItemsByParentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getItemsByParent>>
+>
 export type GetItemsByParentQueryError = unknown
 
-
-export function useGetItemsByParent<TData = Awaited<ReturnType<typeof getItemsByParent>>, TError = unknown>(
- params: undefined |  GetItemsByParentParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData>> & Pick<
+export function useGetItemsByParent<
+  TData = Awaited<ReturnType<typeof getItemsByParent>>,
+  TError = unknown,
+>(
+  params: undefined | GetItemsByParentParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getItemsByParent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getItemsByParent>>,
           TError,
           Awaited<ReturnType<typeof getItemsByParent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetItemsByParent<TData = Awaited<ReturnType<typeof getItemsByParent>>, TError = unknown>(
- params?: GetItemsByParentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetItemsByParent<
+  TData = Awaited<ReturnType<typeof getItemsByParent>>,
+  TError = unknown,
+>(
+  params?: GetItemsByParentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getItemsByParent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getItemsByParent>>,
           TError,
           Awaited<ReturnType<typeof getItemsByParent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetItemsByParent<TData = Awaited<ReturnType<typeof getItemsByParent>>, TError = unknown>(
- params?: GetItemsByParentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetItemsByParent<
+  TData = Awaited<ReturnType<typeof getItemsByParent>>,
+  TError = unknown,
+>(
+  params?: GetItemsByParentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getItemsByParent>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
 /**
  * @summary Get Items
  */
 
-export function useGetItemsByParent<TData = Awaited<ReturnType<typeof getItemsByParent>>, TError = unknown>(
- params?: GetItemsByParentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItemsByParent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetItemsByParent<
+  TData = Awaited<ReturnType<typeof getItemsByParent>>,
+  TError = unknown,
+>(
+  params?: GetItemsByParentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getItemsByParent>>,
+        TError,
+        TData
+      >
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+} {
+  const queryOptions = getGetItemsByParentQueryOptions(params, options)
 
-  const queryOptions = getGetItemsByParentQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+  return { ...query, queryKey: queryOptions.queryKey }
 }
-
-
-
 
 /**
  * Assign an existing tag to an item
@@ -254,85 +339,99 @@ export type assignTagToItemResponse200 = {
   status: 200
 }
 
-export type assignTagToItemResponseSuccess = (assignTagToItemResponse200) & {
-  headers: Headers;
-};
-;
+export type assignTagToItemResponseSuccess = assignTagToItemResponse200 & {
+  headers: Headers
+}
 
-export type assignTagToItemResponse = (assignTagToItemResponseSuccess)
+export type assignTagToItemResponse = assignTagToItemResponseSuccess
 
-export const getAssignTagToItemUrl = (itemId: string,
-    tagId: string,) => {
-
-
-  
-
+export const getAssignTagToItemUrl = (itemId: string, tagId: string) => {
   return `http://localhost:3000/api/items/${itemId}/tags/${tagId}`
 }
 
-export const assignTagToItem = async (itemId: string,
-    tagId: string, options?: RequestInit): Promise<assignTagToItemResponse> => {
-  
-  const res = await fetch(getAssignTagToItemUrl(itemId,tagId),
-  {      
+export const assignTagToItem = async (
+  itemId: string,
+  tagId: string,
+  options?: RequestInit,
+): Promise<assignTagToItemResponse> => {
+  const res = await fetch(getAssignTagToItemUrl(itemId, tagId), {
     ...options,
-    method: 'PATCH'
-    
-    
-  }
-)
+    method: 'PATCH',
+  })
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
+
   const data: assignTagToItemResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as assignTagToItemResponse
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as assignTagToItemResponse
 }
-  
 
+export const getAssignTagToItemMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof assignTagToItem>>,
+    TError,
+    { itemId: string; tagId: string },
+    TContext
+  >
+  fetch?: RequestInit
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof assignTagToItem>>,
+  TError,
+  { itemId: string; tagId: string },
+  TContext
+> => {
+  const mutationKey = ['assignTagToItem']
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined }
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof assignTagToItem>>,
+    { itemId: string; tagId: string }
+  > = (props) => {
+    const { itemId, tagId } = props ?? {}
 
-export const getAssignTagToItemMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext> => {
+    return assignTagToItem(itemId, tagId, fetchOptions)
+  }
 
-const mutationKey = ['assignTagToItem'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+  return { mutationFn, ...mutationOptions }
+}
 
-      
+export type AssignTagToItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof assignTagToItem>>
+>
 
+export type AssignTagToItemMutationError = unknown
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTagToItem>>, {itemId: string;tagId: string}> = (props) => {
-          const {itemId,tagId} = props ?? {};
-
-          return  assignTagToItem(itemId,tagId,fetchOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AssignTagToItemMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToItem>>>
-    
-    export type AssignTagToItemMutationError = unknown
-
-    /**
+/**
  * @summary Assign Tag to Item
  */
-export const useAssignTagToItem = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof assignTagToItem>>,
-        TError,
-        {itemId: string;tagId: string},
-        TContext
-      > => {
-      return useMutation(getAssignTagToItemMutationOptions(options), queryClient);
-    }
-    
+export const useAssignTagToItem = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof assignTagToItem>>,
+      TError,
+      { itemId: string; tagId: string },
+      TContext
+    >
+    fetch?: RequestInit
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof assignTagToItem>>,
+  TError,
+  { itemId: string; tagId: string },
+  TContext
+> => {
+  return useMutation(getAssignTagToItemMutationOptions(options), queryClient)
+}

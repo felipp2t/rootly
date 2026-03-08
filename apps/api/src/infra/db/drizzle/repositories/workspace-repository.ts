@@ -34,13 +34,17 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
     return DrizzleWorkspaceMapper.toDomain(workspaces[0])
   }
 
-  async findManyByUserId(userId: string): Promise<Workspace[]> {
-    const workspaces = await this.db
+  async findMany(userId?: string): Promise<Workspace[]> {
+    const rows = await this.db
       .select()
       .from(schema.workspaces)
-      .where(eq(schema.workspaces.userId, userId))
+      .where(
+        userId !== undefined ? eq(schema.workspaces.userId, userId) : undefined,
+      )
 
-    return workspaces.map(DrizzleWorkspaceMapper.toDomain)
+    if (rows.length === 0) return []
+
+    return rows.map((row) => DrizzleWorkspaceMapper.toDomain(row))
   }
 
   async create(workspace: Workspace): Promise<void> {
