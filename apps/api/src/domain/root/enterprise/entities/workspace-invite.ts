@@ -51,6 +51,10 @@ export class WorkspaceInvite extends Entity<WorkspaceInviteProps> {
     this.touch()
   }
 
+  get expiresAt() {
+    return this.props.expiresAt
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
