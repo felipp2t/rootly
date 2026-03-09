@@ -2,6 +2,7 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
+import { permissionResource } from '../../enterprise/entities/role-permission.ts'
 import { CreateWorkspaceUseCase } from './create-workspace.ts'
 
 let workspaceRepository: InMemoryWorkspaceRepository
@@ -58,5 +59,67 @@ describe('CreateWorkspace', () => {
     expect(response.value).toEqual({
       workspaceId: workspaceRepository.items[0].id.toString(),
     })
+  })
+
+  it('should create an Owner role for the workspace', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    expect(workspaceRoleRepository.items.length).toBe(1)
+    expect(workspaceRoleRepository.items[0].name).toBe('Owner')
+  })
+
+  it('should associate the Owner role with the created workspace', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    const workspace = workspaceRepository.items[0]
+    const role = workspaceRoleRepository.items[0]
+
+    expect(role.workspaceId).toBe(workspace.id.toString())
+  })
+
+  it('should create one permission per resource with action "all"', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    expect(rolePermissionRepository.items.length).toBe(
+      permissionResource.length,
+    )
+
+    for (const resource of permissionResource) {
+      const permission = rolePermissionRepository.items.find(
+        (p) => p.resource === resource,
+      )
+      expect(permission).toBeDefined()
+      expect(permission?.action).toBe('all')
+    }
+  })
+
+  it('should bind all permissions to the Owner role', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    const role = workspaceRoleRepository.items[0]
+
+    for (const permission of rolePermissionRepository.items) {
+      expect(permission.roleId).toBe(role.id.toString())
+    }
   })
 })
