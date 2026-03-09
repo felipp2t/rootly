@@ -2,8 +2,8 @@ import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import { Folder } from '../../enterprise/entities/folder.ts'
 import type { FolderRepository } from '../repositories/folder-repository.ts'
-import { FolderAlreadyExistsError } from './_errors/folder-already-exists-error.ts'
-import { InvalidFolderNameError } from './_errors/invalid-folder-name-error.ts'
+import { FolderAlreadyExistsError } from './errors/folder-already-exists-error.ts'
+import { InvalidFolderNameError } from './errors/invalid-folder-name-error.ts'
 
 interface CreateFolderUseCaseRequest {
   name: string

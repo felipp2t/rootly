@@ -2,8 +2,8 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { Folder } from '../../enterprise/entities/folder.ts'
-import { FolderAlreadyExistsError } from './_errors/folder-already-exists-error.ts'
-import { InvalidFolderNameError } from './_errors/invalid-folder-name-error.ts'
+import { FolderAlreadyExistsError } from './errors/folder-already-exists-error.ts'
+import { InvalidFolderNameError } from './errors/invalid-folder-name-error.ts'
 import { CreateFolderUseCase } from './create-folder.ts'
 
 let folderRepository: InMemoryFolderRepository

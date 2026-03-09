@@ -2,8 +2,8 @@ import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import type { ItemRepository } from '../repositories/item-repository.ts'
 import type { TagRepository } from '../repositories/tag-repository.ts'
-import { ItemNotFoundError } from './_errors/item-not-found-error.ts'
-import { TagNotFoundError } from './_errors/tag-not-found-error.ts'
+import { ItemNotFoundError } from './errors/item-not-found-error.ts'
+import { TagNotFoundError } from './errors/tag-not-found-error.ts'
 
 interface AssignTagToItemUseCaseRequest {
   itemId: string

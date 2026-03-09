@@ -5,8 +5,8 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
 import { InMemoryTagRepository } from '@test/repositories/in-memory-tag-repository.ts'
-import { ItemNotFoundError } from './_errors/item-not-found-error.ts'
-import { TagNotFoundError } from './_errors/tag-not-found-error.ts'
+import { ItemNotFoundError } from './errors/item-not-found-error.ts'
+import { TagNotFoundError } from './errors/tag-not-found-error.ts'
 import { AssignTagToItemUseCase } from './assign-tag-to-item.ts'
 
 let itemRepository: InMemoryItemRepository

@@ -4,8 +4,8 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { InMemoryTagRepository } from '@test/repositories/in-memory-tag-repository.ts'
-import { FolderNotFoundError } from './_errors/folder-not-found-error.ts'
-import { TagNotFoundError } from './_errors/tag-not-found-error.ts'
+import { FolderNotFoundError } from './errors/folder-not-found-error.ts'
+import { TagNotFoundError } from './errors/tag-not-found-error.ts'
 import { AssignTagToFolderUseCase } from './assign-tag-to-folder.ts'
 
 let folderRepository: InMemoryFolderRepository

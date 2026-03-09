@@ -2,7 +2,7 @@ import { makeTag } from '@test/factories/make-tag.ts'
 import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryTagRepository } from '@test/repositories/in-memory-tag-repository.ts'
-import { TagAlreadyExistsError } from './_errors/tag-already-exists-error.ts'
+import { TagAlreadyExistsError } from './errors/tag-already-exists-error.ts'
 import { CreateTagUseCase } from './create-tag.ts'
 
 let tagRepository: InMemoryTagRepository

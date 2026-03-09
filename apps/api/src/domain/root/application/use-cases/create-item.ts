@@ -3,8 +3,8 @@ import { type Either, left, right } from '@/core/types/either.ts'
 import { safeEither } from '@/core/utils/safe-execute.ts'
 import { Item, type ItemType } from '../../enterprise/entities/item.ts'
 import type { ItemRepository } from '../repositories/item-repository.ts'
-import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
-import { ItemAlreadyExistsError } from './_errors/item-already-exists-error.ts'
+import { InvalidItemTitleError } from './errors/invalid-item-title-error.ts'
+import { ItemAlreadyExistsError } from './errors/item-already-exists-error.ts'
 
 interface CreateItemUseCaseRequest {
   workspaceId: string

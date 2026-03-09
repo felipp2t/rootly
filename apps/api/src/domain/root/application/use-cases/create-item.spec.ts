@@ -5,8 +5,8 @@ import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
 import { InvalidItemTypeError } from '../../enterprise/validators/_errors/invalid-item-type.ts'
-import { InvalidItemTitleError } from './_errors/invalid-item-title-error.ts'
-import { ItemAlreadyExistsError } from './_errors/item-already-exists-error.ts'
+import { InvalidItemTitleError } from './errors/invalid-item-title-error.ts'
+import { ItemAlreadyExistsError } from './errors/item-already-exists-error.ts'
 import { CreateItemUseCase } from './create-item.ts'
 
 let itemRepository: InMemoryItemRepository

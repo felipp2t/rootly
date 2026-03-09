@@ -2,8 +2,8 @@ import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import type { FolderRepository } from '../repositories/folder-repository.ts'
 import type { TagRepository } from '../repositories/tag-repository.ts'
-import { FolderNotFoundError } from './_errors/folder-not-found-error.ts'
-import { TagNotFoundError } from './_errors/tag-not-found-error.ts'
+import { FolderNotFoundError } from './errors/folder-not-found-error.ts'
+import { TagNotFoundError } from './errors/tag-not-found-error.ts'
 
 interface AssignTagToFolderUseCaseRequest {
   folderId: string

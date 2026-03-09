@@ -3,7 +3,7 @@ import { type Either, left, right } from '@/core/types/either.ts'
 import type { Encrypter } from '../cryptography/encrypter.ts'
 import type { HashComparer } from '../cryptography/hash-comparer.ts'
 import type { UserRepository } from '../repositories/user-repository.ts'
-import { WrongCredentialsError } from './_errors/wrong-credencials-error.ts'
+import { WrongCredentialsError } from './errors/wrong-credencials-error.ts'
 
 interface AuthenticateUserUseCaseRequest {
   email: string
