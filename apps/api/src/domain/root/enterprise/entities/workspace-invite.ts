@@ -1,6 +1,6 @@
 export const INVITE_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000
 
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
@@ -25,7 +25,7 @@ export interface WorkspaceInviteProps {
   updatedAt: Date
 }
 
-export class WorkspaceInvite extends Entity<WorkspaceInviteProps> {
+export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
   get workspaceId() {
     return this.props.workspaceId
   }
