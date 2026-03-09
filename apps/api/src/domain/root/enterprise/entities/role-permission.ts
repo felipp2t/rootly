@@ -2,21 +2,27 @@ import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
-export type PermissionResource =
-  | 'workspace'
-  | 'folder'
-  | 'item'
-  | 'tag'
-  | 'member'
-  | 'role'
+export const permissionResource = [
+  'workspace',
+  'folder',
+  'item',
+  'tag',
+  'member',
+  'role',
+] as const
 
-export type PermissionAction =
-  | 'create'
-  | 'read'
-  | 'update'
-  | 'delete'
-  | 'invite'
-  | 'all'
+export type PermissionResource = (typeof permissionResource)[number]
+
+export const permissionAction = [
+  'create',
+  'read',
+  'update',
+  'delete',
+  'invite',
+  'all',
+] as const
+
+export type PermissionAction = (typeof permissionAction)[number]
 
 export interface RolePermissionProps {
   roleId: string
