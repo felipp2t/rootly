@@ -10,7 +10,13 @@ export type PermissionResource =
   | 'member'
   | 'role'
 
-export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'invite'
+export type PermissionAction =
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'invite'
+  | 'all'
 
 export interface RolePermissionProps {
   roleId: string
