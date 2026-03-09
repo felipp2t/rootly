@@ -2,11 +2,15 @@ import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
+export const workspaceInviteStatus = {
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  DECLINED: 'declined',
+  REVOKED: 'revoked',
+} as const
+
 export type WorkspaceInviteStatus =
-  | 'pending'
-  | 'accepted'
-  | 'declined'
-  | 'revoked'
+  (typeof workspaceInviteStatus)[keyof typeof workspaceInviteStatus]
 
 export interface WorkspaceInviteProps {
   workspaceId: string
