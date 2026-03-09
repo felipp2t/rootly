@@ -1,4 +1,11 @@
-import { foreignKey, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  foreignKey,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core'
+import { defaultExpiresAt } from '../helpers/default-expires-at.ts'
 import { nanoid } from '../helpers/nanoid.ts'
 import { now } from '../helpers/now.ts'
 import { users } from './users.ts'
@@ -24,6 +31,9 @@ export const workspaceInvites = pgTable(
     invitedByUserId: text('invited_by_user_id').notNull(),
     roleId: text('role_id').notNull(),
     status: workspaceInvitesStatusEnum('pending').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true })
+      .notNull()
+      .$defaultFn(defaultExpiresAt),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -49,6 +59,6 @@ export const workspaceInvites = pgTable(
       name: 'workspaces_invites_role_id_fkey',
       columns: [table.roleId],
       foreignColumns: [workspaceRoles.id],
-    })
+    }),
   ],
 )

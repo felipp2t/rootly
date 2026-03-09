@@ -1,3 +1,5 @@
+export const INVITE_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000
+
 import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
@@ -62,13 +64,18 @@ export class WorkspaceInvite extends Entity<WorkspaceInviteProps> {
   }
 
   static create(
-    props: Optional<WorkspaceInviteProps, 'createdAt' | 'updatedAt' | 'status'>,
+    props: Optional<
+      WorkspaceInviteProps,
+      'createdAt' | 'updatedAt' | 'status' | 'expiresAt'
+    >,
     id?: UniqueEntityID,
   ) {
     return new WorkspaceInvite(
       {
         ...props,
         status: props.status ?? workspaceInviteStatus.PENDING,
+        expiresAt:
+          props.expiresAt ?? new Date(Date.now() + INVITE_EXPIRATION_MS),
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
