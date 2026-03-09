@@ -24,6 +24,7 @@ export const permissionActionEnum = pgEnum('permission_action', [
   'update',
   'delete',
   'invite',
+  'all'
 ])
 
 export const rolePermissions = pgTable(
