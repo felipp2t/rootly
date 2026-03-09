@@ -62,12 +62,13 @@ export class WorkspaceInvite extends Entity<WorkspaceInviteProps> {
   }
 
   static create(
-    props: Optional<WorkspaceInviteProps, 'createdAt' | 'updatedAt'>,
+    props: Optional<WorkspaceInviteProps, 'createdAt' | 'updatedAt' | 'status'>,
     id?: UniqueEntityID,
   ) {
     return new WorkspaceInvite(
       {
         ...props,
+        status: props.status ?? workspaceInviteStatus.PENDING,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
