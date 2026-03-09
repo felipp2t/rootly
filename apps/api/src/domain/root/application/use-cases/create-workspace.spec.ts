@@ -1,14 +1,24 @@
 import { makeUser } from '@test/factories/make-user.ts'
+import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
+import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
 import { CreateWorkspaceUseCase } from './create-workspace.ts'
 
 let workspaceRepository: InMemoryWorkspaceRepository
+let rolePermissionRepository: InMemoryRolePermissionRepository
+let workspaceRoleRepository: InMemoryWorkspaceRoleRepository
 let sut: CreateWorkspaceUseCase
 
 describe('CreateWorkspace', () => {
   beforeEach(() => {
     workspaceRepository = new InMemoryWorkspaceRepository()
-    sut = new CreateWorkspaceUseCase(workspaceRepository)
+    rolePermissionRepository = new InMemoryRolePermissionRepository()
+    workspaceRoleRepository = new InMemoryWorkspaceRoleRepository()
+    sut = new CreateWorkspaceUseCase(
+      workspaceRepository,
+      workspaceRoleRepository,
+      rolePermissionRepository,
+    )
   })
 
   it('should be able to create a workspace', async () => {
