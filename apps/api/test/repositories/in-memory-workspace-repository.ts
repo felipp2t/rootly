@@ -6,12 +6,12 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
 
   async findById(id: string): Promise<Workspace | null> {
     return (
-      this.items.find((Workspace) => Workspace.id.toString() === id) ?? null
+      this.items.find((workspace) => workspace.id.toString() === id) ?? null
     )
   }
 
   async findByName(name: string): Promise<Workspace | null> {
-    return this.items.find((Workspace) => Workspace.name === name) ?? null
+    return this.items.find((workspace) => workspace.name === name) ?? null
   }
 
   async findMany(userId?: string): Promise<Workspace[]> {
@@ -19,16 +19,17 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return this.items.filter((workspace) => workspace.userId === userId)
   }
 
-  async create(Workspace: Workspace): Promise<void> {
-    this.items.push(Workspace)
+  async create(workspace: Workspace): Promise<void> {
+    this.items.push(workspace)
   }
+
   async delete(id: string): Promise<void> {
-    const WorkspaceIndex = this.items.findIndex(
-      (Workspace) => Workspace.id.toString() === id,
+    const workspaceIndex = this.items.findIndex(
+      (workspace) => workspace.id.toString() === id,
     )
 
-    if (WorkspaceIndex !== -1) {
-      this.items.splice(WorkspaceIndex, 1)
+    if (workspaceIndex !== -1) {
+      this.items.splice(workspaceIndex, 1)
     }
   }
 }
