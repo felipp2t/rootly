@@ -9,6 +9,7 @@ import * as workspaceMembers from './workspace-members.ts'
 import * as workspaceRoles from './workspace-roles.ts'
 import * as workspaces from './workspaces.ts'
 import * as workspaceInvites from './workspace-invites.ts'
+import * as refreshTokens from './refresh-tokens.ts'
 
 export const schema = {
   ...folderTags,
@@ -21,5 +22,6 @@ export const schema = {
   ...workspaceMembers,
   ...workspaceRoles,
   ...workspaces,
-  ...workspaceInvites
+  ...workspaceInvites,
+  ...refreshTokens,
 }

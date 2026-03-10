@@ -64,6 +64,13 @@
       "when": 1773081007528,
       "tag": "0008_eager_hellfire_club",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1773174669870,
+      "tag": "0009_material_jocasta",
+      "breakpoints": true
     }
   ]
 }
