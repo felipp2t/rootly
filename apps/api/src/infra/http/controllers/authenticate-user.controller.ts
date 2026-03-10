@@ -40,9 +40,9 @@ export const authenticateUserController: FastifyPluginCallbackZod = async (
         }
       }
 
-      const { accessToken } = result.value
+      const { accessToken, refreshToken } = result.value
 
-      return reply.status(201).send({ accessToken })
+      return reply.status(201).send({ accessToken, refreshToken })
     },
   )
 }
