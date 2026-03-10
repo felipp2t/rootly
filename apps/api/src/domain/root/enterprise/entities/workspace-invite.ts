@@ -73,6 +73,11 @@ export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
     this.touch()
   }
 
+  decline() {
+    this.props.status = workspaceInviteStatus.DECLINED
+    this.touch()
+  }
+
   static create(
     props: Optional<
       WorkspaceInviteProps,
