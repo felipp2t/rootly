@@ -1,59 +1,47 @@
 import { eq } from 'drizzle-orm'
-import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
-import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
+import { DomainEvents } from '@/core/events/domain-events.ts'
+import type { WorkspaceMemberRepository } from '@/domain/root/application/repositories/workspace-member-repository.ts'
+import type { WorkspaceMember } from '@/domain/root/enterprise/entities/workspace-member.ts'
 import type { DrizzleDatabase } from '../index.ts'
-import { DrizzleWorkspaceMapper } from '../mappers/drizzle-workspace-mapper.ts'
+import { DrizzleWorkspaceMemberMapper } from '../mappers/drizzle-workspace-member-mapper.ts'
 import { schema } from '../schema/index.ts'
 
-export class DrizzleWorkspaceMemberRepository implements WorkspaceRepository {
+export class DrizzleWorkspaceMemberRepository
+  implements WorkspaceMemberRepository
+{
   constructor(private readonly db: DrizzleDatabase) {}
 
-  async findById(id: string): Promise<Workspace | null> {
-    const workspaces = await this.db
-      .select()
-      .from(schema.workspaces)
-      .where(eq(schema.workspaces.id, id))
-
-    if (workspaces.length === 0) {
-      return null
-    }
-
-    return DrizzleWorkspaceMapper.toDomain(workspaces[0])
-  }
-
-  async findByName(name: string): Promise<Workspace | null> {
-    const workspaces = await this.db
-      .select()
-      .from(schema.workspaces)
-      .where(eq(schema.workspaces.name, name))
-
-    if (workspaces.length === 0) {
-      return null
-    }
-
-    return DrizzleWorkspaceMapper.toDomain(workspaces[0])
-  }
-
-  async findMany(userId?: string): Promise<Workspace[]> {
+  async findById(id: string): Promise<WorkspaceMember | null> {
     const rows = await this.db
       .select()
-      .from(schema.workspaces)
-      .where(
-        userId !== undefined ? eq(schema.workspaces.userId, userId) : undefined,
-      )
+      .from(schema.workspaceMembers)
+      .where(eq(schema.workspaceMembers.id, id))
 
-    if (rows.length === 0) return []
+    if (rows.length === 0) return null
 
-    return rows.map((row) => DrizzleWorkspaceMapper.toDomain(row))
+    return DrizzleWorkspaceMemberMapper.toDomain(rows[0])
   }
 
-  async create(workspace: Workspace): Promise<void> {
+  async findByUserId(userId: string): Promise<WorkspaceMember[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.workspaceMembers)
+      .where(eq(schema.workspaceMembers.userId, userId))
+
+    return rows.map(DrizzleWorkspaceMemberMapper.toDomain)
+  }
+
+  async create(member: WorkspaceMember): Promise<void> {
     await this.db
-      .insert(schema.workspaces)
-      .values(DrizzleWorkspaceMapper.toDrizzle(workspace))
+      .insert(schema.workspaceMembers)
+      .values(DrizzleWorkspaceMemberMapper.toDrizzle(member))
+
+    DomainEvents.dispatchEventsForAggregate(member.id)
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.delete(schema.workspaces).where(eq(schema.workspaces.id, id))
+    await this.db
+      .delete(schema.workspaceMembers)
+      .where(eq(schema.workspaceMembers.id, id))
   }
 }
