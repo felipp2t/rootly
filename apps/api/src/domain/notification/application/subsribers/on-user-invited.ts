@@ -20,6 +20,10 @@ export class OnUserInvited implements EventHandler {
       recipientId: workspaceInvite.invitedUserId,
       title: 'Você foi convidado para um workspace',
       content: `Você recebeu um convite para entrar no workspace ${workspaceInvite.workspaceId}.`,
+      metadata: {
+        type: 'workspace_invite',
+        inviteId: workspaceInvite.id.toString(),
+      },
     })
   }
 }

@@ -15,6 +15,7 @@ describe('Send Notification', () => {
       recipientId: '1',
       title: 'Nova notificação',
       content: 'Conteúdo da notificação',
+      metadata: { type: 'info' },
     })
 
     expect(result.isRight()).toBe(true)
