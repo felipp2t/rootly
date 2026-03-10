@@ -40,6 +40,7 @@ See `patterns.md` for detailed notes. Summary below.
 | `makeTag` | `workspaceId` |
 | `makeWorkspaceInvite` | `workspaceId`, `invitedUserId`, `invitedByUserId`, `roleId` |
 | `makeWorkspaceMember` | `userId`, `workspaceId`, `roleId` |
+| `makeRefreshToken` | `userId` |
 
 ## Use UniqueEntityID for Synthetic IDs in Tests
 When a test needs a foreign-key ID (e.g. `inviterId`, `workspaceId`, `roleId`) that is not
