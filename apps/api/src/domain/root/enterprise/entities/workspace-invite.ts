@@ -68,6 +68,11 @@ export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
     this.props.updatedAt = new Date()
   }
 
+  accept() {
+    this.props.status = workspaceInviteStatus.ACCEPTED
+    this.touch()
+  }
+
   static create(
     props: Optional<
       WorkspaceInviteProps,
