@@ -45,6 +45,17 @@ When a test needs a foreign-key ID (e.g. `inviterId`, `workspaceId`, `roleId`) t
 backed by a real entity in the repository, generate it with `new UniqueEntityID().toString()`.
 Import from `@/core/entities/unique-entity-id.ts`.
 
+## Seeding Entities Without a Factory
+When no `test/factories/make-<entity>.ts` exists, construct the entity directly using its
+static `create()` method and push it into `repository.items` manually. For example:
+
+```typescript
+const role = WorkspaceRole.create({ name: 'Developer', workspaceId: workspace.id.toString() })
+workspaceRoleRepository.items.push(role)
+```
+
+This avoids creating a factory just for test setup when the entity constructor is simple.
+
 ## Watch for Missing Methods in In-Memory Repos
 Before writing tests, always verify that every method called by the use case under test
 is actually implemented in the corresponding in-memory repository. Cross-check the abstract
