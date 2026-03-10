@@ -9,5 +9,6 @@ export abstract class WorkspaceInviteRepository {
     status?: WorkspaceInviteStatus[],
   ): Promise<WorkspaceInvite[]>
   abstract create(workspace: WorkspaceInvite): Promise<void>
+  abstract save(workspace: WorkspaceInvite): Promise<void>
   abstract revoke(id: string): Promise<void>
 }

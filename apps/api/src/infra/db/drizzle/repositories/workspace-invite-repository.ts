@@ -50,6 +50,15 @@ export class DrizzleWorkspaceInviteRepository
     DomainEvents.dispatchEventsForAggregate(workspaceInvite.id)
   }
 
+  async save(workspaceInvite: WorkspaceInvite): Promise<void> {
+    await this.db
+      .update(schema.workspaceInvites)
+      .set(DrizzleWorkspaceInviteMapper.toDrizzle(workspaceInvite))
+      .where(eq(schema.workspaceInvites.id, workspaceInvite.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(workspaceInvite.id)
+  }
+
   async revoke(id: string): Promise<void> {
     await this.db
       .update(schema.workspaceInvites)

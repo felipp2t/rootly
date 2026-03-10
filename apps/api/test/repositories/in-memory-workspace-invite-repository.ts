@@ -25,6 +25,16 @@ export class InMemoryWorkspaceInviteRepository
     this.items.push(workspace)
   }
 
+  async save(workspace: WorkspaceInvite): Promise<void> {
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === workspace.id.toString(),
+    )
+
+    if (index !== -1) {
+      this.items[index] = workspace
+    }
+  }
+
   async revoke(id: string): Promise<void> {
     const workspaceIndex = this.items.findIndex(
       (workspace) => workspace.id.toString() === id,
