@@ -3,6 +3,7 @@ export const INVITE_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000
 import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { UserInvitedEvent } from '../events/user-invited-event.ts'
 
 export const workspaceInviteStatus = {
   PENDING: 'pending',
@@ -74,7 +75,7 @@ export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
     >,
     id?: UniqueEntityID,
   ) {
-    return new WorkspaceInvite(
+    const invite = new WorkspaceInvite(
       {
         ...props,
         status: props.status ?? workspaceInviteStatus.PENDING,
@@ -85,5 +86,13 @@ export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
       },
       id,
     )
+
+    const isNew = !id
+
+    if (isNew) {
+      invite.addDomainEvent(new UserInvitedEvent(invite))
+    }
+
+    return invite
   }
 }

@@ -1,7 +1,7 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
-import { MemberInvitedEvent } from '../events/member-invited-event.ts'
+import { MemberJoinedEvent } from '../events/member-joined-event.ts'
 
 export interface WorkspaceMemberProps {
   userId: string
@@ -55,8 +55,9 @@ export class WorkspaceMember extends AggregateRoot<WorkspaceMemberProps> {
     )
 
     const isNew = !id
+
     if (isNew) {
-      member.addDomainEvent(new MemberInvitedEvent(member))
+      member.addDomainEvent(new MemberJoinedEvent(member))
     }
 
     return member
