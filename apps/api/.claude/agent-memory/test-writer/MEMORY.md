@@ -38,10 +38,20 @@ See `patterns.md` for detailed notes. Summary below.
 | `makeFolder` | `workspaceId` |
 | `makeItem` | `workspaceId` |
 | `makeTag` | `workspaceId` |
+| `makeWorkspaceInvite` | `workspaceId`, `invitedUserId`, `invitedByUserId`, `roleId` |
 
-## Existing In-Memory Repos
-`InMemoryUserRepository`, `InMemoryWorkspaceRepository`, `InMemoryFolderRepository`,
-`InMemoryItemRepository`, `InMemoryTagRepository`
+## Use UniqueEntityID for Synthetic IDs in Tests
+When a test needs a foreign-key ID (e.g. `inviterId`, `workspaceId`, `roleId`) that is not
+backed by a real entity in the repository, generate it with `new UniqueEntityID().toString()`.
+Import from `@/core/entities/unique-entity-id.ts`.
+
+## Watch for Missing Methods in In-Memory Repos
+Before writing tests, always verify that every method called by the use case under test
+is actually implemented in the corresponding in-memory repository. Cross-check the abstract
+repository class against the in-memory implementation for all methods:
+
+If the abstract class declares a method that is missing from the in-memory repo,
+add it before writing the tests — otherwise the test will fail silently or throw at runtime.
 
 ## E2E Conventions
 - Use `app.inject()` (Fastify) — no supertest
