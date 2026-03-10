@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
 import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -55,5 +55,14 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
 
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.workspaces).where(eq(schema.workspaces.id, id))
+  }
+
+  async findManyByIds(ids: string[]): Promise<Workspace[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.workspaces)
+      .where(inArray(schema.workspaces.id, ids))
+
+    return rows.map((row) => DrizzleWorkspaceMapper.toDomain(row))
   }
 }

@@ -32,4 +32,10 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       this.items.splice(workspaceIndex, 1)
     }
   }
+
+  async findManyByIds(ids: string[]): Promise<Workspace[]> {
+    return this.items.filter((workspace) =>
+      ids.includes(workspace.id.toString()),
+    )
+  }
 }
