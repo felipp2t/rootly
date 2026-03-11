@@ -55,7 +55,9 @@ export class DrizzleItemRepository implements ItemRepository {
       .select()
       .from(schema.items)
       .where(
-        parentId !== undefined ? eq(schema.items.folderId, parentId) : undefined,
+        parentId !== undefined
+          ? eq(schema.items.folderId, parentId)
+          : undefined,
       )
 
     if (rows.length === 0) return []

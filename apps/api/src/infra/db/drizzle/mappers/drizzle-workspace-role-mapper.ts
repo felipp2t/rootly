@@ -1,6 +1,6 @@
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { WorkspaceRole } from '@/domain/root/enterprise/entities/workspace-role.ts'
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
 import type { schema } from '../schema/index.ts'
 
 type DrizzleWorkspaceRole = InferSelectModel<typeof schema.workspaceRoles>

@@ -28,7 +28,10 @@ export class DrizzleWorkspaceRoleRepository implements WorkspaceRoleRepository {
     return rows.map(DrizzleWorkspaceRoleMapper.toDomain)
   }
 
-  async findByWorkspaceIdAndName(workspaceId: string, name: string): Promise<WorkspaceRole | null> {
+  async findByWorkspaceIdAndName(
+    workspaceId: string,
+    name: string,
+  ): Promise<WorkspaceRole | null> {
     const rows = await this.db
       .select()
       .from(schema.workspaceRoles)
@@ -48,7 +51,9 @@ export class DrizzleWorkspaceRoleRepository implements WorkspaceRoleRepository {
     const rows = await this.db
       .select()
       .from(schema.workspaceRoles)
-      .where(name !== undefined ? eq(schema.workspaceRoles.name, name) : undefined)
+      .where(
+        name !== undefined ? eq(schema.workspaceRoles.name, name) : undefined,
+      )
 
     return rows.map(DrizzleWorkspaceRoleMapper.toDomain)
   }
