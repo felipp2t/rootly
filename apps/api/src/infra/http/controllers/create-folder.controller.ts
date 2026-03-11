@@ -16,6 +16,12 @@ export const createFolderController: FastifyPluginCallbackZod = async (app) => {
           workspaceId: z.string(),
           parentId: z.string().optional(),
         }),
+        response: {
+          201: z.object({ folderId: z.string() }),
+          400: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {

@@ -17,6 +17,10 @@ export const createWorkspaceController: FastifyPluginCallbackZod = async (
           name: z.string(),
           userId: z.string(),
         }),
+        response: {
+          201: z.object({ workspaceId: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {

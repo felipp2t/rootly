@@ -16,6 +16,11 @@ export const createTagController: FastifyPluginCallbackZod = async (app) => {
           color: z.enum(['blue', 'green', 'orange', 'purple', 'red', 'yellow']),
           workspaceId: z.string(),
         }),
+        response: {
+          201: z.object({ tagId: z.string() }),
+          409: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {

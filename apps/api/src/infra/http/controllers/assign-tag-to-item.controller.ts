@@ -17,6 +17,11 @@ export const assignTagToItemController: FastifyPluginCallbackZod = async (
           itemId: z.string(),
           tagId: z.string(),
         }),
+        response: {
+          204: z.void(),
+          404: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {

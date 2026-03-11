@@ -18,6 +18,12 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
           type: z.enum(['link', 'document', 'text', 'secret']),
           content: z.string().optional(),
         }),
+        response: {
+          201: z.object({ itemId: z.string() }),
+          400: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {

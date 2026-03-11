@@ -10,12 +10,25 @@ export const refreshAccessTokenController: FastifyPluginCallbackZod = async (
     {
       schema: {
         summary: 'Refresh Access Token',
-        description: 'Exchange a valid refresh token for a new access token and refresh token',
+        description:
+          'Exchange a valid refresh token for a new access token and refresh token',
         operationId: 'refreshAccessToken',
         tags: ['Auth'],
         body: z.object({
           refreshToken: z.string(),
         }),
+        response: {
+          200: z.object({
+            accessToken: z.string(),
+            refreshToken: z.string(),
+          }),
+          401: z.object({
+            message: z.string(),
+          }),
+          500: z.object({
+            message: z.string(),
+          }),
+        },
       },
     },
     async (request, reply) => {
@@ -40,7 +53,9 @@ export const refreshAccessTokenController: FastifyPluginCallbackZod = async (
 
       const { accessToken, refreshToken: newRefreshToken } = result.value
 
-      return reply.status(200).send({ accessToken, refreshToken: newRefreshToken })
+      return reply
+        .status(200)
+        .send({ accessToken, refreshToken: newRefreshToken })
     },
   )
 }

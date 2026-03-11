@@ -18,6 +18,11 @@ export const createAccountController: FastifyPluginCallbackZod = async (
           email: z.email(),
           password: z.string().min(6),
         }),
+        response: {
+          201: z.object({ userId: z.string() }),
+          409: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {
