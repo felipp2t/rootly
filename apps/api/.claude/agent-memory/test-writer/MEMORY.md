@@ -5,7 +5,7 @@ See `patterns.md` for detailed notes. Summary below.
 ## Framework & Config
 - Test framework: **Vitest** (configured via vitest config in the monorepo root)
 - Unit test file naming: `<use-case-name>.spec.ts`, co-located alongside the implementation
-- E2E test file naming: `<controller-name>.e2e-spec.ts`, co-located alongside the controller
+- E2E test file naming: `<controller-name>.e2e.spec.ts` (dot-separated, not hyphen), co-located alongside the controller
 
 ## Key Conventions
 - SUT variable is always named `sut`
@@ -69,6 +69,8 @@ add it before writing the tests — otherwise the test will fail silently or thr
 ## E2E Conventions
 - Use `app.inject()` (Fastify) — no supertest
 - `beforeAll(() => app.ready())`
-- `afterEach` deletes rows in dependency order: items → folders → workspaces → users
+- `afterEach` deletes rows in dependency order: refreshTokens → items → folders → workspaces → users (respect FK constraints)
 - Happy path only in e2e; error cases belong in unit tests
-- Auth/JWT setup: check existing e2e specs (not yet documented — add when explored)
+- No auth headers needed for auth-related endpoints (accounts, sessions, sessions/refresh)
+- To get a refreshToken for seeding: POST /api/accounts then POST /api/sessions — the session response includes both `accessToken` and `refreshToken`
+- `describe` block name in e2e tests uses the HTTP method + path format: `describe('POST /sessions/refresh', ...)`
