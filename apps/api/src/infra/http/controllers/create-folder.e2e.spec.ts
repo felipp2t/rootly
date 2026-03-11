@@ -8,6 +8,7 @@ describe('POST /folders', () => {
   })
 
   afterEach(async () => {
+    await db.delete(schema.refreshTokens)
     await db.delete(schema.items)
     await db.delete(schema.folders)
     await db.delete(schema.workspaces)

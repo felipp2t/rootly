@@ -8,6 +8,7 @@ describe('POST /accounts', () => {
   })
 
   afterEach(async () => {
+    await db.delete(schema.refreshTokens)
     await db.delete(schema.items)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
@@ -27,5 +28,4 @@ describe('POST /accounts', () => {
     expect(response.statusCode).toBe(201)
     expect(response.json()).toMatchObject({ userId: expect.any(String) })
   })
-
 })

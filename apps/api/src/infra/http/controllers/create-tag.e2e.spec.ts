@@ -8,6 +8,7 @@ describe('POST /tags', () => {
   })
 
   afterEach(async () => {
+    await db.delete(schema.refreshTokens)
     await db.delete(schema.tags)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)

@@ -8,6 +8,7 @@ describe('POST /sessions', () => {
   })
 
   afterEach(async () => {
+    await db.delete(schema.refreshTokens)
     await db.delete(schema.items)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
@@ -33,5 +34,4 @@ describe('POST /sessions', () => {
     expect(response.statusCode).toBe(201)
     expect(response.json()).toMatchObject({ accessToken: expect.any(String) })
   })
-
 })
