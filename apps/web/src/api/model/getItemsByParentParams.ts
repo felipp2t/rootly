@@ -6,5 +6,5 @@
  */
 
 export type GetItemsByParentParams = {
-parentId?: string;
-};
+  parentId?: string
+}

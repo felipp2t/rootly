@@ -21,22 +21,57 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-import type { CreateFolderBody, GetFoldersByParentParams } from '../model'
+import type {
+  AssignTagToFolder404,
+  AssignTagToFolder500,
+  CreateFolder201,
+  CreateFolder400,
+  CreateFolder409,
+  CreateFolder500,
+  CreateFolderBody,
+  GetFolders200,
+  GetFolders500,
+  GetFoldersParams,
+} from '../model'
 
 /**
  * Create a new folder
  * @summary Create Folder
  */
-export type createFolderResponse200 = {
-  data: void
-  status: 200
+export type createFolderResponse201 = {
+  data: CreateFolder201
+  status: 201
 }
 
-export type createFolderResponseSuccess = createFolderResponse200 & {
+export type createFolderResponse400 = {
+  data: CreateFolder400
+  status: 400
+}
+
+export type createFolderResponse409 = {
+  data: CreateFolder409
+  status: 409
+}
+
+export type createFolderResponse500 = {
+  data: CreateFolder500
+  status: 500
+}
+
+export type createFolderResponseSuccess = createFolderResponse201 & {
+  headers: Headers
+}
+export type createFolderResponseError = (
+  | createFolderResponse400
+  | createFolderResponse409
+  | createFolderResponse500
+) & {
   headers: Headers
 }
 
-export type createFolderResponse = createFolderResponseSuccess
+export type createFolderResponse =
+  | createFolderResponseSuccess
+  | createFolderResponseError
 
 export const getCreateFolderUrl = () => {
   return `http://localhost:3000/api/folders`
@@ -64,7 +99,7 @@ export const createFolder = async (
 }
 
 export const getCreateFolderMutationOptions = <
-  TError = unknown,
+  TError = CreateFolder400 | CreateFolder409 | CreateFolder500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -105,12 +140,18 @@ export type CreateFolderMutationResult = NonNullable<
   Awaited<ReturnType<typeof createFolder>>
 >
 export type CreateFolderMutationBody = CreateFolderBody
-export type CreateFolderMutationError = unknown
+export type CreateFolderMutationError =
+  | CreateFolder400
+  | CreateFolder409
+  | CreateFolder500
 
 /**
  * @summary Create Folder
  */
-export const useCreateFolder = <TError = unknown, TContext = unknown>(
+export const useCreateFolder = <
+  TError = CreateFolder400 | CreateFolder409 | CreateFolder500,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createFolder>>,
@@ -130,22 +171,31 @@ export const useCreateFolder = <TError = unknown, TContext = unknown>(
   return useMutation(getCreateFolderMutationOptions(options), queryClient)
 }
 /**
- * List folders by parent. Omit parentId to get root folders.
+ * List folders. Optionally filter by parentId.
  * @summary Get Folders
  */
-export type getFoldersByParentResponse200 = {
-  data: void
+export type getFoldersResponse200 = {
+  data: GetFolders200
   status: 200
 }
 
-export type getFoldersByParentResponseSuccess =
-  getFoldersByParentResponse200 & {
-    headers: Headers
-  }
+export type getFoldersResponse500 = {
+  data: GetFolders500
+  status: 500
+}
 
-export type getFoldersByParentResponse = getFoldersByParentResponseSuccess
+export type getFoldersResponseSuccess = getFoldersResponse200 & {
+  headers: Headers
+}
+export type getFoldersResponseError = getFoldersResponse500 & {
+  headers: Headers
+}
 
-export const getGetFoldersByParentUrl = (params?: GetFoldersByParentParams) => {
+export type getFoldersResponse =
+  | getFoldersResponseSuccess
+  | getFoldersResponseError
+
+export const getGetFoldersUrl = (params?: GetFoldersParams) => {
   const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -161,89 +211,78 @@ export const getGetFoldersByParentUrl = (params?: GetFoldersByParentParams) => {
     : `http://localhost:3000/api/folders`
 }
 
-export const getFoldersByParent = async (
-  params?: GetFoldersByParentParams,
+export const getFolders = async (
+  params?: GetFoldersParams,
   options?: RequestInit,
-): Promise<getFoldersByParentResponse> => {
-  const res = await fetch(getGetFoldersByParentUrl(params), {
+): Promise<getFoldersResponse> => {
+  const res = await fetch(getGetFoldersUrl(params), {
     ...options,
     method: 'GET',
   })
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: getFoldersByParentResponse['data'] = body ? JSON.parse(body) : {}
+  const data: getFoldersResponse['data'] = body ? JSON.parse(body) : {}
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as getFoldersByParentResponse
+  } as getFoldersResponse
 }
 
-export const getGetFoldersByParentQueryKey = (
-  params?: GetFoldersByParentParams,
-) => {
+export const getGetFoldersQueryKey = (params?: GetFoldersParams) => {
   return [
     `http://localhost:3000/api/folders`,
     ...(params ? [params] : []),
   ] as const
 }
 
-export const getGetFoldersByParentQueryOptions = <
-  TData = Awaited<ReturnType<typeof getFoldersByParent>>,
-  TError = unknown,
+export const getGetFoldersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders500,
 >(
-  params?: GetFoldersByParentParams,
+  params?: GetFoldersParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getFoldersByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
     fetch?: RequestInit
   },
 ) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetFoldersByParentQueryKey(params)
+  const queryKey = queryOptions?.queryKey ?? getGetFoldersQueryKey(params)
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getFoldersByParent>>
-  > = ({ signal }) => getFoldersByParent(params, { signal, ...fetchOptions })
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({
+    signal,
+  }) => getFolders(params, { signal, ...fetchOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getFoldersByParent>>,
+    Awaited<ReturnType<typeof getFolders>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetFoldersByParentQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getFoldersByParent>>
+export type GetFoldersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getFolders>>
 >
-export type GetFoldersByParentQueryError = unknown
+export type GetFoldersQueryError = GetFolders500
 
-export function useGetFoldersByParent<
-  TData = Awaited<ReturnType<typeof getFoldersByParent>>,
-  TError = unknown,
+export function useGetFolders<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders500,
 >(
-  params: undefined | GetFoldersByParentParams,
+  params: undefined | GetFoldersParams,
   options: {
     query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getFoldersByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFoldersByParent>>,
+          Awaited<ReturnType<typeof getFolders>>,
           TError,
-          Awaited<ReturnType<typeof getFoldersByParent>>
+          Awaited<ReturnType<typeof getFolders>>
         >,
         'initialData'
       >
@@ -253,24 +292,20 @@ export function useGetFoldersByParent<
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetFoldersByParent<
-  TData = Awaited<ReturnType<typeof getFoldersByParent>>,
-  TError = unknown,
+export function useGetFolders<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders500,
 >(
-  params?: GetFoldersByParentParams,
+  params?: GetFoldersParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getFoldersByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFoldersByParent>>,
+          Awaited<ReturnType<typeof getFolders>>,
           TError,
-          Awaited<ReturnType<typeof getFoldersByParent>>
+          Awaited<ReturnType<typeof getFolders>>
         >,
         'initialData'
       >
@@ -280,18 +315,14 @@ export function useGetFoldersByParent<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetFoldersByParent<
-  TData = Awaited<ReturnType<typeof getFoldersByParent>>,
-  TError = unknown,
+export function useGetFolders<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders500,
 >(
-  params?: GetFoldersByParentParams,
+  params?: GetFoldersParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getFoldersByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
     fetch?: RequestInit
   },
@@ -303,18 +334,14 @@ export function useGetFoldersByParent<
  * @summary Get Folders
  */
 
-export function useGetFoldersByParent<
-  TData = Awaited<ReturnType<typeof getFoldersByParent>>,
-  TError = unknown,
+export function useGetFolders<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders500,
 >(
-  params?: GetFoldersByParentParams,
+  params?: GetFoldersParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getFoldersByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
     fetch?: RequestInit
   },
@@ -322,7 +349,7 @@ export function useGetFoldersByParent<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 } {
-  const queryOptions = getGetFoldersByParentQueryOptions(params, options)
+  const queryOptions = getGetFoldersQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -336,16 +363,34 @@ export function useGetFoldersByParent<
  * Assign an existing tag to a folder
  * @summary Assign Tag to Folder
  */
-export type assignTagToFolderResponse200 = {
-  data: void
-  status: 200
+export type assignTagToFolderResponse204 = {
+  data: unknown
+  status: 204
 }
 
-export type assignTagToFolderResponseSuccess = assignTagToFolderResponse200 & {
+export type assignTagToFolderResponse404 = {
+  data: AssignTagToFolder404
+  status: 404
+}
+
+export type assignTagToFolderResponse500 = {
+  data: AssignTagToFolder500
+  status: 500
+}
+
+export type assignTagToFolderResponseSuccess = assignTagToFolderResponse204 & {
+  headers: Headers
+}
+export type assignTagToFolderResponseError = (
+  | assignTagToFolderResponse404
+  | assignTagToFolderResponse500
+) & {
   headers: Headers
 }
 
-export type assignTagToFolderResponse = assignTagToFolderResponseSuccess
+export type assignTagToFolderResponse =
+  | assignTagToFolderResponseSuccess
+  | assignTagToFolderResponseError
 
 export const getAssignTagToFolderUrl = (folderId: string, tagId: string) => {
   return `http://localhost:3000/api/folders/${folderId}/tags/${tagId}`
@@ -372,7 +417,7 @@ export const assignTagToFolder = async (
 }
 
 export const getAssignTagToFolderMutationOptions = <
-  TError = unknown,
+  TError = AssignTagToFolder404 | AssignTagToFolder500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -413,12 +458,17 @@ export type AssignTagToFolderMutationResult = NonNullable<
   Awaited<ReturnType<typeof assignTagToFolder>>
 >
 
-export type AssignTagToFolderMutationError = unknown
+export type AssignTagToFolderMutationError =
+  | AssignTagToFolder404
+  | AssignTagToFolder500
 
 /**
  * @summary Assign Tag to Folder
  */
-export const useAssignTagToFolder = <TError = unknown, TContext = unknown>(
+export const useAssignTagToFolder = <
+  TError = AssignTagToFolder404 | AssignTagToFolder500,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof assignTagToFolder>>,

@@ -4,12 +4,12 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreateItemBodyType } from './createItemBodyType';
+import type { CreateItemBodyType } from './createItemBodyType'
 
 export type CreateItemBody = {
-  title: string;
-  folderId?: string;
-  workspaceId: string;
-  type: CreateItemBodyType;
-  content?: string;
-};
+  title: string
+  folderId?: string
+  workspaceId: string
+  type: CreateItemBodyType
+  content?: string
+}

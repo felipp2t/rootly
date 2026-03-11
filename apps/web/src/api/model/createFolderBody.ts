@@ -6,7 +6,7 @@
  */
 
 export type CreateFolderBody = {
-  name: string;
-  workspaceId: string;
-  parentId?: string;
-};
+  name: string
+  workspaceId: string
+  parentId?: string
+}

@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type CreateTagBodyColor = typeof CreateTagBodyColor[keyof typeof CreateTagBodyColor];
-
+export type CreateTagBodyColor =
+  (typeof CreateTagBodyColor)[keyof typeof CreateTagBodyColor]
 
 export const CreateTagBodyColor = {
   blue: 'blue',
@@ -15,4 +15,4 @@ export const CreateTagBodyColor = {
   purple: 'purple',
   red: 'red',
   yellow: 'yellow',
-} as const;
+} as const

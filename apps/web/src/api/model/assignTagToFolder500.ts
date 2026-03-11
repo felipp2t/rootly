@@ -5,6 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetFoldersByParentParams = {
-  parentId?: string
+export type AssignTagToFolder500 = {
+  message: string
 }

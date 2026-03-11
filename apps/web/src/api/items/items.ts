@@ -21,22 +21,57 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-import type { CreateItemBody, GetItemsByParentParams } from '../model'
+import type {
+  AssignTagToItem404,
+  AssignTagToItem500,
+  CreateItem201,
+  CreateItem400,
+  CreateItem409,
+  CreateItem500,
+  CreateItemBody,
+  GetItems200,
+  GetItems500,
+  GetItemsParams,
+} from '../model'
 
 /**
  * Create a new item
  * @summary Create Item
  */
-export type createItemResponse200 = {
-  data: void
-  status: 200
+export type createItemResponse201 = {
+  data: CreateItem201
+  status: 201
 }
 
-export type createItemResponseSuccess = createItemResponse200 & {
+export type createItemResponse400 = {
+  data: CreateItem400
+  status: 400
+}
+
+export type createItemResponse409 = {
+  data: CreateItem409
+  status: 409
+}
+
+export type createItemResponse500 = {
+  data: CreateItem500
+  status: 500
+}
+
+export type createItemResponseSuccess = createItemResponse201 & {
+  headers: Headers
+}
+export type createItemResponseError = (
+  | createItemResponse400
+  | createItemResponse409
+  | createItemResponse500
+) & {
   headers: Headers
 }
 
-export type createItemResponse = createItemResponseSuccess
+export type createItemResponse =
+  | createItemResponseSuccess
+  | createItemResponseError
 
 export const getCreateItemUrl = () => {
   return `http://localhost:3000/api/items`
@@ -64,7 +99,7 @@ export const createItem = async (
 }
 
 export const getCreateItemMutationOptions = <
-  TError = unknown,
+  TError = CreateItem400 | CreateItem409 | CreateItem500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -105,12 +140,18 @@ export type CreateItemMutationResult = NonNullable<
   Awaited<ReturnType<typeof createItem>>
 >
 export type CreateItemMutationBody = CreateItemBody
-export type CreateItemMutationError = unknown
+export type CreateItemMutationError =
+  | CreateItem400
+  | CreateItem409
+  | CreateItem500
 
 /**
  * @summary Create Item
  */
-export const useCreateItem = <TError = unknown, TContext = unknown>(
+export const useCreateItem = <
+  TError = CreateItem400 | CreateItem409 | CreateItem500,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createItem>>,
@@ -130,21 +171,29 @@ export const useCreateItem = <TError = unknown, TContext = unknown>(
   return useMutation(getCreateItemMutationOptions(options), queryClient)
 }
 /**
- * List items by parent folder. Omit parentId to get root items.
+ * List items. Optionally filter by parentId.
  * @summary Get Items
  */
-export type getItemsByParentResponse200 = {
-  data: void
+export type getItemsResponse200 = {
+  data: GetItems200
   status: 200
 }
 
-export type getItemsByParentResponseSuccess = getItemsByParentResponse200 & {
+export type getItemsResponse500 = {
+  data: GetItems500
+  status: 500
+}
+
+export type getItemsResponseSuccess = getItemsResponse200 & {
+  headers: Headers
+}
+export type getItemsResponseError = getItemsResponse500 & {
   headers: Headers
 }
 
-export type getItemsByParentResponse = getItemsByParentResponseSuccess
+export type getItemsResponse = getItemsResponseSuccess | getItemsResponseError
 
-export const getGetItemsByParentUrl = (params?: GetItemsByParentParams) => {
+export const getGetItemsUrl = (params?: GetItemsParams) => {
   const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -160,88 +209,74 @@ export const getGetItemsByParentUrl = (params?: GetItemsByParentParams) => {
     : `http://localhost:3000/api/items`
 }
 
-export const getItemsByParent = async (
-  params?: GetItemsByParentParams,
+export const getItems = async (
+  params?: GetItemsParams,
   options?: RequestInit,
-): Promise<getItemsByParentResponse> => {
-  const res = await fetch(getGetItemsByParentUrl(params), {
+): Promise<getItemsResponse> => {
+  const res = await fetch(getGetItemsUrl(params), {
     ...options,
     method: 'GET',
   })
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text()
 
-  const data: getItemsByParentResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getItemsByParentResponse
+  const data: getItemsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getItemsResponse
 }
 
-export const getGetItemsByParentQueryKey = (
-  params?: GetItemsByParentParams,
-) => {
+export const getGetItemsQueryKey = (params?: GetItemsParams) => {
   return [
     `http://localhost:3000/api/items`,
     ...(params ? [params] : []),
   ] as const
 }
 
-export const getGetItemsByParentQueryOptions = <
-  TData = Awaited<ReturnType<typeof getItemsByParent>>,
-  TError = unknown,
+export const getGetItemsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getItems>>,
+  TError = GetItems500,
 >(
-  params?: GetItemsByParentParams,
+  params?: GetItemsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getItemsByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
     fetch?: RequestInit
   },
 ) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetItemsByParentQueryKey(params)
+  const queryKey = queryOptions?.queryKey ?? getGetItemsQueryKey(params)
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getItemsByParent>>
-  > = ({ signal }) => getItemsByParent(params, { signal, ...fetchOptions })
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({
+    signal,
+  }) => getItems(params, { signal, ...fetchOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getItemsByParent>>,
+    Awaited<ReturnType<typeof getItems>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetItemsByParentQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getItemsByParent>>
+export type GetItemsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getItems>>
 >
-export type GetItemsByParentQueryError = unknown
+export type GetItemsQueryError = GetItems500
 
-export function useGetItemsByParent<
-  TData = Awaited<ReturnType<typeof getItemsByParent>>,
-  TError = unknown,
+export function useGetItems<
+  TData = Awaited<ReturnType<typeof getItems>>,
+  TError = GetItems500,
 >(
-  params: undefined | GetItemsByParentParams,
+  params: undefined | GetItemsParams,
   options: {
     query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getItemsByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getItemsByParent>>,
+          Awaited<ReturnType<typeof getItems>>,
           TError,
-          Awaited<ReturnType<typeof getItemsByParent>>
+          Awaited<ReturnType<typeof getItems>>
         >,
         'initialData'
       >
@@ -251,24 +286,20 @@ export function useGetItemsByParent<
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetItemsByParent<
-  TData = Awaited<ReturnType<typeof getItemsByParent>>,
-  TError = unknown,
+export function useGetItems<
+  TData = Awaited<ReturnType<typeof getItems>>,
+  TError = GetItems500,
 >(
-  params?: GetItemsByParentParams,
+  params?: GetItemsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getItemsByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getItemsByParent>>,
+          Awaited<ReturnType<typeof getItems>>,
           TError,
-          Awaited<ReturnType<typeof getItemsByParent>>
+          Awaited<ReturnType<typeof getItems>>
         >,
         'initialData'
       >
@@ -278,18 +309,14 @@ export function useGetItemsByParent<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 }
-export function useGetItemsByParent<
-  TData = Awaited<ReturnType<typeof getItemsByParent>>,
-  TError = unknown,
+export function useGetItems<
+  TData = Awaited<ReturnType<typeof getItems>>,
+  TError = GetItems500,
 >(
-  params?: GetItemsByParentParams,
+  params?: GetItemsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getItemsByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
     fetch?: RequestInit
   },
@@ -301,18 +328,14 @@ export function useGetItemsByParent<
  * @summary Get Items
  */
 
-export function useGetItemsByParent<
-  TData = Awaited<ReturnType<typeof getItemsByParent>>,
-  TError = unknown,
+export function useGetItems<
+  TData = Awaited<ReturnType<typeof getItems>>,
+  TError = GetItems500,
 >(
-  params?: GetItemsByParentParams,
+  params?: GetItemsParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getItemsByParent>>,
-        TError,
-        TData
-      >
+      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
     fetch?: RequestInit
   },
@@ -320,7 +343,7 @@ export function useGetItemsByParent<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>
 } {
-  const queryOptions = getGetItemsByParentQueryOptions(params, options)
+  const queryOptions = getGetItemsQueryOptions(params, options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -334,16 +357,34 @@ export function useGetItemsByParent<
  * Assign an existing tag to an item
  * @summary Assign Tag to Item
  */
-export type assignTagToItemResponse200 = {
-  data: void
-  status: 200
+export type assignTagToItemResponse204 = {
+  data: unknown
+  status: 204
 }
 
-export type assignTagToItemResponseSuccess = assignTagToItemResponse200 & {
+export type assignTagToItemResponse404 = {
+  data: AssignTagToItem404
+  status: 404
+}
+
+export type assignTagToItemResponse500 = {
+  data: AssignTagToItem500
+  status: 500
+}
+
+export type assignTagToItemResponseSuccess = assignTagToItemResponse204 & {
+  headers: Headers
+}
+export type assignTagToItemResponseError = (
+  | assignTagToItemResponse404
+  | assignTagToItemResponse500
+) & {
   headers: Headers
 }
 
-export type assignTagToItemResponse = assignTagToItemResponseSuccess
+export type assignTagToItemResponse =
+  | assignTagToItemResponseSuccess
+  | assignTagToItemResponseError
 
 export const getAssignTagToItemUrl = (itemId: string, tagId: string) => {
   return `http://localhost:3000/api/items/${itemId}/tags/${tagId}`
@@ -370,7 +411,7 @@ export const assignTagToItem = async (
 }
 
 export const getAssignTagToItemMutationOptions = <
-  TError = unknown,
+  TError = AssignTagToItem404 | AssignTagToItem500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -411,12 +452,17 @@ export type AssignTagToItemMutationResult = NonNullable<
   Awaited<ReturnType<typeof assignTagToItem>>
 >
 
-export type AssignTagToItemMutationError = unknown
+export type AssignTagToItemMutationError =
+  | AssignTagToItem404
+  | AssignTagToItem500
 
 /**
  * @summary Assign Tag to Item
  */
-export const useAssignTagToItem = <TError = unknown, TContext = unknown>(
+export const useAssignTagToItem = <
+  TError = AssignTagToItem404 | AssignTagToItem500,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof assignTagToItem>>,

@@ -4,10 +4,10 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreateTagBodyColor } from './createTagBodyColor';
+import type { CreateTagBodyColor } from './createTagBodyColor'
 
 export type CreateTagBody = {
-  name: string;
-  color: CreateTagBodyColor;
-  workspaceId: string;
-};
+  name: string
+  color: CreateTagBodyColor
+  workspaceId: string
+}

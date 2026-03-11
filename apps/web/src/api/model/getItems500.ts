@@ -5,6 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetFoldersByParentParams = {
-  parentId?: string
+export type GetItems500 = {
+  message: string
 }
