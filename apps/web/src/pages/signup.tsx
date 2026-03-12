@@ -2,8 +2,9 @@ import { FolderLibraryIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { z } from 'zod'
-import { authenticateUser } from '@/api/auth/auth'
+import { authenticateUser, createAccount } from '@/api/auth/auth'
 import { Button } from '@/shared/components/ui/button'
 import {
   Field,
@@ -16,12 +17,13 @@ import { Input } from '@/shared/components/ui/input'
 import { tokenStore } from '@/shared/lib/fetch'
 import { cn } from '@/shared/lib/utils'
 
-const signInSchema = z.object({
+const signUpSchema = z.object({
   email: z.email('Please enter a valid email address.'),
+  name: z.string().min(3, 'Name must be at least 3 characters long.'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
 })
 
-export const Route = createFileRoute('/session')({
+export const Route = createFileRoute('/signup')({
   component: RouteComponent,
 })
 
@@ -29,32 +31,59 @@ function RouteComponent() {
   const signInForm = useForm({
     defaultValues: {
       email: '',
+      name: '',
       password: '',
     },
-    validators: { onSubmit: signInSchema },
+    validators: { onSubmit: signUpSchema },
     validationLogic: revalidateLogic({
       mode: 'submit',
       modeAfterSubmission: 'change',
     }),
     onSubmit: async ({ value }) => {
-      const result = await authenticateUser({
+      const result = await createAccount({
         email: value.email,
+        name: value.name,
         password: value.password,
       })
 
       if (result.status !== 201) {
+        switch (result.status) {
+          case 409:
+            signInForm.setFieldMeta('email', (meta) => ({
+              ...meta,
+              isTouched: true,
+              errorMap: {
+                ...meta.errorMap,
+                onServer: { message: result.data.message },
+              },
+            }))
+            break
+          default:
+            toast.error(result.data.message)
+        }
+        return
+      }
+
+      const authResult = await authenticateUser({
+        email: value.email,
+        password: value.password,
+      })
+
+      if (authResult.status === 201) {
+        tokenStore.set(
+          authResult.data.accessToken,
+          authResult.data.refreshToken,
+        )
+      } else {
         signInForm.setFieldMeta('email', (meta) => ({
           ...meta,
           isTouched: true,
           errorMap: {
             ...meta.errorMap,
-            onServer: { message: result.data.message },
+            onServer: { message: authResult.data.message },
           },
         }))
-        return
       }
-
-      tokenStore.set(result.data.accessToken, result.data.refreshToken)
     },
   })
 
@@ -86,9 +115,9 @@ function RouteComponent() {
                 </a>
                 <h1 className='text-xl font-bold'>Welcome to Rootly</h1>
                 <FieldDescription>
-                  Don&apos;t have an account?{' '}
-                  <Link to='/signup' preload='viewport'>
-                    Sign up
+                  Already have an account?{' '}
+                  <Link to='/session' preload='viewport'>
+                    Sign in
                   </Link>
                 </FieldDescription>
               </div>
@@ -111,6 +140,36 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           autoComplete='off'
                           placeholder='your.email@example.com'
+                          className={cn(
+                            'dark:border-input/40',
+                            'focus-visible:outline-none focus-visible:border-input/40 focus-visible:ring-2 focus-visible:ring-input/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                          )}
+                        />
+                        <FieldError>
+                          {field.state.meta.errors[0]?.message}
+                        </FieldError>
+                      </Field>
+                    )
+                  }}
+                />
+
+                <signInForm.Field
+                  name='name'
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          autoComplete='off'
+                          placeholder='your name'
                           className={cn(
                             'dark:border-input/40',
                             'focus-visible:outline-none focus-visible:border-input/40 focus-visible:ring-2 focus-visible:ring-input/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -168,7 +227,7 @@ function RouteComponent() {
                       )}
                       type='submit'
                     >
-                      Login
+                      Create Account
                     </Button>
                   </Field>
                 )}
