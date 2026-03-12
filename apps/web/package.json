@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate": "pnpm --filter @rootly/api openapi && orval"
+    "generate": "pnpm --filter @rootly/api openapi && orval",
+    "postgenerate": "biome format --write src/api"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
