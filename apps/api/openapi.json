@@ -57,18 +57,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "accessToken": {
-                      "type": "string"
-                    },
-                    "refreshToken": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "accessToken",
-                    "refreshToken"
-                  ],
+                  "properties": {},
                   "additionalProperties": false
                 }
               }
@@ -123,24 +112,68 @@
           "Auth"
         ],
         "description": "Exchange a valid refresh token for a new access token and refresh token",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "refreshToken": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "refreshToken"
-                ]
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "operationId": "getMe",
+        "summary": "Get Me",
+        "tags": [
+          "Me"
+        ],
+        "description": "Get the authenticated user information",
         "responses": {
           "200": {
             "description": "Default Response",
@@ -149,16 +182,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "accessToken": {
+                    "id": {
                       "type": "string"
                     },
-                    "refreshToken": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "accessToken",
-                    "refreshToken"
+                    "id",
+                    "name",
+                    "email"
                   ],
                   "additionalProperties": false
                 }
