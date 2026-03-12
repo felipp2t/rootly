@@ -1,7 +1,12 @@
 import { FolderLibraryIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { authenticateUser, createAccount } from '@/api/auth/auth'
@@ -14,7 +19,7 @@ import {
   FieldLabel,
 } from '@/shared/components/ui/field'
 import { Input } from '@/shared/components/ui/input'
-import { tokenStore } from '@/shared/lib/fetch'
+import { useAuth } from '@/shared/lib/auth'
 import { cn } from '@/shared/lib/utils'
 
 const signUpSchema = z.object({
@@ -23,11 +28,24 @@ const signUpSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
 })
 
+const signupSearchSchema = z.object({
+  redirect: z.string().optional(),
+})
+
 export const Route = createFileRoute('/signup')({
+  validateSearch: signupSearchSchema,
+  beforeLoad: ({ context, search }) => {
+    if (context.auth.isAuthenticated)
+      throw redirect({ to: search.redirect ?? '/' })
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { setAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const { redirect = '/' } = Route.useSearch()
+
   const signInForm = useForm({
     defaultValues: {
       email: '',
@@ -70,10 +88,8 @@ function RouteComponent() {
       })
 
       if (authResult.status === 201) {
-        tokenStore.set(
-          authResult.data.accessToken,
-          authResult.data.refreshToken,
-        )
+        setAuthenticated(true)
+        navigate({ to: '/' })
       } else {
         signInForm.setFieldMeta('email', (meta) => ({
           ...meta,
@@ -116,7 +132,11 @@ function RouteComponent() {
                 <h1 className='text-xl font-bold'>Welcome to Rootly</h1>
                 <FieldDescription>
                   Already have an account?{' '}
-                  <Link to='/session' preload='viewport'>
+                  <Link
+                    to='/session'
+                    preload='viewport'
+                    search={redirect !== '/' ? { redirect } : undefined}
+                  >
                     Sign in
                   </Link>
                 </FieldDescription>
