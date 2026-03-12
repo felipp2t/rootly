@@ -40,7 +40,7 @@ export const createAccountController: FastifyPluginCallbackZod = async (
         const error = result.value
 
         switch (error.constructor.name) {
-          case 'UserAlreadyExistsError':
+          case 'EmailAlreadyExistsError':
             return reply.status(409).send({ message: error.message })
           default:
             return reply.status(500).send({ message: 'Internal Server Error' })

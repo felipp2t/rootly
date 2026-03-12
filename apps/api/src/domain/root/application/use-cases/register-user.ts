@@ -3,7 +3,7 @@ import { type Either, left, right } from '@/core/types/either.ts'
 import { User } from '../../enterprise/entities/user.ts'
 import type { HashGenerator } from '../cryptography/hash-generator.ts'
 import type { UserRepository } from '../repositories/user-repository.ts'
-import { UserAlreadyExistsError } from './errors/user-already-exists-error.ts'
+import { EmailAlreadyExistsError } from './errors/email-already-exists-error.ts'
 
 interface RegisterUserUseCaseRequest {
   name: string
@@ -32,7 +32,7 @@ export class RegisterUserUseCase {
     const userWithSameEmail = await this.userRepository.findByEmail(email)
 
     if (userWithSameEmail) {
-      return left(new UserAlreadyExistsError(email))
+      return left(new EmailAlreadyExistsError(email))
     }
 
     const hashedPassword = await this.hashGenerator.hash(password)
