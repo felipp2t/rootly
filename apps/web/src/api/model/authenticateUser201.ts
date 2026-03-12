@@ -5,7 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type AuthenticateUser201 = {
-  accessToken: string
-  refreshToken: string
-}
+export type AuthenticateUser201 = { [key: string]: unknown }

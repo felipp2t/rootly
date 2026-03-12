@@ -1,48 +1,23 @@
-import { STORAGE_KEYS, storage } from './storage'
-
-let accessToken: string | null = null
+// Auth endpoints must not trigger the auto-refresh loop
+const PUBLIC_PREFIXES = [
+  'http://localhost:3333/api/sessions',
+  'http://localhost:3333/api/accounts',
+]
 
 let isRefreshing = false
-let queue: Array<(token: string | null) => void> = []
+let queue: Array<(success: boolean) => void> = []
 
-function flushQueue(token: string | null) {
-  for (const cb of queue) {
-    cb(token)
-  }
+function flushQueue(success: boolean) {
+  for (const cb of queue) cb(success)
   queue = []
 }
 
-async function doRefresh(): Promise<string | null> {
-  const refreshToken = storage.get(STORAGE_KEYS.REFRESH_TOKEN)
-  if (!refreshToken) return null
-
+async function doRefresh(): Promise<boolean> {
   const res = await fetch('http://localhost:3333/api/sessions/refresh', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
+    credentials: 'include',
   })
-
-  if (!res.ok) {
-    storage.remove(STORAGE_KEYS.REFRESH_TOKEN)
-    accessToken = null
-    return null
-  }
-
-  const data = await res.json()
-  accessToken = data.accessToken
-  storage.set(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken)
-  return data.accessToken
-}
-
-function withAuthHeader(
-  options: RequestInit,
-  token: string | null,
-): RequestInit {
-  if (!token) return options
-  return {
-    ...options,
-    headers: { ...options.headers, Authorization: `Bearer ${token}` },
-  }
+  return res.ok
 }
 
 async function parseResponse<T>(res: Response): Promise<T> {
@@ -51,50 +26,36 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return { data, status: res.status, headers: res.headers } as T
 }
 
-export async function fetchWithAuth<T>(
-  url: string,
-  options: RequestInit,
-): Promise<T> {
-  let res = await fetch(url, withAuthHeader(options, accessToken))
+export async function fetchWithAuth<T>(url: string, options: RequestInit): Promise<T> {
+  let res = await fetch(url, { ...options, credentials: 'include' })
 
   if (res.status !== 401) return parseResponse<T>(res)
 
-  // If there's no accessToken, the 401 came from a public/unauthenticated request
-  // (e.g. wrong credentials on login). Don't attempt refresh, just return the response.
-  if (!accessToken && !storage.get(STORAGE_KEYS.REFRESH_TOKEN)) {
+  if (PUBLIC_PREFIXES.some((prefix) => url.startsWith(prefix))) {
     return parseResponse<T>(res)
   }
 
   if (isRefreshing) {
-    const newToken = await new Promise<string | null>((resolve) => {
+    const success = await new Promise<boolean>((resolve) => {
       queue.push(resolve)
     })
-    if (!newToken) throw new Error('Session expired')
-    res = await fetch(url, withAuthHeader(options, newToken))
+    if (!success) throw new Error('Session expired')
+    res = await fetch(url, { ...options, credentials: 'include' })
   } else {
     isRefreshing = true
-    const newToken = await doRefresh()
+    const success = await doRefresh()
     isRefreshing = false
-    flushQueue(newToken)
+    flushQueue(success)
 
-    if (!newToken) {
-      window.location.href = '/session'
+    if (!success) {
+      if (window.location.pathname !== '/session') {
+        window.location.href = '/session'
+      }
       throw new Error('Session expired')
     }
 
-    res = await fetch(url, withAuthHeader(options, newToken))
+    res = await fetch(url, { ...options, credentials: 'include' })
   }
 
   return parseResponse<T>(res)
-}
-
-export const tokenStore = {
-  set(at: string, rt: string) {
-    accessToken = at
-    storage.set(STORAGE_KEYS.REFRESH_TOKEN, rt)
-  },
-  clear() {
-    accessToken = null
-    storage.remove(STORAGE_KEYS.REFRESH_TOKEN)
-  },
 }

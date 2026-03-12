@@ -5,4 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type RefreshAccessToken200 = { [key: string]: unknown }
+export type GetMe200 = {
+  id: string
+  name: string
+  email: string
+}

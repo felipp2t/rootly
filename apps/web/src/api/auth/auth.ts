@@ -25,7 +25,6 @@ import type {
   RefreshAccessToken200,
   RefreshAccessToken401,
   RefreshAccessToken500,
-  RefreshAccessTokenBody,
 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -189,14 +188,11 @@ export const getRefreshAccessTokenUrl = () => {
 }
 
 export const refreshAccessToken = async (
-  refreshAccessTokenBody: RefreshAccessTokenBody,
   options?: RequestInit,
 ): Promise<refreshAccessTokenResponse> => {
   return fetchWithAuth<refreshAccessTokenResponse>(getRefreshAccessTokenUrl(), {
     ...options,
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(refreshAccessTokenBody),
   })
 }
 
@@ -207,14 +203,14 @@ export const getRefreshAccessTokenMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof refreshAccessToken>>,
     TError,
-    { data: RefreshAccessTokenBody },
+    void,
     TContext
   >
   request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof refreshAccessToken>>,
   TError,
-  { data: RefreshAccessTokenBody },
+  void,
   TContext
 > => {
   const mutationKey = ['refreshAccessToken']
@@ -228,11 +224,9 @@ export const getRefreshAccessTokenMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof refreshAccessToken>>,
-    { data: RefreshAccessTokenBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return refreshAccessToken(data, requestOptions)
+    void
+  > = () => {
+    return refreshAccessToken(requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -241,7 +235,7 @@ export const getRefreshAccessTokenMutationOptions = <
 export type RefreshAccessTokenMutationResult = NonNullable<
   Awaited<ReturnType<typeof refreshAccessToken>>
 >
-export type RefreshAccessTokenMutationBody = RefreshAccessTokenBody
+
 export type RefreshAccessTokenMutationError =
   | RefreshAccessToken401
   | RefreshAccessToken500
@@ -257,7 +251,7 @@ export const useRefreshAccessToken = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof refreshAccessToken>>,
       TError,
-      { data: RefreshAccessTokenBody },
+      void,
       TContext
     >
     request?: SecondParameter<typeof fetchWithAuth>
@@ -266,7 +260,7 @@ export const useRefreshAccessToken = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof refreshAccessToken>>,
   TError,
-  { data: RefreshAccessTokenBody },
+  void,
   TContext
 > => {
   return useMutation(getRefreshAccessTokenMutationOptions(options), queryClient)
