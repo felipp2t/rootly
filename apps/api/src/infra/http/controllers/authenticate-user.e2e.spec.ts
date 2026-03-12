@@ -14,7 +14,7 @@ describe('POST /sessions', () => {
     await db.delete(schema.users)
   })
 
-  it('should authenticate and return 201 with accessToken', async () => {
+  it('should authenticate and return 201 with accessToken and refreshToken as httpOnly cookies', async () => {
     await app.inject({
       method: 'POST',
       url: '/api/accounts',
@@ -31,7 +31,14 @@ describe('POST /sessions', () => {
       payload: { email: 'john@example.com', password: '123456' },
     })
 
+    const setCookieHeader = response.headers['set-cookie']
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader]
+
     expect(response.statusCode).toBe(201)
-    expect(response.json()).toMatchObject({ accessToken: expect.any(String) })
+    expect(response.json()).toEqual({})
+    expect(cookies.some((c) => c?.startsWith('accessToken='))).toBe(true)
+    expect(cookies.some((c) => c?.startsWith('refreshToken='))).toBe(true)
   })
 })

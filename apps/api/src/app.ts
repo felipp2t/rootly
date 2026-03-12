@@ -1,3 +1,4 @@
+import cookie from '@fastify/cookie'
 import cors from '@fastify/cors'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
@@ -11,6 +12,8 @@ import {
 import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
+
+await app.register(cookie)
 
 await app.register(cors, {
   origin: 'http://localhost:5173',

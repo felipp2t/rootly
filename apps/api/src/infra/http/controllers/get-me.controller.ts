@@ -25,13 +25,11 @@ export const getMeController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const authHeader = request.headers.authorization
+      const token = request.cookies.accessToken
 
-      if (!authHeader?.startsWith('Bearer ')) {
+      if (!token) {
         return reply.status(401).send({ message: 'Unauthorized' })
       }
-
-      const token = authHeader.slice(7)
       const secret = new TextEncoder().encode(env.JWT_SECRET)
 
       let userId: string

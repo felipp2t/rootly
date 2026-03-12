@@ -14,7 +14,7 @@ describe('POST /sessions/refresh', () => {
     await db.delete(schema.users)
   })
 
-  it('should exchange a valid refresh token for a new accessToken and refreshToken', async () => {
+  it('should exchange a valid refresh token for new accessToken and refreshToken cookies', async () => {
     await app.inject({
       method: 'POST',
       url: '/api/accounts',
@@ -31,18 +31,29 @@ describe('POST /sessions/refresh', () => {
       payload: { email: 'john@example.com', password: '123456' },
     })
 
-    const { refreshToken } = sessionResponse.json<{ accessToken: string; refreshToken: string }>()
+    const sessionCookies = Array.isArray(sessionResponse.headers['set-cookie'])
+      ? sessionResponse.headers['set-cookie']
+      : [sessionResponse.headers['set-cookie']]
+
+    const cookieHeader = sessionCookies.map((c) => c.split(';')[0]).join('; ')
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/sessions/refresh',
-      payload: { refreshToken },
+      headers: { cookie: cookieHeader },
     })
 
+    const refreshedCookies = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']]
+
     expect(response.statusCode).toBe(200)
-    expect(response.json()).toMatchObject({
-      accessToken: expect.any(String),
-      refreshToken: expect.any(String),
-    })
+    expect(response.json()).toEqual({})
+    expect(refreshedCookies.some((c) => c?.startsWith('accessToken='))).toBe(
+      true,
+    )
+    expect(refreshedCookies.some((c) => c?.startsWith('refreshToken='))).toBe(
+      true,
+    )
   })
 })

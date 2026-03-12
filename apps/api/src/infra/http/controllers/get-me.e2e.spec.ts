@@ -15,7 +15,7 @@ describe('GET /me', () => {
     await db.delete(schema.users)
   })
 
-  async function createUserAndGetAccessToken() {
+  async function createUserAndGetCookieHeader() {
     await app.inject({
       method: 'POST',
       url: '/api/accounts',
@@ -32,16 +32,21 @@ describe('GET /me', () => {
       payload: { email: 'john@example.com', password: '123456' },
     })
 
-    return sessionResponse.json<{ accessToken: string; refreshToken: string }>().accessToken
+    const setCookieHeader = sessionResponse.headers['set-cookie']
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader]
+
+    return cookies.map((c) => c?.split(';')[0]).join('; ')
   }
 
   it('should return 200 with the authenticated user information', async () => {
-    const accessToken = await createUserAndGetAccessToken()
+    const cookieHeader = await createUserAndGetCookieHeader()
 
     const response = await app.inject({
       method: 'GET',
       url: '/api/me',
-      headers: { authorization: `Bearer ${accessToken}` },
+      headers: { cookie: cookieHeader },
     })
 
     expect(response.statusCode).toBe(200)

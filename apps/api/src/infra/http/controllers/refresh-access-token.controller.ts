@@ -14,14 +14,8 @@ export const refreshAccessTokenController: FastifyPluginCallbackZod = async (
           'Exchange a valid refresh token for a new access token and refresh token',
         operationId: 'refreshAccessToken',
         tags: ['Auth'],
-        body: z.object({
-          refreshToken: z.string(),
-        }),
         response: {
-          200: z.object({
-            accessToken: z.string(),
-            refreshToken: z.string(),
-          }),
+          200: z.object({}),
           401: z.object({
             message: z.string(),
           }),
@@ -32,7 +26,11 @@ export const refreshAccessTokenController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const { refreshToken } = request.body
+      const refreshToken = request.cookies.refreshToken
+
+      if (!refreshToken) {
+        return reply.status(401).send({ message: 'Unauthorized' })
+      }
 
       const refreshAccessTokenUseCase = makeRefreshAccessTokenUseCase()
 
@@ -54,8 +52,21 @@ export const refreshAccessTokenController: FastifyPluginCallbackZod = async (
       const { accessToken, refreshToken: newRefreshToken } = result.value
 
       return reply
+        .setCookie('accessToken', accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15, // 15 minutes
+        })
+        .setCookie('refreshToken', newRefreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          path: '/',
+        })
         .status(200)
-        .send({ accessToken, refreshToken: newRefreshToken })
+        .send({})
     },
   )
 }

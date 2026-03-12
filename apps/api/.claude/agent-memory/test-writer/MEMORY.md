@@ -71,6 +71,10 @@ add it before writing the tests — otherwise the test will fail silently or thr
 - `beforeAll(() => app.ready())`
 - `afterEach` deletes rows in dependency order: refreshTokens → items → folders → workspaces → users (respect FK constraints)
 - Happy path only in e2e; error cases belong in unit tests
-- No auth headers needed for auth-related endpoints (accounts, sessions, sessions/refresh)
-- To get a refreshToken for seeding: POST /api/accounts then POST /api/sessions — the session response includes both `accessToken` and `refreshToken`
+- Auth uses httpOnly cookies — `POST /api/sessions` sets `accessToken` and `refreshToken` cookies; returns `201 {}` (no body tokens)
+- `POST /api/sessions/refresh` reads `refreshToken` from cookies; sets new cookies; returns `200 {}`
+- `GET /api/me` reads `accessToken` from cookies (no Authorization header)
+- To authenticate in e2e tests: POST /api/accounts, POST /api/sessions, extract `Set-Cookie` header, build cookie string
+- Cookie extraction pattern: `const cookies = [].concat(response.headers['set-cookie']); const cookieHeader = cookies.map(c => c.split(';')[0]).join('; ')`
+- Pass cookies in subsequent requests via `headers: { cookie: cookieHeader }`
 - `describe` block name in e2e tests uses the HTTP method + path format: `describe('POST /sessions/refresh', ...)`

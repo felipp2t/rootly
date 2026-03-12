@@ -18,7 +18,7 @@ export const authenticateUserController: FastifyPluginCallbackZod = async (
           password: z.string().min(6),
         }),
         response: {
-          201: z.object({ accessToken: z.string(), refreshToken: z.string() }),
+          201: z.object({}),
           401: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
         },
@@ -47,7 +47,22 @@ export const authenticateUserController: FastifyPluginCallbackZod = async (
 
       const { accessToken, refreshToken } = result.value
 
-      return reply.status(201).send({ accessToken, refreshToken })
+      return reply
+        .setCookie('accessToken', accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15, // 15 minutes
+        })
+        .setCookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          path: '/',
+        })
+        .status(201)
+        .send({})
     },
   )
 }
