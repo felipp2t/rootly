@@ -14,6 +14,7 @@ const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 await app.register(cors, {
   origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 })
 
 await app.register(swagger, {
