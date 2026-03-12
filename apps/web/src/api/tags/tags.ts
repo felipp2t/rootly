@@ -12,13 +12,15 @@ import type {
   UseMutationResult,
 } from '@tanstack/react-query'
 import { useMutation } from '@tanstack/react-query'
-
+import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   CreateTag201,
   CreateTag409,
   CreateTag500,
   CreateTagBody,
 } from '../model'
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * Create a new tag
@@ -54,24 +56,19 @@ export type createTagResponse =
   | createTagResponseError
 
 export const getCreateTagUrl = () => {
-  return `http://localhost:3000/api/tags`
+  return `http://localhost:3333/api/tags`
 }
 
 export const createTag = async (
   createTagBody: CreateTagBody,
   options?: RequestInit,
 ): Promise<createTagResponse> => {
-  const res = await fetch(getCreateTagUrl(), {
+  return fetchWithAuth<createTagResponse>(getCreateTagUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createTagBody),
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: createTagResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createTagResponse
 }
 
 export const getCreateTagMutationOptions = <
@@ -84,7 +81,7 @@ export const getCreateTagMutationOptions = <
     { data: CreateTagBody },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createTag>>,
   TError,
@@ -92,13 +89,13 @@ export const getCreateTagMutationOptions = <
   TContext
 > => {
   const mutationKey = ['createTag']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createTag>>,
@@ -106,7 +103,7 @@ export const getCreateTagMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return createTag(data, fetchOptions)
+    return createTag(data, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -132,7 +129,7 @@ export const useCreateTag = <
       { data: CreateTagBody },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<

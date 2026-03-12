@@ -18,6 +18,10 @@ import type {
 } from '@tanstack/react-query'
 import { useQuery } from '@tanstack/react-query'
 
+import { fetchWithAuth } from '../../shared/lib/fetch'
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
 export type getHealthResponse200 = {
   data: void
   status: 200
@@ -30,25 +34,20 @@ export type getHealthResponseSuccess = getHealthResponse200 & {
 export type getHealthResponse = getHealthResponseSuccess
 
 export const getGetHealthUrl = () => {
-  return `http://localhost:3000/health`
+  return `http://localhost:3333/health`
 }
 
 export const getHealth = async (
   options?: RequestInit,
 ): Promise<getHealthResponse> => {
-  const res = await fetch(getGetHealthUrl(), {
+  return fetchWithAuth<getHealthResponse>(getGetHealthUrl(), {
     ...options,
     method: 'GET',
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: getHealthResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getHealthResponse
 }
 
 export const getGetHealthQueryKey = () => {
-  return [`http://localhost:3000/health`] as const
+  return [`http://localhost:3333/health`] as const
 }
 
 export const getGetHealthQueryOptions = <
@@ -58,15 +57,15 @@ export const getGetHealthQueryOptions = <
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getHealth>>, TError, TData>
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
+  const { query: queryOptions, request: requestOptions } = options ?? {}
 
   const queryKey = queryOptions?.queryKey ?? getGetHealthQueryKey()
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getHealth>>> = ({
     signal,
-  }) => getHealth({ signal, ...fetchOptions })
+  }) => getHealth({ signal, ...requestOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getHealth>>,
@@ -96,7 +95,7 @@ export function useGetHealth<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -118,7 +117,7 @@ export function useGetHealth<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -132,7 +131,7 @@ export function useGetHealth<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getHealth>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -147,7 +146,7 @@ export function useGetHealth<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getHealth>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {

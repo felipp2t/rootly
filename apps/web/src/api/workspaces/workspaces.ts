@@ -12,12 +12,14 @@ import type {
   UseMutationResult,
 } from '@tanstack/react-query'
 import { useMutation } from '@tanstack/react-query'
-
+import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   CreateWorkspace201,
   CreateWorkspace500,
   CreateWorkspaceBody,
 } from '../model'
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * Create a new workspace
@@ -45,28 +47,19 @@ export type createWorkspaceResponse =
   | createWorkspaceResponseError
 
 export const getCreateWorkspaceUrl = () => {
-  return `http://localhost:3000/api/workspaces`
+  return `http://localhost:3333/api/workspaces`
 }
 
 export const createWorkspace = async (
   createWorkspaceBody: CreateWorkspaceBody,
   options?: RequestInit,
 ): Promise<createWorkspaceResponse> => {
-  const res = await fetch(getCreateWorkspaceUrl(), {
+  return fetchWithAuth<createWorkspaceResponse>(getCreateWorkspaceUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createWorkspaceBody),
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: createWorkspaceResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createWorkspaceResponse
 }
 
 export const getCreateWorkspaceMutationOptions = <
@@ -79,7 +72,7 @@ export const getCreateWorkspaceMutationOptions = <
     { data: CreateWorkspaceBody },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createWorkspace>>,
   TError,
@@ -87,13 +80,13 @@ export const getCreateWorkspaceMutationOptions = <
   TContext
 > => {
   const mutationKey = ['createWorkspace']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createWorkspace>>,
@@ -101,7 +94,7 @@ export const getCreateWorkspaceMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return createWorkspace(data, fetchOptions)
+    return createWorkspace(data, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -127,7 +120,7 @@ export const useCreateWorkspace = <
       { data: CreateWorkspaceBody },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<

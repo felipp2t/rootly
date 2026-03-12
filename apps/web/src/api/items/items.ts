@@ -20,7 +20,7 @@ import type {
   UseQueryResult,
 } from '@tanstack/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-
+import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   AssignTagToItem404,
   AssignTagToItem500,
@@ -33,6 +33,8 @@ import type {
   GetItems500,
   GetItemsParams,
 } from '../model'
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * Create a new item
@@ -74,28 +76,19 @@ export type createItemResponse =
   | createItemResponseError
 
 export const getCreateItemUrl = () => {
-  return `http://localhost:3000/api/items`
+  return `http://localhost:3333/api/items`
 }
 
 export const createItem = async (
   createItemBody: CreateItemBody,
   options?: RequestInit,
 ): Promise<createItemResponse> => {
-  const res = await fetch(getCreateItemUrl(), {
+  return fetchWithAuth<createItemResponse>(getCreateItemUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createItemBody),
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: createItemResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createItemResponse
 }
 
 export const getCreateItemMutationOptions = <
@@ -108,7 +101,7 @@ export const getCreateItemMutationOptions = <
     { data: CreateItemBody },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createItem>>,
   TError,
@@ -116,13 +109,13 @@ export const getCreateItemMutationOptions = <
   TContext
 > => {
   const mutationKey = ['createItem']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createItem>>,
@@ -130,7 +123,7 @@ export const getCreateItemMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return createItem(data, fetchOptions)
+    return createItem(data, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -159,7 +152,7 @@ export const useCreateItem = <
       { data: CreateItemBody },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -205,28 +198,23 @@ export const getGetItemsUrl = (params?: GetItemsParams) => {
   const stringifiedParams = normalizedParams.toString()
 
   return stringifiedParams.length > 0
-    ? `http://localhost:3000/api/items?${stringifiedParams}`
-    : `http://localhost:3000/api/items`
+    ? `http://localhost:3333/api/items?${stringifiedParams}`
+    : `http://localhost:3333/api/items`
 }
 
 export const getItems = async (
   params?: GetItemsParams,
   options?: RequestInit,
 ): Promise<getItemsResponse> => {
-  const res = await fetch(getGetItemsUrl(params), {
+  return fetchWithAuth<getItemsResponse>(getGetItemsUrl(params), {
     ...options,
     method: 'GET',
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: getItemsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getItemsResponse
 }
 
 export const getGetItemsQueryKey = (params?: GetItemsParams) => {
   return [
-    `http://localhost:3000/api/items`,
+    `http://localhost:3333/api/items`,
     ...(params ? [params] : []),
   ] as const
 }
@@ -240,16 +228,16 @@ export const getGetItemsQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
+  const { query: queryOptions, request: requestOptions } = options ?? {}
 
   const queryKey = queryOptions?.queryKey ?? getGetItemsQueryKey(params)
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({
     signal,
-  }) => getItems(params, { signal, ...fetchOptions })
+  }) => getItems(params, { signal, ...requestOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getItems>>,
@@ -280,7 +268,7 @@ export function useGetItems<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -303,7 +291,7 @@ export function useGetItems<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -318,7 +306,7 @@ export function useGetItems<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -337,7 +325,7 @@ export function useGetItems<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -387,7 +375,7 @@ export type assignTagToItemResponse =
   | assignTagToItemResponseError
 
 export const getAssignTagToItemUrl = (itemId: string, tagId: string) => {
-  return `http://localhost:3000/api/items/${itemId}/tags/${tagId}`
+  return `http://localhost:3333/api/items/${itemId}/tags/${tagId}`
 }
 
 export const assignTagToItem = async (
@@ -395,19 +383,13 @@ export const assignTagToItem = async (
   tagId: string,
   options?: RequestInit,
 ): Promise<assignTagToItemResponse> => {
-  const res = await fetch(getAssignTagToItemUrl(itemId, tagId), {
-    ...options,
-    method: 'PATCH',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: assignTagToItemResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as assignTagToItemResponse
+  return fetchWithAuth<assignTagToItemResponse>(
+    getAssignTagToItemUrl(itemId, tagId),
+    {
+      ...options,
+      method: 'PATCH',
+    },
+  )
 }
 
 export const getAssignTagToItemMutationOptions = <
@@ -420,7 +402,7 @@ export const getAssignTagToItemMutationOptions = <
     { itemId: string; tagId: string },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof assignTagToItem>>,
   TError,
@@ -428,13 +410,13 @@ export const getAssignTagToItemMutationOptions = <
   TContext
 > => {
   const mutationKey = ['assignTagToItem']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof assignTagToItem>>,
@@ -442,7 +424,7 @@ export const getAssignTagToItemMutationOptions = <
   > = (props) => {
     const { itemId, tagId } = props ?? {}
 
-    return assignTagToItem(itemId, tagId, fetchOptions)
+    return assignTagToItem(itemId, tagId, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -470,7 +452,7 @@ export const useAssignTagToItem = <
       { itemId: string; tagId: string },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<

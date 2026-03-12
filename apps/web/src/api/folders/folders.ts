@@ -20,7 +20,7 @@ import type {
   UseQueryResult,
 } from '@tanstack/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-
+import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   AssignTagToFolder404,
   AssignTagToFolder500,
@@ -33,6 +33,8 @@ import type {
   GetFolders500,
   GetFoldersParams,
 } from '../model'
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * Create a new folder
@@ -74,28 +76,19 @@ export type createFolderResponse =
   | createFolderResponseError
 
 export const getCreateFolderUrl = () => {
-  return `http://localhost:3000/api/folders`
+  return `http://localhost:3333/api/folders`
 }
 
 export const createFolder = async (
   createFolderBody: CreateFolderBody,
   options?: RequestInit,
 ): Promise<createFolderResponse> => {
-  const res = await fetch(getCreateFolderUrl(), {
+  return fetchWithAuth<createFolderResponse>(getCreateFolderUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(createFolderBody),
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: createFolderResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createFolderResponse
 }
 
 export const getCreateFolderMutationOptions = <
@@ -108,7 +101,7 @@ export const getCreateFolderMutationOptions = <
     { data: CreateFolderBody },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createFolder>>,
   TError,
@@ -116,13 +109,13 @@ export const getCreateFolderMutationOptions = <
   TContext
 > => {
   const mutationKey = ['createFolder']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createFolder>>,
@@ -130,7 +123,7 @@ export const getCreateFolderMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return createFolder(data, fetchOptions)
+    return createFolder(data, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -159,7 +152,7 @@ export const useCreateFolder = <
       { data: CreateFolderBody },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -207,32 +200,23 @@ export const getGetFoldersUrl = (params?: GetFoldersParams) => {
   const stringifiedParams = normalizedParams.toString()
 
   return stringifiedParams.length > 0
-    ? `http://localhost:3000/api/folders?${stringifiedParams}`
-    : `http://localhost:3000/api/folders`
+    ? `http://localhost:3333/api/folders?${stringifiedParams}`
+    : `http://localhost:3333/api/folders`
 }
 
 export const getFolders = async (
   params?: GetFoldersParams,
   options?: RequestInit,
 ): Promise<getFoldersResponse> => {
-  const res = await fetch(getGetFoldersUrl(params), {
+  return fetchWithAuth<getFoldersResponse>(getGetFoldersUrl(params), {
     ...options,
     method: 'GET',
   })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: getFoldersResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getFoldersResponse
 }
 
 export const getGetFoldersQueryKey = (params?: GetFoldersParams) => {
   return [
-    `http://localhost:3000/api/folders`,
+    `http://localhost:3333/api/folders`,
     ...(params ? [params] : []),
   ] as const
 }
@@ -246,16 +230,16 @@ export const getGetFoldersQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {}
+  const { query: queryOptions, request: requestOptions } = options ?? {}
 
   const queryKey = queryOptions?.queryKey ?? getGetFoldersQueryKey(params)
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({
     signal,
-  }) => getFolders(params, { signal, ...fetchOptions })
+  }) => getFolders(params, { signal, ...requestOptions })
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getFolders>>,
@@ -286,7 +270,7 @@ export function useGetFolders<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -309,7 +293,7 @@ export function useGetFolders<
         >,
         'initialData'
       >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -324,7 +308,7 @@ export function useGetFolders<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -343,7 +327,7 @@ export function useGetFolders<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -393,7 +377,7 @@ export type assignTagToFolderResponse =
   | assignTagToFolderResponseError
 
 export const getAssignTagToFolderUrl = (folderId: string, tagId: string) => {
-  return `http://localhost:3000/api/folders/${folderId}/tags/${tagId}`
+  return `http://localhost:3333/api/folders/${folderId}/tags/${tagId}`
 }
 
 export const assignTagToFolder = async (
@@ -401,19 +385,13 @@ export const assignTagToFolder = async (
   tagId: string,
   options?: RequestInit,
 ): Promise<assignTagToFolderResponse> => {
-  const res = await fetch(getAssignTagToFolderUrl(folderId, tagId), {
-    ...options,
-    method: 'PATCH',
-  })
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text()
-
-  const data: assignTagToFolderResponse['data'] = body ? JSON.parse(body) : {}
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as assignTagToFolderResponse
+  return fetchWithAuth<assignTagToFolderResponse>(
+    getAssignTagToFolderUrl(folderId, tagId),
+    {
+      ...options,
+      method: 'PATCH',
+    },
+  )
 }
 
 export const getAssignTagToFolderMutationOptions = <
@@ -426,7 +404,7 @@ export const getAssignTagToFolderMutationOptions = <
     { folderId: string; tagId: string },
     TContext
   >
-  fetch?: RequestInit
+  request?: SecondParameter<typeof fetchWithAuth>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof assignTagToFolder>>,
   TError,
@@ -434,13 +412,13 @@ export const getAssignTagToFolderMutationOptions = <
   TContext
 > => {
   const mutationKey = ['assignTagToFolder']
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined }
+    : { mutation: { mutationKey }, request: undefined }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof assignTagToFolder>>,
@@ -448,7 +426,7 @@ export const getAssignTagToFolderMutationOptions = <
   > = (props) => {
     const { folderId, tagId } = props ?? {}
 
-    return assignTagToFolder(folderId, tagId, fetchOptions)
+    return assignTagToFolder(folderId, tagId, requestOptions)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -476,7 +454,7 @@ export const useAssignTagToFolder = <
       { folderId: string; tagId: string },
       TContext
     >
-    fetch?: RequestInit
+    request?: SecondParameter<typeof fetchWithAuth>
   },
   queryClient?: QueryClient,
 ): UseMutationResult<

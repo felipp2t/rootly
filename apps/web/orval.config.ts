@@ -10,7 +10,7 @@ export default defineConfig({
       target: './src/api/index.ts',
       schemas: './src/api/model',
       client: 'react-query',
-      baseUrl: 'http://localhost:3000',
+      baseUrl: 'http://localhost:3333',
       override: {
         mutator: {
           path: './src/shared/lib/fetch.ts',
