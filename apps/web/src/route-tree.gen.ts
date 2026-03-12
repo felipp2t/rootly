@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './pages/__root'
 import { Route as SignupRouteImport } from './pages/signup'
 import { Route as SessionRouteImport } from './pages/session'
-import { Route as IndexRouteImport } from './pages/index'
+import { Route as AuthenticateddashboardIndexRouteImport } from './pages/_authenticated/(dashboard)/index'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -23,40 +23,41 @@ const SessionRoute = SessionRouteImport.update({
   path: '/session',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticateddashboardIndexRoute =
+  AuthenticateddashboardIndexRouteImport.update({
+    id: '/_authenticated/(dashboard)/',
+    path: '/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/(dashboard)/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/session' | '/signup'
+  fullPaths: '/session' | '/signup' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/session' | '/signup'
-  id: '__root__' | '/' | '/session' | '/signup'
+  to: '/session' | '/signup' | '/'
+  id: '__root__' | '/session' | '/signup' | '/_authenticated/(dashboard)/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   SessionRoute: typeof SessionRoute
   SignupRoute: typeof SignupRoute
+  AuthenticateddashboardIndexRoute: typeof AuthenticateddashboardIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,20 +76,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated/(dashboard)/': {
+      id: '/_authenticated/(dashboard)/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticateddashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   SessionRoute: SessionRoute,
   SignupRoute: SignupRoute,
+  AuthenticateddashboardIndexRoute: AuthenticateddashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
