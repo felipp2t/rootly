@@ -9,11 +9,13 @@ import { createTagController } from './controllers/create-tag.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
 import { getFoldersController } from './controllers/get-folders.controller.ts'
 import { getItemsController } from './controllers/get-items.controller.ts'
+import { getMeController } from './controllers/get-me.controller.ts'
 import { refreshAccessTokenController } from './controllers/refresh-access-token.controller.ts'
 
 export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(authenticateUserController)
   app.register(refreshAccessTokenController)
+  app.register(getMeController)
   app.register(createAccountController)
   app.register(createFolderController)
   app.register(createItemsController)
