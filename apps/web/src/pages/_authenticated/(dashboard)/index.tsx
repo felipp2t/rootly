@@ -32,16 +32,6 @@ function Header() {
   )
 }
 
-function Sidebar() {
-  return (
-    <aside className='w-14 border-r border-zinc-800 bg-zinc-950 flex flex-col items-center pt-4 gap-3 shrink-0'>
-      <div className='w-8 h-8 rounded-md bg-zinc-800' />
-      <div className='w-8 h-8 rounded-md bg-zinc-800' />
-      <div className='w-8 h-8 rounded-md bg-zinc-800' />
-    </aside>
-  )
-}
-
 function RouteComponent() {
   return (
     <div className='relative h-svh'>
