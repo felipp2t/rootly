@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
+import { authenticateUser } from '@/api/auth/auth'
 import { Button } from '@/shared/components/ui/button'
 import {
   Field,
@@ -12,6 +13,7 @@ import {
   FieldLabel,
 } from '@/shared/components/ui/field'
 import { Input } from '@/shared/components/ui/input'
+import { tokenStore } from '@/shared/lib/fetch'
 import { cn } from '@/shared/lib/utils'
 
 const signInSchema = z.object({
@@ -35,7 +37,21 @@ function RouteComponent() {
       modeAfterSubmission: 'change',
     }),
     onSubmit: async ({ value }) => {
-      console.log(value)
+      const result = await authenticateUser({
+        email: value.email,
+        password: value.password,
+      })
+
+      if (result.status !== 201) {
+        signInForm.setFieldMeta('email', (meta) => ({
+          ...meta,
+          isTouched: true,
+          errorMap: { ...meta.errorMap, onServer: { message: result.data.message } },
+        }))
+        return
+      }
+
+      tokenStore.set(result.data.accessToken, result.data.refreshToken)
     },
   })
 
@@ -95,9 +111,7 @@ function RouteComponent() {
                           )}
                         />
                         <FieldError>
-                          {field.state.meta.errors[0]?.message && (
-                            <p>{field.state.meta.errors[0].message}</p>
-                          )}
+                          {field.state.meta.errors[0]?.message}
                         </FieldError>
                       </Field>
                     )
