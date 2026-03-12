@@ -4,8 +4,6 @@ import { Pool } from 'pg'
 import { env } from '../../env/index.ts'
 import { schema } from './schema/index.ts'
 
-console.info(env.DATABASE_URL)
-
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
   connectionTimeoutMillis: 10_000,
