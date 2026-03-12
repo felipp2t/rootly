@@ -69,8 +69,9 @@ add it before writing the tests — otherwise the test will fail silently or thr
 ## E2E Conventions
 - Use `app.inject()` (Fastify) — no supertest
 - `beforeAll(() => app.ready())`
-- `afterEach` deletes rows in dependency order: refreshTokens → items → folders → workspaces → users (respect FK constraints)
-- Happy path only in e2e; error cases belong in unit tests
+- `afterEach` deletes rows in dependency order: refreshTokens → items → folders → workspaceMembers → workspaceInvites → rolePermissions → workspaceRoles → workspaces → users (respect FK constraints; add tables only if the test creates those rows)
+- Happy path only in e2e; error cases belong in unit tests (exception: 401 auth checks are acceptable when they test infrastructure wiring)
+- `create-workspace` does NOT create a workspace_member row — seed membership manually with `db.insert(schema.workspaceMembers)` after fetching the auto-created workspaceRole by workspaceId
 - Auth uses httpOnly cookies — `POST /api/sessions` sets `accessToken` and `refreshToken` cookies; returns `201 {}` (no body tokens)
 - `POST /api/sessions/refresh` reads `refreshToken` from cookies; sets new cookies; returns `200 {}`
 - `GET /api/me` reads `accessToken` from cookies (no Authorization header)
