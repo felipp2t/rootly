@@ -11,6 +11,12 @@ export default defineConfig({
       schemas: './src/api/model',
       client: 'react-query',
       baseUrl: 'http://localhost:3000',
+      override: {
+        mutator: {
+          path: './src/shared/lib/fetch.ts',
+          name: 'fetchWithAuth',
+        },
+      },
     },
   },
 })
