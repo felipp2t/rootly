@@ -79,8 +79,8 @@ function RouteComponent() {
         <Header />
         <div className='flex flex-1 overflow-hidden'>
           <ScrollArea className='flex-1'>
-            <main className='container mx-auto px-8 py-12'>
-              <div className='mb-10 space-y-1.5'>
+            <main className='container mx-auto px-8 py-12 space-y-6'>
+              <div className='space-y-1.5'>
                 <h1 className='text-4xl font-bold text-white'>WORKSPACES</h1>
                 <InlineCode>8 WORKSPACES IN YOUR ORGANIZATION</InlineCode>
               </div>
