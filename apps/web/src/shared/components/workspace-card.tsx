@@ -1,74 +1,105 @@
-import {
-  File02Icon,
-  PlusSignIcon,
-  UserGroup03Icon,
-} from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { cn } from '../lib/utils'
+import { Folder, Plus, Settings2Icon, Shield, Users } from 'lucide-react'
+import type * as React from 'react'
+import { cn } from '@/shared/lib/utils'
 import { Button } from './ui/button'
+import { Separator } from './ui/separator'
 
 export interface Workspace {
   name: string
-  memberCount: number
   itemCount: number
+  updatedAt: string
+  memberCount: number
+  roleCount: number
 }
 
-interface WorkspaceCardProps {
+interface WorkspaceCardProps extends React.ComponentProps<'div'> {
   workspace: Workspace
+  onSettings?: () => void
 }
 
-export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
-  const hasOneMember = workspace.memberCount === 1
-  const hasOneItem = workspace.itemCount === 1
+function WorkspaceCard({
+  workspace,
+  onSettings,
+  className,
+  ...props
+}: WorkspaceCardProps) {
   return (
     <div
+      data-slot='workspace-card'
       className={cn(
-        'group h-24 w-full border-zinc-800/50 border-2 rounded-md flex flex-col items-start gap-3 p-4 cursor-pointer transition-all text-left duration-150',
-        // 'hover:outline-none hover:border-zinc-800/40 hover:ring-2 hover:ring-zinc-800/50 hover:ring-offset-2 hover:ring-offset-background',
-        'bg-linear-to-r from-card to-card/50',
-        'hover:brightness-125',
+        'flex cursor-pointer flex-col justify-between gap-3 border border-border hover:border-primary/50 bg-card p-5',
+        className,
       )}
+      {...props}
     >
-      <p className='text-lg font-display font-semibold text-zinc-100 line-clamp-2 leading-snug'>
-        {workspace.name}
-      </p>
-      <div className='mt-auto flex items-center gap-3 text-xs text-zinc-500'>
-        <div className='flex items-center gap-1.5'>
-          <HugeiconsIcon
-            icon={UserGroup03Icon}
-            size={18}
-            className='text-zinc-400'
-          />
-
-          <span>
-            {workspace.memberCount} {hasOneMember ? 'membro' : 'membros'}
-          </span>
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Folder className='size-4 shrink-0 text-primary' />
+            <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
+              {workspace.name}
+            </span>
+          </div>
+          <Button
+            size='icon-sm'
+            className='cursor-pointer group bg-transparent'
+          >
+            <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
+          </Button>
         </div>
-        <div className='flex items-center gap-1.5'>
-          <HugeiconsIcon
-            icon={File02Icon}
-            size={18}
-            className='text-zinc-400'
-          />
-          <span>
-            {workspace.itemCount} {hasOneItem ? 'item' : 'items'}
-          </span>
+        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+          {workspace.itemCount} ITEMS
+        </span>
+        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+          UPDATED {workspace.updatedAt}
+        </span>
+      </div>
+
+      <Separator />
+
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-1.5'>
+            <Users className='size-3.5 text-muted-foreground' />
+            <span className='font-mono text-sm font-medium text-muted-foreground'>
+              {workspace.memberCount}{' '}
+              {workspace.memberCount === 1 ? 'member' : 'members'}
+            </span>
+          </div>
+          <span className='font-mono text-[10px] text-border'>·</span>
+          <div className='flex items-center gap-1.5'>
+            <Shield className='size-3.5 text-muted-foreground' />
+            <span className='font-mono text-sm font-medium text-muted-foreground'>
+              {workspace.roleCount}{' '}
+              {workspace.roleCount === 1 ? 'role' : 'roles'}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export function NewWorkspaceCard({ onClick }: { onClick?: () => void }) {
+function NewWorkspaceCard({
+  onClick,
+  className,
+}: {
+  onClick?: () => void
+  className?: string
+}) {
   return (
-    <Button
-      onClick={onClick}
-      variant='ghost'
+    <button
       type='button'
-      className='h-24 w-full border border-dashed border-zinc-700 rounded-lg flex  items-center justify-center gap-2.5 cursor-pointer hover:border-zinc-500 hover:bg-zinc-800/30 transition-all'
+      onClick={onClick}
+      className={cn(
+        'flex h-full min-h-39 w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-border bg-transparent font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/50 hover:text-primary',
+        className,
+      )}
     >
-      <HugeiconsIcon icon={PlusSignIcon} size={18} color='#a1a1aa' />
-      <span className='text-sm text-zinc-400'>Novo Workspace</span>
-    </Button>
+      <Plus className='size-3.5' />
+      NEW WORKSPACE
+    </button>
   )
 }
+
+export { NewWorkspaceCard, WorkspaceCard }
