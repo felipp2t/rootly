@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { FoldersIcon } from 'lucide-react'
 import { getWorkspaces } from '@/api/workspaces/workspaces'
 import { InlineCode } from '@/shared/components/inline-code'
 import GridPattern from '@/shared/components/ui/grid-pattern'
@@ -48,9 +49,12 @@ const MOCK_WORKSPACES: Workspace[] = [
 function Header() {
   return (
     <header className='h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm flex items-center px-6 gap-4 sticky top-0 z-10'>
-      <span className='text-sm font-semibold text-white tracking-tight'>
-        Rootly
-      </span>
+      <div className='ml-8 flex items-center gap-4'>
+        <FoldersIcon className='text-primary' />
+        <span className='text-xl font-semibold text-white uppercase font-mono tracking-widest'>
+          Rootly
+        </span>
+      </div>
       <div className='flex-1' />
       <div className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300'>
         U
