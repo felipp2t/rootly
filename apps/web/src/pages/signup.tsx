@@ -240,11 +240,7 @@ function RouteComponent() {
                   <Field>
                     <Button
                       disabled={!canSubmit}
-                      className={cn(
-                        'cursor-pointer',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-                        'hover:outline-none hover:ring-2 hover:ring-primary/80 hover:ring-offset-2 hover:ring-offset-background',
-                      )}
+                      className={cn('cursor-pointer')}
                       type='submit'
                     >
                       Create Account
