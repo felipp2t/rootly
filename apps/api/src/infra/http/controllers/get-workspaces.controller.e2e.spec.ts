@@ -94,6 +94,55 @@ describe('GET /workspaces', () => {
     })
   })
 
+  it('should return itemCount of 0 when a workspace has no items', async () => {
+    const { userId, cookieHeader } = await createUserAndAuthenticate()
+    await createWorkspaceAndAddMember(cookieHeader, userId)
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/workspaces',
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().workspaces[0].itemCount).toBe(0)
+  })
+
+  it('should return the correct itemCount when a workspace has items', async () => {
+    const { userId, cookieHeader } = await createUserAndAuthenticate()
+    const workspaceId = await createWorkspaceAndAddMember(cookieHeader, userId)
+
+    await app.inject({
+      method: 'POST',
+      url: '/api/items',
+      headers: { cookie: cookieHeader },
+      payload: {
+        workspaceId,
+        title: 'Item One',
+        type: 'text',
+      },
+    })
+    await app.inject({
+      method: 'POST',
+      url: '/api/items',
+      headers: { cookie: cookieHeader },
+      payload: {
+        workspaceId,
+        title: 'Item Two',
+        type: 'text',
+      },
+    })
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/workspaces',
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().workspaces[0].itemCount).toBe(2)
+  })
+
   it('should return 200 with an empty list when the user has no workspace memberships', async () => {
     const { cookieHeader } = await createUserAndAuthenticate()
 

@@ -1,8 +1,11 @@
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
-import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
+import { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
+import type { InMemoryItemRepository } from './in-memory-item-repository.ts'
 
 export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   items: Workspace[] = []
+
+  constructor(private readonly itemRepository?: InMemoryItemRepository) {}
 
   async findById(id: string): Promise<Workspace | null> {
     return (
@@ -34,8 +37,27 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   }
 
   async findManyByIds(ids: string[]): Promise<Workspace[]> {
-    return this.items.filter((workspace) =>
+    const matched = this.items.filter((workspace) =>
       ids.includes(workspace.id.toString()),
     )
+
+    return matched.map((workspace) => {
+      const itemCount = this.itemRepository
+        ? this.itemRepository.items.filter(
+            (item) => item.workspaceId === workspace.id.toString(),
+          ).length
+        : workspace.itemCount
+
+      return Workspace.create(
+        {
+          name: workspace.name,
+          userId: workspace.userId,
+          itemCount,
+          createdAt: workspace.createdAt,
+          updatedAt: workspace.updatedAt,
+        },
+        workspace.id,
+      )
+    })
   }
 }
