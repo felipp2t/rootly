@@ -1,12 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './globals.css'
 import { AuthProvider, useAuth } from '@/shared/lib/auth'
+import './globals.css'
 import { routeTree } from './route-tree.gen.ts'
-
-const queryClient = new QueryClient()
+import { queryClient } from './shared/lib/query.tsx'
 
 const router = createRouter({
   routeTree,
