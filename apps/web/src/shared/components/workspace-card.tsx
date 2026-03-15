@@ -1,7 +1,17 @@
-import { Folder, Plus, Settings2Icon, Shield, Users } from 'lucide-react'
+import { Folder, PlusIcon, Settings2Icon, Shield, Users } from 'lucide-react'
 import type * as React from 'react'
 import { cn } from '@/shared/lib/utils'
 import { Button } from './ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog'
+import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 
 export interface Workspace {
@@ -88,17 +98,44 @@ function NewWorkspaceCard({
   className?: string
 }) {
   return (
-    <button
-      type='button'
-      onClick={onClick}
-      className={cn(
-        'flex h-full min-h-39 w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-border bg-transparent font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/50 hover:text-primary',
-        className,
-      )}
-    >
-      <Plus className='size-3.5' />
-      NEW WORKSPACE
-    </button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          type='button'
+          onClick={onClick}
+          className={cn(
+            'flex h-full min-h-39 w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-border bg-transparent font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/50 hover:text-primary',
+            className,
+          )}
+        >
+          <PlusIcon className='size-3.5' />
+          NEW WORKSPACE
+        </Button>
+      </DialogTrigger>
+      <DialogContent className='space-y-6'>
+        <DialogHeader>
+          <DialogTitle>NEW WORKSPACE</DialogTitle>
+        </DialogHeader>
+        <Input
+          className={cn(
+            'border border-border focus-visible:border-primary/50 rounded-none focus-visible:outline-none focus-visible:ring-0',
+          )}
+          placeholder='my-workspace'
+        />
+
+        <DialogFooter>
+          <DialogClose>
+            <Button variant='outline' className='cursor-pointer'>
+              CANCEL
+            </Button>
+          </DialogClose>
+          <Button className='cursor-pointer'>
+            <PlusIcon className='size-3.5' />
+            CREATE
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
