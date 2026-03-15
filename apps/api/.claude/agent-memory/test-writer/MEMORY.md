@@ -66,6 +66,29 @@ repository class against the in-memory implementation for all methods:
 If the abstract class declares a method that is missing from the in-memory repo,
 add it before writing the tests — otherwise the test will fail silently or throw at runtime.
 
+## Cross-Repository Dependencies in In-Memory Repos
+When an in-memory repo method mirrors a Drizzle query that JOIN-aggregates from another table
+(e.g. `findManyByIds` counting items per workspace), inject the related in-memory repo as an
+optional constructor parameter and compute the aggregation inline. Pattern:
+
+```typescript
+constructor(private readonly itemRepository?: InMemoryItemRepository) {}
+
+async findManyByIds(ids: string[]): Promise<Workspace[]> {
+  return matched.map((workspace) => {
+    const itemCount = this.itemRepository
+      ? this.itemRepository.items.filter(
+          (item) => item.workspaceId === workspace.id.toString(),
+        ).length
+      : workspace.itemCount
+    return Workspace.create({ ...workspace.props, itemCount }, workspace.id)
+  })
+}
+```
+
+Tests that need the aggregation pass the sibling repo to the constructor; tests that don't
+need it omit it (constructor param is optional, falls back to stored value).
+
 ## E2E Conventions
 - Use `app.inject()` (Fastify) — no supertest
 - `beforeAll(() => app.ready())`
