@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
+import { QUERY_KEYS } from '../keys'
 import type { GetMe200, GetMe401, GetMe500 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -64,7 +65,7 @@ export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
 }
 
 export const getGetMeQueryKey = () => {
-  return [`http://localhost:3333/api/me`] as const
+  return QUERY_KEYS.me()
 }
 
 export const getGetMeQueryOptions = <

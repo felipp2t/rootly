@@ -39,7 +39,11 @@ function RouteSuspense() {
 }
 
 function WorkspacePage() {
-  const { data: res } = useGetWorkspacesSuspense()
+  const { data: res } = useGetWorkspacesSuspense({
+    query: {
+      queryKey: ['workspaces'],
+    },
+  })
   const workspaces = res.status === 200 ? res.data.workspaces : []
 
   return (

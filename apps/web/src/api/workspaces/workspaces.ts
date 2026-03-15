@@ -23,6 +23,7 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
+import { QUERY_KEYS } from '../keys'
 import type {
   CreateWorkspace201,
   CreateWorkspace401,
@@ -202,7 +203,7 @@ export const getWorkspaces = async (
 }
 
 export const getGetWorkspacesQueryKey = () => {
-  return [`http://localhost:3333/api/workspaces`] as const
+  return QUERY_KEYS.workspaces()
 }
 
 export const getGetWorkspacesQueryOptions = <

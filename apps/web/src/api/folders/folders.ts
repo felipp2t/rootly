@@ -23,6 +23,7 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
+import { QUERY_KEYS } from '../keys'
 import type {
   AssignTagToFolder401,
   AssignTagToFolder404,
@@ -243,10 +244,7 @@ export const getFolders = async (
 }
 
 export const getGetFoldersQueryKey = (params?: GetFoldersParams) => {
-  return [
-    `http://localhost:3333/api/folders`,
-    ...(params ? [params] : []),
-  ] as const
+  return QUERY_KEYS.folders(params)
 }
 
 export const getGetFoldersQueryOptions = <
