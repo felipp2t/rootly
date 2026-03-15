@@ -1,11 +1,13 @@
 import { makeUser } from '@test/factories/make-user.ts'
 import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
+import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
 import { permissionResource } from '../../enterprise/entities/role-permission.ts'
 import { CreateWorkspaceUseCase } from './create-workspace.ts'
 
 let workspaceRepository: InMemoryWorkspaceRepository
+let workspaceMemberRepository: InMemoryWorkspaceMemberRepository
 let rolePermissionRepository: InMemoryRolePermissionRepository
 let workspaceRoleRepository: InMemoryWorkspaceRoleRepository
 let sut: CreateWorkspaceUseCase
@@ -13,10 +15,12 @@ let sut: CreateWorkspaceUseCase
 describe('CreateWorkspace', () => {
   beforeEach(() => {
     workspaceRepository = new InMemoryWorkspaceRepository()
+    workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
     rolePermissionRepository = new InMemoryRolePermissionRepository()
     workspaceRoleRepository = new InMemoryWorkspaceRoleRepository()
     sut = new CreateWorkspaceUseCase(
       workspaceRepository,
+      workspaceMemberRepository,
       workspaceRoleRepository,
       rolePermissionRepository,
     )
@@ -121,5 +125,55 @@ describe('CreateWorkspace', () => {
     for (const permission of rolePermissionRepository.items) {
       expect(permission.roleId).toBe(role.id.toString())
     }
+  })
+
+  it('should create a workspace member for the creator', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    expect(workspaceMemberRepository.items.length).toBe(1)
+  })
+
+  it('should associate the workspace member with the creator', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    expect(workspaceMemberRepository.items[0].userId).toBe(user.id.toString())
+  })
+
+  it('should associate the workspace member with the created workspace', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    const workspace = workspaceRepository.items[0]
+
+    expect(workspaceMemberRepository.items[0].workspaceId).toBe(
+      workspace.id.toString(),
+    )
+  })
+
+  it('should assign the Owner role to the workspace member', async () => {
+    const user = makeUser()
+
+    await sut.execute({
+      name: 'My Workspace',
+      userId: user.id.toString(),
+    })
+
+    const role = workspaceRoleRepository.items[0]
+
+    expect(workspaceMemberRepository.items[0].roleId).toBe(role.id.toString())
   })
 })
