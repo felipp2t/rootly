@@ -18,8 +18,10 @@ import type {
   UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
+  UseSuspenseQueryOptions,
+  UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   AssignTagToFolder401,
@@ -365,6 +367,134 @@ export function useGetFolders<
     TData,
     TError
   > & { queryKey: DataTag<QueryKey, TData, TError> }
+
+  return { ...query, queryKey: queryOptions.queryKey }
+}
+
+export const getGetFoldersSuspenseQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders401 | GetFolders500,
+>(
+  params?: GetFoldersParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getFolders>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetFoldersQueryKey(params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({
+    signal,
+  }) => getFolders(params, { signal, ...requestOptions })
+
+  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
+    Awaited<ReturnType<typeof getFolders>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetFoldersSuspenseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getFolders>>
+>
+export type GetFoldersSuspenseQueryError = GetFolders401 | GetFolders500
+
+export function useGetFoldersSuspense<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders401 | GetFolders500,
+>(
+  params: undefined | GetFoldersParams,
+  options: {
+    query: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getFolders>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetFoldersSuspense<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders401 | GetFolders500,
+>(
+  params?: GetFoldersParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getFolders>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useGetFoldersSuspense<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders401 | GetFolders500,
+>(
+  params?: GetFoldersParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getFolders>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+/**
+ * @summary Get Folders
+ */
+
+export function useGetFoldersSuspense<
+  TData = Awaited<ReturnType<typeof getFolders>>,
+  TError = GetFolders401 | GetFolders500,
+>(
+  params?: GetFoldersParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getFolders>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+} {
+  const queryOptions = getGetFoldersSuspenseQueryOptions(params, options)
+
+  const query = useSuspenseQuery(
+    queryOptions,
+    queryClient,
+  ) as UseSuspenseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
 
   return { ...query, queryKey: queryOptions.queryKey }
 }

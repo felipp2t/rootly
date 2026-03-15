@@ -16,6 +16,9 @@ export default defineConfig({
           path: './src/shared/lib/fetch.ts',
           name: 'fetchWithAuth',
         },
+        query: {
+          useSuspenseQuery: true,
+        },
       },
     },
   },
