@@ -1108,6 +1108,9 @@
                           "userId": {
                             "type": "string"
                           },
+                          "itemCount": {
+                            "type": "number"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -1121,6 +1124,7 @@
                           "id",
                           "name",
                           "userId",
+                          "itemCount",
                           "createdAt",
                           "updatedAt"
                         ],

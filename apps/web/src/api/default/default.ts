@@ -49,6 +49,10 @@ export const getHealth = async (
   })
 }
 
+export const getGetHealthQueryKey = () => {
+  return QUERY_KEYS.health()
+}
+
 export const getGetHealthQueryOptions = <
   TData = Awaited<ReturnType<typeof getHealth>>,
   TError = unknown,
@@ -60,7 +64,7 @@ export const getGetHealthQueryOptions = <
 }) => {
   const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? QUERY_KEYS.health()
+  const queryKey = queryOptions?.queryKey ?? getGetHealthQueryKey()
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getHealth>>> = ({
     signal,
@@ -176,7 +180,7 @@ export const getGetHealthSuspenseQueryOptions = <
 }) => {
   const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? QUERY_KEYS.health()
+  const queryKey = queryOptions?.queryKey ?? getGetHealthQueryKey()
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getHealth>>> = ({
     signal,

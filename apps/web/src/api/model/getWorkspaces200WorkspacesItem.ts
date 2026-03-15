@@ -9,6 +9,7 @@ export type GetWorkspaces200WorkspacesItem = {
   id: string
   name: string
   userId: string
+  itemCount: number
   createdAt: string
   updatedAt: string
 }
