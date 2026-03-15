@@ -7,6 +7,7 @@ import z from 'zod'
 import { createWorkspace } from '@/api/workspaces/workspaces'
 import { cn } from '@/shared/lib/utils'
 import { queryClient } from '../lib/query'
+import { formatTimeAgo } from '../utils/format-time-ago'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -69,7 +70,7 @@ function WorkspaceCard({
           {workspace.itemCount} ITEMS
         </span>
         <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-          UPDATED {workspace.updatedAt}
+          UPDATED {formatTimeAgo(new Date(workspace.updatedAt))}
         </span>
       </div>
 
