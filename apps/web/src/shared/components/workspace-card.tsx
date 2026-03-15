@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
-import { FieldGroup } from './ui/field'
+import { Field, FieldError, FieldGroup } from './ui/field'
 import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 import { Skeleton } from './ui/skeleton'
@@ -120,13 +120,13 @@ function NewWorkspaceCard({ className }: { className?: string }) {
       if (response.status === 201) {
         queryClient.invalidateQueries({ queryKey: ['workspaces'] })
         toast.success('Workspace created successfully')
+        createWorkspaceForm.reset()
+        setDialogIsOpen(false)
       }
 
       if (response.status === 500) {
         toast.error('Failed to create workspace. Please try again later.')
       }
-
-      setDialogIsOpen(false)
     },
   })
 
@@ -162,19 +162,24 @@ function NewWorkspaceCard({ className }: { className?: string }) {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    autoComplete='off'
-                    className={cn(
-                      'border border-border focus-visible:border-primary/50 rounded-none focus-visible:outline-none focus-visible:ring-0',
-                    )}
-                    placeholder='my-workspace'
-                  />
+                  <Field data-invalid={isInvalid}>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      autoComplete='off'
+                      className={cn(
+                        'border border-border focus-visible:border-primary/50 rounded-none focus-visible:outline-none focus-visible:ring-0',
+                      )}
+                      placeholder='my-workspace'
+                    />
+                    <FieldError>
+                      {field.state.meta.errors[0]?.message}
+                    </FieldError>
+                  </Field>
                 )
               }}
             />
