@@ -48,11 +48,15 @@ describe('GET /workspaces', () => {
     return { userId, cookieHeader }
   }
 
-  async function createWorkspaceAndAddMember(userId: string) {
+  async function createWorkspaceAndAddMember(
+    cookieHeader: string,
+    userId: string,
+  ) {
     const workspaceResponse = await app.inject({
       method: 'POST',
       url: '/api/workspaces',
-      payload: { name: 'My Workspace', userId },
+      headers: { cookie: cookieHeader },
+      payload: { name: 'My Workspace' },
     })
 
     const { workspaceId } = workspaceResponse.json<{ workspaceId: string }>()
@@ -73,7 +77,7 @@ describe('GET /workspaces', () => {
 
   it('should return 200 with workspaces the authenticated user is a member of', async () => {
     const { userId, cookieHeader } = await createUserAndAuthenticate()
-    await createWorkspaceAndAddMember(userId)
+    await createWorkspaceAndAddMember(cookieHeader, userId)
 
     const response = await app.inject({
       method: 'GET',

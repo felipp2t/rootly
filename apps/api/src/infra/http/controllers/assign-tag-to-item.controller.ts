@@ -1,6 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeAssignTagToItemUseCase } from '../factories/make-assign-tag-to-item-use-case.ts'
+import { verifyJwt } from '../verify-jwt.ts'
 
 export const assignTagToItemController: FastifyPluginCallbackZod = async (
   app,
@@ -19,12 +20,25 @@ export const assignTagToItemController: FastifyPluginCallbackZod = async (
         }),
         response: {
           204: z.void(),
+          401: z.object({ message: z.string() }),
           404: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
         },
       },
     },
     async (request, reply) => {
+      const token = request.cookies.accessToken
+
+      if (!token) {
+        return reply.status(401).send({ message: 'Unauthorized' })
+      }
+
+      const payload = await verifyJwt(token)
+
+      if (!payload) {
+        return reply.status(401).send({ message: 'Unauthorized' })
+      }
+
       const { itemId, tagId } = request.params
 
       const useCase = makeAssignTagToItemUseCase()

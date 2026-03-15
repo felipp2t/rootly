@@ -11,12 +11,16 @@ describe('POST /items', () => {
     await db.delete(schema.refreshTokens)
     await db.delete(schema.items)
     await db.delete(schema.folders)
+    await db.delete(schema.workspaceMembers)
+    await db.delete(schema.workspaceInvites)
+    await db.delete(schema.rolePermissions)
+    await db.delete(schema.workspaceRoles)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
   })
 
-  async function createUserAndGetWorkspaceId() {
-    const accountResponse = await app.inject({
+  async function createUserAndGetCookieAndWorkspaceId() {
+    await app.inject({
       method: 'POST',
       url: '/api/accounts',
       payload: {
@@ -26,38 +30,55 @@ describe('POST /items', () => {
       },
     })
 
-    const { userId } = accountResponse.json<{ userId: string }>()
+    const sessionResponse = await app.inject({
+      method: 'POST',
+      url: '/api/sessions',
+      payload: { email: 'john@example.com', password: '123456' },
+    })
+
+    const setCookieHeader = sessionResponse.headers['set-cookie']
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader]
+    const cookieHeader = cookies.map((c) => c?.split(';')[0]).join('; ')
 
     const workspaceResponse = await app.inject({
       method: 'POST',
       url: '/api/workspaces',
-      payload: { name: 'My Workspace', userId },
+      headers: { cookie: cookieHeader },
+      payload: { name: 'My Workspace' },
     })
 
     const { workspaceId } = workspaceResponse.json<{ workspaceId: string }>()
 
-    return workspaceId
+    return { cookieHeader, workspaceId }
   }
 
-  async function createFolderAndGetId(workspaceId: string) {
-    const folderResponse = await app.inject({
+  async function createFolder(
+    cookieHeader: string,
+    workspaceId: string,
+  ) {
+    const response = await app.inject({
       method: 'POST',
       url: '/api/folders',
+      headers: { cookie: cookieHeader },
       payload: { name: 'My Folder', workspaceId },
     })
 
-    const { folderId } = folderResponse.json<{ folderId: string }>()
+    const { folderId } = response.json<{ folderId: string }>()
 
     return folderId
   }
 
   it('should create an item inside a folder and return 201 with itemId', async () => {
-    const workspaceId = await createUserAndGetWorkspaceId()
-    const folderId = await createFolderAndGetId(workspaceId)
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
+    const folderId = await createFolder(cookieHeader, workspaceId)
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/items',
+      headers: { cookie: cookieHeader },
       payload: {
         title: 'My Link',
         workspaceId,
@@ -72,11 +93,13 @@ describe('POST /items', () => {
   })
 
   it('should create an item without a folder and return 201 with itemId', async () => {
-    const workspaceId = await createUserAndGetWorkspaceId()
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
 
     const response = await app.inject({
       method: 'POST',
       url: '/api/items',
+      headers: { cookie: cookieHeader },
       payload: {
         title: 'My Link',
         workspaceId,
@@ -90,8 +113,9 @@ describe('POST /items', () => {
   })
 
   it('should create items of all valid types', async () => {
-    const workspaceId = await createUserAndGetWorkspaceId()
-    const folderId = await createFolderAndGetId(workspaceId)
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
+    const folderId = await createFolder(cookieHeader, workspaceId)
 
     const payloads = [
       {
@@ -127,6 +151,7 @@ describe('POST /items', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/api/items',
+        headers: { cookie: cookieHeader },
         payload,
       })
 

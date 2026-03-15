@@ -12,12 +12,16 @@ describe('PATCH /folders/:folderId/tags/:tagId', () => {
     await db.delete(schema.items)
     await db.delete(schema.folders)
     await db.delete(schema.tags)
+    await db.delete(schema.workspaceMembers)
+    await db.delete(schema.workspaceInvites)
+    await db.delete(schema.rolePermissions)
+    await db.delete(schema.workspaceRoles)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
   })
 
-  async function createUserAndGetWorkspaceId() {
-    const accountResponse = await app.inject({
+  async function createUserAndGetCookieAndWorkspaceId() {
+    await app.inject({
       method: 'POST',
       url: '/api/accounts',
       payload: {
@@ -27,31 +31,47 @@ describe('PATCH /folders/:folderId/tags/:tagId', () => {
       },
     })
 
-    const { userId } = accountResponse.json<{ userId: string }>()
+    const sessionResponse = await app.inject({
+      method: 'POST',
+      url: '/api/sessions',
+      payload: { email: 'john@example.com', password: '123456' },
+    })
+
+    const setCookieHeader = sessionResponse.headers['set-cookie']
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader]
+    const cookieHeader = cookies.map((c) => c?.split(';')[0]).join('; ')
 
     const workspaceResponse = await app.inject({
       method: 'POST',
       url: '/api/workspaces',
-      payload: { name: 'My Workspace', userId },
+      headers: { cookie: cookieHeader },
+      payload: { name: 'My Workspace' },
     })
 
-    return workspaceResponse.json<{ workspaceId: string }>().workspaceId
+    const workspaceId =
+      workspaceResponse.json<{ workspaceId: string }>().workspaceId
+
+    return { cookieHeader, workspaceId }
   }
 
-  async function createTag(workspaceId: string) {
+  async function createTag(cookieHeader: string, workspaceId: string) {
     const response = await app.inject({
       method: 'POST',
       url: '/api/tags',
+      headers: { cookie: cookieHeader },
       payload: { name: 'Important', color: 'red', workspaceId },
     })
 
     return response.json<{ tagId: string }>().tagId
   }
 
-  async function createFolder(workspaceId: string) {
+  async function createFolder(cookieHeader: string, workspaceId: string) {
     const response = await app.inject({
       method: 'POST',
       url: '/api/folders',
+      headers: { cookie: cookieHeader },
       payload: { name: 'My Folder', workspaceId },
     })
 
@@ -59,13 +79,15 @@ describe('PATCH /folders/:folderId/tags/:tagId', () => {
   }
 
   it('should assign a tag to a folder and return 204', async () => {
-    const workspaceId = await createUserAndGetWorkspaceId()
-    const tagId = await createTag(workspaceId)
-    const folderId = await createFolder(workspaceId)
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
+    const tagId = await createTag(cookieHeader, workspaceId)
+    const folderId = await createFolder(cookieHeader, workspaceId)
 
     const response = await app.inject({
       method: 'PATCH',
       url: `/api/folders/${folderId}/tags/${tagId}`,
+      headers: { cookie: cookieHeader },
     })
 
     expect(response.statusCode).toBe(204)

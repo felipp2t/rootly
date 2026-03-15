@@ -1,8 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import { jwtVerify } from 'jose'
 import { z } from 'zod'
-import { env } from '@/infra/env/index.ts'
 import { makeGetMeUseCase } from '../factories/make-get-me-use-case.ts'
+import { verifyJwt } from '../verify-jwt.ts'
 
 export const getMeController: FastifyPluginCallbackZod = async (app) => {
   app.get(
@@ -30,19 +29,14 @@ export const getMeController: FastifyPluginCallbackZod = async (app) => {
       if (!token) {
         return reply.status(401).send({ message: 'Unauthorized' })
       }
-      const secret = new TextEncoder().encode(env.JWT_SECRET)
+      const payload = await verifyJwt(token)
 
-      let userId: string
-
-      try {
-        const { payload } = await jwtVerify(token, secret)
-        userId = payload.sub as string
-      } catch {
+      if (!payload) {
         return reply.status(401).send({ message: 'Unauthorized' })
       }
 
       const getMeUseCase = makeGetMeUseCase()
-      const result = await getMeUseCase.execute({ userId })
+      const result = await getMeUseCase.execute({ userId: payload.userId })
 
       if (result.isLeft()) {
         return reply.status(401).send({ message: 'Unauthorized' })
