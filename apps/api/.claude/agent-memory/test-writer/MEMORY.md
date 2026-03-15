@@ -79,3 +79,15 @@ add it before writing the tests — otherwise the test will fail silently or thr
 - Cookie extraction pattern: `const cookies = [].concat(response.headers['set-cookie']); const cookieHeader = cookies.map(c => c.split(';')[0]).join('; ')`
 - Pass cookies in subsequent requests via `headers: { cookie: cookieHeader }`
 - `describe` block name in e2e tests uses the HTTP method + path format: `describe('POST /sessions/refresh', ...)`
+
+## Protected Routes — Auth Required in E2E Tests
+All routes except `POST /accounts`, `POST /sessions`, and `POST /sessions/refresh` require the
+`accessToken` cookie. When writing e2e tests for protected routes:
+1. Always start with a `createUserAndGetCookieHeader()` (or combined variant) helper that does:
+   POST /api/accounts → POST /api/sessions → extract Set-Cookie header into a cookie string.
+2. Pass `headers: { cookie: cookieHeader }` on every call to a protected route, including
+   intermediate setup calls (e.g. POST /workspaces, POST /folders, POST /tags, POST /items).
+3. `POST /workspaces` no longer accepts `userId` in the body — userId comes from the JWT.
+   Remove any `userId` field from the `POST /workspaces` payload.
+4. The `afterEach` cleanup in tests that call `POST /workspaces` must delete workspace-related
+   tables in FK order: workspaceMembers → workspaceInvites → rolePermissions → workspaceRoles → workspaces.
