@@ -23,6 +23,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   CreateWorkspace201,
+  CreateWorkspace401,
   CreateWorkspace500,
   CreateWorkspaceBody,
   GetWorkspaces200,
@@ -41,6 +42,11 @@ export type createWorkspaceResponse201 = {
   status: 201
 }
 
+export type createWorkspaceResponse401 = {
+  data: CreateWorkspace401
+  status: 401
+}
+
 export type createWorkspaceResponse500 = {
   data: CreateWorkspace500
   status: 500
@@ -49,7 +55,10 @@ export type createWorkspaceResponse500 = {
 export type createWorkspaceResponseSuccess = createWorkspaceResponse201 & {
   headers: Headers
 }
-export type createWorkspaceResponseError = createWorkspaceResponse500 & {
+export type createWorkspaceResponseError = (
+  | createWorkspaceResponse401
+  | createWorkspaceResponse500
+) & {
   headers: Headers
 }
 
@@ -74,7 +83,7 @@ export const createWorkspace = async (
 }
 
 export const getCreateWorkspaceMutationOptions = <
-  TError = CreateWorkspace500,
+  TError = CreateWorkspace401 | CreateWorkspace500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -115,13 +124,15 @@ export type CreateWorkspaceMutationResult = NonNullable<
   Awaited<ReturnType<typeof createWorkspace>>
 >
 export type CreateWorkspaceMutationBody = CreateWorkspaceBody
-export type CreateWorkspaceMutationError = CreateWorkspace500
+export type CreateWorkspaceMutationError =
+  | CreateWorkspace401
+  | CreateWorkspace500
 
 /**
  * @summary Create Workspace
  */
 export const useCreateWorkspace = <
-  TError = CreateWorkspace500,
+  TError = CreateWorkspace401 | CreateWorkspace500,
   TContext = unknown,
 >(
   options?: {

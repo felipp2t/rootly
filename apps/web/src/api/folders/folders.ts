@@ -22,14 +22,17 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
+  AssignTagToFolder401,
   AssignTagToFolder404,
   AssignTagToFolder500,
   CreateFolder201,
   CreateFolder400,
+  CreateFolder401,
   CreateFolder409,
   CreateFolder500,
   CreateFolderBody,
   GetFolders200,
+  GetFolders401,
   GetFolders500,
   GetFoldersParams,
 } from '../model'
@@ -50,6 +53,11 @@ export type createFolderResponse400 = {
   status: 400
 }
 
+export type createFolderResponse401 = {
+  data: CreateFolder401
+  status: 401
+}
+
 export type createFolderResponse409 = {
   data: CreateFolder409
   status: 409
@@ -65,6 +73,7 @@ export type createFolderResponseSuccess = createFolderResponse201 & {
 }
 export type createFolderResponseError = (
   | createFolderResponse400
+  | createFolderResponse401
   | createFolderResponse409
   | createFolderResponse500
 ) & {
@@ -92,7 +101,11 @@ export const createFolder = async (
 }
 
 export const getCreateFolderMutationOptions = <
-  TError = CreateFolder400 | CreateFolder409 | CreateFolder500,
+  TError =
+    | CreateFolder400
+    | CreateFolder401
+    | CreateFolder409
+    | CreateFolder500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -135,6 +148,7 @@ export type CreateFolderMutationResult = NonNullable<
 export type CreateFolderMutationBody = CreateFolderBody
 export type CreateFolderMutationError =
   | CreateFolder400
+  | CreateFolder401
   | CreateFolder409
   | CreateFolder500
 
@@ -142,7 +156,11 @@ export type CreateFolderMutationError =
  * @summary Create Folder
  */
 export const useCreateFolder = <
-  TError = CreateFolder400 | CreateFolder409 | CreateFolder500,
+  TError =
+    | CreateFolder400
+    | CreateFolder401
+    | CreateFolder409
+    | CreateFolder500,
   TContext = unknown,
 >(
   options?: {
@@ -172,6 +190,11 @@ export type getFoldersResponse200 = {
   status: 200
 }
 
+export type getFoldersResponse401 = {
+  data: GetFolders401
+  status: 401
+}
+
 export type getFoldersResponse500 = {
   data: GetFolders500
   status: 500
@@ -180,7 +203,10 @@ export type getFoldersResponse500 = {
 export type getFoldersResponseSuccess = getFoldersResponse200 & {
   headers: Headers
 }
-export type getFoldersResponseError = getFoldersResponse500 & {
+export type getFoldersResponseError = (
+  | getFoldersResponse401
+  | getFoldersResponse500
+) & {
   headers: Headers
 }
 
@@ -223,7 +249,7 @@ export const getGetFoldersQueryKey = (params?: GetFoldersParams) => {
 
 export const getGetFoldersQueryOptions = <
   TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders500,
+  TError = GetFolders401 | GetFolders500,
 >(
   params?: GetFoldersParams,
   options?: {
@@ -251,11 +277,11 @@ export const getGetFoldersQueryOptions = <
 export type GetFoldersQueryResult = NonNullable<
   Awaited<ReturnType<typeof getFolders>>
 >
-export type GetFoldersQueryError = GetFolders500
+export type GetFoldersQueryError = GetFolders401 | GetFolders500
 
 export function useGetFolders<
   TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders500,
+  TError = GetFolders401 | GetFolders500,
 >(
   params: undefined | GetFoldersParams,
   options: {
@@ -278,7 +304,7 @@ export function useGetFolders<
 }
 export function useGetFolders<
   TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders500,
+  TError = GetFolders401 | GetFolders500,
 >(
   params?: GetFoldersParams,
   options?: {
@@ -301,7 +327,7 @@ export function useGetFolders<
 }
 export function useGetFolders<
   TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders500,
+  TError = GetFolders401 | GetFolders500,
 >(
   params?: GetFoldersParams,
   options?: {
@@ -320,7 +346,7 @@ export function useGetFolders<
 
 export function useGetFolders<
   TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders500,
+  TError = GetFolders401 | GetFolders500,
 >(
   params?: GetFoldersParams,
   options?: {
@@ -352,6 +378,11 @@ export type assignTagToFolderResponse204 = {
   status: 204
 }
 
+export type assignTagToFolderResponse401 = {
+  data: AssignTagToFolder401
+  status: 401
+}
+
 export type assignTagToFolderResponse404 = {
   data: AssignTagToFolder404
   status: 404
@@ -366,6 +397,7 @@ export type assignTagToFolderResponseSuccess = assignTagToFolderResponse204 & {
   headers: Headers
 }
 export type assignTagToFolderResponseError = (
+  | assignTagToFolderResponse401
   | assignTagToFolderResponse404
   | assignTagToFolderResponse500
 ) & {
@@ -395,7 +427,7 @@ export const assignTagToFolder = async (
 }
 
 export const getAssignTagToFolderMutationOptions = <
-  TError = AssignTagToFolder404 | AssignTagToFolder500,
+  TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -437,6 +469,7 @@ export type AssignTagToFolderMutationResult = NonNullable<
 >
 
 export type AssignTagToFolderMutationError =
+  | AssignTagToFolder401
   | AssignTagToFolder404
   | AssignTagToFolder500
 
@@ -444,7 +477,7 @@ export type AssignTagToFolderMutationError =
  * @summary Assign Tag to Folder
  */
 export const useAssignTagToFolder = <
-  TError = AssignTagToFolder404 | AssignTagToFolder500,
+  TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
   TContext = unknown,
 >(
   options?: {

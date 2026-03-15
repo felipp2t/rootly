@@ -7,5 +7,4 @@
 
 export type CreateWorkspaceBody = {
   name: string
-  userId: string
 }

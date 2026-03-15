@@ -15,6 +15,7 @@ import { useMutation } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
   CreateTag201,
+  CreateTag401,
   CreateTag409,
   CreateTag500,
   CreateTagBody,
@@ -31,6 +32,11 @@ export type createTagResponse201 = {
   status: 201
 }
 
+export type createTagResponse401 = {
+  data: CreateTag401
+  status: 401
+}
+
 export type createTagResponse409 = {
   data: CreateTag409
   status: 409
@@ -45,6 +51,7 @@ export type createTagResponseSuccess = createTagResponse201 & {
   headers: Headers
 }
 export type createTagResponseError = (
+  | createTagResponse401
   | createTagResponse409
   | createTagResponse500
 ) & {
@@ -72,7 +79,7 @@ export const createTag = async (
 }
 
 export const getCreateTagMutationOptions = <
-  TError = CreateTag409 | CreateTag500,
+  TError = CreateTag401 | CreateTag409 | CreateTag500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -113,13 +120,13 @@ export type CreateTagMutationResult = NonNullable<
   Awaited<ReturnType<typeof createTag>>
 >
 export type CreateTagMutationBody = CreateTagBody
-export type CreateTagMutationError = CreateTag409 | CreateTag500
+export type CreateTagMutationError = CreateTag401 | CreateTag409 | CreateTag500
 
 /**
  * @summary Create Tag
  */
 export const useCreateTag = <
-  TError = CreateTag409 | CreateTag500,
+  TError = CreateTag401 | CreateTag409 | CreateTag500,
   TContext = unknown,
 >(
   options?: {

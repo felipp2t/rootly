@@ -22,14 +22,17 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
 import type {
+  AssignTagToItem401,
   AssignTagToItem404,
   AssignTagToItem500,
   CreateItem201,
   CreateItem400,
+  CreateItem401,
   CreateItem409,
   CreateItem500,
   CreateItemBody,
   GetItems200,
+  GetItems401,
   GetItems500,
   GetItemsParams,
 } from '../model'
@@ -50,6 +53,11 @@ export type createItemResponse400 = {
   status: 400
 }
 
+export type createItemResponse401 = {
+  data: CreateItem401
+  status: 401
+}
+
 export type createItemResponse409 = {
   data: CreateItem409
   status: 409
@@ -65,6 +73,7 @@ export type createItemResponseSuccess = createItemResponse201 & {
 }
 export type createItemResponseError = (
   | createItemResponse400
+  | createItemResponse401
   | createItemResponse409
   | createItemResponse500
 ) & {
@@ -92,7 +101,7 @@ export const createItem = async (
 }
 
 export const getCreateItemMutationOptions = <
-  TError = CreateItem400 | CreateItem409 | CreateItem500,
+  TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -135,6 +144,7 @@ export type CreateItemMutationResult = NonNullable<
 export type CreateItemMutationBody = CreateItemBody
 export type CreateItemMutationError =
   | CreateItem400
+  | CreateItem401
   | CreateItem409
   | CreateItem500
 
@@ -142,7 +152,7 @@ export type CreateItemMutationError =
  * @summary Create Item
  */
 export const useCreateItem = <
-  TError = CreateItem400 | CreateItem409 | CreateItem500,
+  TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
   TContext = unknown,
 >(
   options?: {
@@ -172,6 +182,11 @@ export type getItemsResponse200 = {
   status: 200
 }
 
+export type getItemsResponse401 = {
+  data: GetItems401
+  status: 401
+}
+
 export type getItemsResponse500 = {
   data: GetItems500
   status: 500
@@ -180,7 +195,10 @@ export type getItemsResponse500 = {
 export type getItemsResponseSuccess = getItemsResponse200 & {
   headers: Headers
 }
-export type getItemsResponseError = getItemsResponse500 & {
+export type getItemsResponseError = (
+  | getItemsResponse401
+  | getItemsResponse500
+) & {
   headers: Headers
 }
 
@@ -221,7 +239,7 @@ export const getGetItemsQueryKey = (params?: GetItemsParams) => {
 
 export const getGetItemsQueryOptions = <
   TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems500,
+  TError = GetItems401 | GetItems500,
 >(
   params?: GetItemsParams,
   options?: {
@@ -249,11 +267,11 @@ export const getGetItemsQueryOptions = <
 export type GetItemsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getItems>>
 >
-export type GetItemsQueryError = GetItems500
+export type GetItemsQueryError = GetItems401 | GetItems500
 
 export function useGetItems<
   TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems500,
+  TError = GetItems401 | GetItems500,
 >(
   params: undefined | GetItemsParams,
   options: {
@@ -276,7 +294,7 @@ export function useGetItems<
 }
 export function useGetItems<
   TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems500,
+  TError = GetItems401 | GetItems500,
 >(
   params?: GetItemsParams,
   options?: {
@@ -299,7 +317,7 @@ export function useGetItems<
 }
 export function useGetItems<
   TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems500,
+  TError = GetItems401 | GetItems500,
 >(
   params?: GetItemsParams,
   options?: {
@@ -318,7 +336,7 @@ export function useGetItems<
 
 export function useGetItems<
   TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems500,
+  TError = GetItems401 | GetItems500,
 >(
   params?: GetItemsParams,
   options?: {
@@ -350,6 +368,11 @@ export type assignTagToItemResponse204 = {
   status: 204
 }
 
+export type assignTagToItemResponse401 = {
+  data: AssignTagToItem401
+  status: 401
+}
+
 export type assignTagToItemResponse404 = {
   data: AssignTagToItem404
   status: 404
@@ -364,6 +387,7 @@ export type assignTagToItemResponseSuccess = assignTagToItemResponse204 & {
   headers: Headers
 }
 export type assignTagToItemResponseError = (
+  | assignTagToItemResponse401
   | assignTagToItemResponse404
   | assignTagToItemResponse500
 ) & {
@@ -393,7 +417,7 @@ export const assignTagToItem = async (
 }
 
 export const getAssignTagToItemMutationOptions = <
-  TError = AssignTagToItem404 | AssignTagToItem500,
+  TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -435,6 +459,7 @@ export type AssignTagToItemMutationResult = NonNullable<
 >
 
 export type AssignTagToItemMutationError =
+  | AssignTagToItem401
   | AssignTagToItem404
   | AssignTagToItem500
 
@@ -442,7 +467,7 @@ export type AssignTagToItemMutationError =
  * @summary Assign Tag to Item
  */
 export const useAssignTagToItem = <
-  TError = AssignTagToItem404 | AssignTagToItem500,
+  TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
   TContext = unknown,
 >(
   options?: {
