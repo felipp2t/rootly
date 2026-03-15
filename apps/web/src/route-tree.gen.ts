@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './pages/__root'
 import { Route as SignupRouteImport } from './pages/signup'
 import { Route as SessionRouteImport } from './pages/session'
+import { Route as AuthenticatedLayoutRouteImport } from './pages/_authenticated/layout'
 import { Route as AuthenticateddashboardIndexRouteImport } from './pages/_authenticated/(dashboard)/index'
 
 const SignupRoute = SignupRouteImport.update({
@@ -23,17 +24,21 @@ const SessionRoute = SessionRouteImport.update({
   path: '/session',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedLayoutRoute = AuthenticatedLayoutRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticateddashboardIndexRoute =
   AuthenticateddashboardIndexRouteImport.update({
-    id: '/_authenticated/(dashboard)/',
+    id: '/(dashboard)/',
     path: '/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticateddashboardIndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
-  '/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/session': typeof SessionRoute
@@ -42,22 +47,28 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedLayoutRouteWithChildren
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
   '/_authenticated/(dashboard)/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/session' | '/signup' | '/'
+  fullPaths: '/' | '/session' | '/signup'
   fileRoutesByTo: FileRoutesByTo
   to: '/session' | '/signup' | '/'
-  id: '__root__' | '/session' | '/signup' | '/_authenticated/(dashboard)/'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/session'
+    | '/signup'
+    | '/_authenticated/(dashboard)/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthenticatedLayoutRoute: typeof AuthenticatedLayoutRouteWithChildren
   SessionRoute: typeof SessionRoute
   SignupRoute: typeof SignupRoute
-  AuthenticateddashboardIndexRoute: typeof AuthenticateddashboardIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,20 +87,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/(dashboard)/': {
       id: '/_authenticated/(dashboard)/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticateddashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
     }
   }
 }
 
+interface AuthenticatedLayoutRouteChildren {
+  AuthenticateddashboardIndexRoute: typeof AuthenticateddashboardIndexRoute
+}
+
+const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticateddashboardIndexRoute: AuthenticateddashboardIndexRoute,
+}
+
+const AuthenticatedLayoutRouteWithChildren =
+  AuthenticatedLayoutRoute._addFileChildren(AuthenticatedLayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedLayoutRoute: AuthenticatedLayoutRouteWithChildren,
   SessionRoute: SessionRoute,
   SignupRoute: SignupRoute,
-  AuthenticateddashboardIndexRoute: AuthenticateddashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

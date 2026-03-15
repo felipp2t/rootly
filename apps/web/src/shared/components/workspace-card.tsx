@@ -1,6 +1,11 @@
+import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { Folder, PlusIcon, Settings2Icon, Shield, Users } from 'lucide-react'
 import type * as React from 'react'
+import { toast } from 'sonner'
+import z from 'zod'
+import { createWorkspace } from '@/api/workspaces/workspaces'
 import { cn } from '@/shared/lib/utils'
+import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -11,8 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
+import { FieldGroup } from './ui/field'
 import { Input } from './ui/input'
 import { Separator } from './ui/separator'
+import { Skeleton } from './ui/skeleton'
 
 export interface Workspace {
   name: string
@@ -90,19 +97,41 @@ function WorkspaceCard({
   )
 }
 
-function NewWorkspaceCard({
-  onClick,
-  className,
-}: {
-  onClick?: () => void
-  className?: string
-}) {
+const newWorkspaceSchema = z.object({
+  name: z.string().min(3, 'Workspace name must be at least 3 characters long'),
+})
+
+function NewWorkspaceCard({ className }: { className?: string }) {
+  const createWorkspaceForm = useForm({
+    validators: { onSubmit: newWorkspaceSchema },
+    validationLogic: revalidateLogic({
+      mode: 'submit',
+      modeAfterSubmission: 'change',
+    }),
+    defaultValues: {
+      name: '',
+    },
+    onSubmit: async ({ value }) => {
+      const response = await createWorkspace({ name: value.name })
+
+      console.info({ response })
+
+      if (response.status === 201) {
+        queryClient.invalidateQueries({ queryKey: ['workspaces'] })
+        toast.success('Workspace created successfully')
+      }
+
+      if (response.status === 500) {
+        toast.error('Failed to create workspace. Please try again later.')
+      }
+    },
+  })
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
           type='button'
-          onClick={onClick}
           className={cn(
             'flex h-full min-h-39 w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-border bg-transparent font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/50 hover:text-primary',
             className,
@@ -112,31 +141,95 @@ function NewWorkspaceCard({
           NEW WORKSPACE
         </Button>
       </DialogTrigger>
-      <DialogContent className='space-y-6'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>NEW WORKSPACE</DialogTitle>
         </DialogHeader>
-        <Input
-          className={cn(
-            'border border-border focus-visible:border-primary/50 rounded-none focus-visible:outline-none focus-visible:ring-0',
-          )}
-          placeholder='my-workspace'
-        />
+        <form
+          className='space-y-6 mt-6'
+          onSubmit={(e) => {
+            e.preventDefault()
+            createWorkspaceForm.handleSubmit()
+          }}
+        >
+          <FieldGroup>
+            <createWorkspaceForm.Field
+              name='name'
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                    autoComplete='off'
+                    className={cn(
+                      'border border-border focus-visible:border-primary/50 rounded-none focus-visible:outline-none focus-visible:ring-0',
+                    )}
+                    placeholder='my-workspace'
+                  />
+                )
+              }}
+            />
+          </FieldGroup>
 
-        <DialogFooter>
-          <DialogClose>
-            <Button variant='outline' className='cursor-pointer'>
-              CANCEL
+          <DialogFooter>
+            <DialogClose>
+              <Button variant='outline' className='cursor-pointer'>
+                CANCEL
+              </Button>
+            </DialogClose>
+            <Button className='cursor-pointer'>
+              <PlusIcon className='size-3.5' />
+              CREATE
             </Button>
-          </DialogClose>
-          <Button className='cursor-pointer'>
-            <PlusIcon className='size-3.5' />
-            CREATE
-          </Button>
-        </DialogFooter>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )
 }
 
-export { NewWorkspaceCard, WorkspaceCard }
+function WorkspaceCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      data-slot='workspace-card-skeleton'
+      className={cn(
+        'flex flex-col justify-between gap-3 border border-border bg-card p-5',
+        className,
+      )}
+    >
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Skeleton className='size-4 shrink-0 rounded-none' />
+            <Skeleton className='h-4 w-32 rounded-none' />
+          </div>
+          <Skeleton className='size-7 rounded-none' />
+        </div>
+        <Skeleton className='h-3 w-16 rounded-none' />
+        <Skeleton className='h-3 w-24 rounded-none' />
+      </div>
+
+      <Separator />
+
+      <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-1.5'>
+          <Skeleton className='size-3.5 rounded-none' />
+          <Skeleton className='h-3 w-16 rounded-none' />
+        </div>
+        <Skeleton className='h-3 w-1 rounded-none' />
+        <div className='flex items-center gap-1.5'>
+          <Skeleton className='size-3.5 rounded-none' />
+          <Skeleton className='h-3 w-12 rounded-none' />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { NewWorkspaceCard, WorkspaceCard, WorkspaceCardSkeleton }
