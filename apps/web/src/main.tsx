@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { AuthProvider, useAuth } from '@/shared/lib/auth'
 import './globals.css'
 import { routeTree } from './route-tree.gen.ts'
+import { Toaster } from './shared/components/ui/sonner.tsx'
 import { queryClient } from './shared/lib/query.tsx'
 
 const router = createRouter({
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <App />
+        <Toaster richColors />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

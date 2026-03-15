@@ -1,6 +1,7 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { Folder, PlusIcon, Settings2Icon, Shield, Users } from 'lucide-react'
 import type * as React from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
 import { createWorkspace } from '@/api/workspaces/workspaces'
@@ -102,6 +103,8 @@ const newWorkspaceSchema = z.object({
 })
 
 function NewWorkspaceCard({ className }: { className?: string }) {
+  const [dialogIsOpen, setDialogIsOpen] = useState(false)
+
   const createWorkspaceForm = useForm({
     validators: { onSubmit: newWorkspaceSchema },
     validationLogic: revalidateLogic({
@@ -114,8 +117,6 @@ function NewWorkspaceCard({ className }: { className?: string }) {
     onSubmit: async ({ value }) => {
       const response = await createWorkspace({ name: value.name })
 
-      console.info({ response })
-
       if (response.status === 201) {
         queryClient.invalidateQueries({ queryKey: ['workspaces'] })
         toast.success('Workspace created successfully')
@@ -124,11 +125,13 @@ function NewWorkspaceCard({ className }: { className?: string }) {
       if (response.status === 500) {
         toast.error('Failed to create workspace. Please try again later.')
       }
+
+      setDialogIsOpen(false)
     },
   })
 
   return (
-    <Dialog>
+    <Dialog open={dialogIsOpen} onOpenChange={(open) => setDialogIsOpen(open)}>
       <DialogTrigger asChild>
         <Button
           type='button'
