@@ -58,9 +58,8 @@ function WorkspacePage() {
             workspace={{
               name: ws.name,
               updatedAt: ws.updatedAt,
-              itemCount: 0,
-              memberCount: 0,
-              roleCount: 0,
+              itemCount: ws.itemCount,
+              memberCount: ws.memberCount,
             }}
           />
         ))}

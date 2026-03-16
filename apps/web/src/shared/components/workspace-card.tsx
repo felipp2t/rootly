@@ -1,5 +1,5 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import { Folder, PlusIcon, Settings2Icon, Shield, Users } from 'lucide-react'
+import { Folder, PlusIcon, Settings2Icon, Users } from 'lucide-react'
 import type * as React from 'react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -28,7 +28,6 @@ export interface Workspace {
   itemCount: number
   updatedAt: string
   memberCount: number
-  roleCount: number
 }
 
 interface WorkspaceCardProps extends React.ComponentProps<'div'> {
@@ -83,14 +82,6 @@ function WorkspaceCard({
             <span className='font-mono text-sm font-medium text-muted-foreground'>
               {workspace.memberCount}{' '}
               {workspace.memberCount === 1 ? 'member' : 'members'}
-            </span>
-          </div>
-          <span className='font-mono text-[10px] text-border'>·</span>
-          <div className='flex items-center gap-1.5'>
-            <Shield className='size-3.5 text-muted-foreground' />
-            <span className='font-mono text-sm font-medium text-muted-foreground'>
-              {workspace.roleCount}{' '}
-              {workspace.roleCount === 1 ? 'role' : 'roles'}
             </span>
           </div>
         </div>
