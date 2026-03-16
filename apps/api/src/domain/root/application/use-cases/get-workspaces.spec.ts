@@ -15,8 +15,11 @@ let sut: GetWorkspacesUseCase
 describe('GetWorkspaces', () => {
   beforeEach(() => {
     itemRepository = new InMemoryItemRepository()
-    workspaceRepository = new InMemoryWorkspaceRepository(itemRepository)
     workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    workspaceRepository = new InMemoryWorkspaceRepository(
+      itemRepository,
+      workspaceMemberRepository,
+    )
     sut = new GetWorkspacesUseCase(
       workspaceRepository,
       workspaceMemberRepository,
@@ -161,6 +164,77 @@ describe('GetWorkspaces', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.workspaces[0].itemCount).toBe(0)
+    }
+  })
+
+  it('should return memberCount reflecting the number of members in each workspace', async () => {
+    const userId = new UniqueEntityID().toString()
+    const otherUserId = new UniqueEntityID().toString()
+    const roleId = new UniqueEntityID().toString()
+
+    const workspaceA = makeWorkspace({ userId })
+    const workspaceB = makeWorkspace({ userId })
+    workspaceRepository.items.push(workspaceA)
+    workspaceRepository.items.push(workspaceB)
+
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId,
+        workspaceId: workspaceA.id.toString(),
+        roleId,
+      }),
+    )
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId: otherUserId,
+        workspaceId: workspaceA.id.toString(),
+        roleId,
+      }),
+    )
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId,
+        workspaceId: workspaceB.id.toString(),
+        roleId,
+      }),
+    )
+
+    const response = await sut.execute({ userId })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      const returnedA = response.value.workspaces.find(
+        (w) => w.id.toString() === workspaceA.id.toString(),
+      )
+      const returnedB = response.value.workspaces.find(
+        (w) => w.id.toString() === workspaceB.id.toString(),
+      )
+
+      expect(returnedA?.memberCount).toBe(2)
+      expect(returnedB?.memberCount).toBe(1)
+    }
+  })
+
+  it('should return memberCount of 0 for a workspace with no members', async () => {
+    const userId = new UniqueEntityID().toString()
+    const roleId = new UniqueEntityID().toString()
+
+    const workspace = makeWorkspace({ userId })
+    workspaceRepository.items.push(workspace)
+
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId,
+        workspaceId: workspace.id.toString(),
+        roleId,
+      }),
+    )
+
+    const response = await sut.execute({ userId })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.workspaces[0].memberCount).toBe(1)
     }
   })
 })

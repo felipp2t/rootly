@@ -48,10 +48,7 @@ describe('GET /workspaces', () => {
     return { userId, cookieHeader }
   }
 
-  async function createWorkspaceAndAddMember(
-    cookieHeader: string,
-    userId: string,
-  ) {
+  async function createWorkspaceAndAddMember(cookieHeader: string) {
     const workspaceResponse = await app.inject({
       method: 'POST',
       url: '/api/workspaces',
@@ -61,23 +58,12 @@ describe('GET /workspaces', () => {
 
     const { workspaceId } = workspaceResponse.json<{ workspaceId: string }>()
 
-    const [role] = await db
-      .select()
-      .from(schema.workspaceRoles)
-      .where(eq(schema.workspaceRoles.workspaceId, workspaceId))
-
-    await db.insert(schema.workspaceMembers).values({
-      userId,
-      workspaceId,
-      roleId: role.id,
-    })
-
     return workspaceId
   }
 
   it('should return 200 with workspaces the authenticated user is a member of', async () => {
     const { userId, cookieHeader } = await createUserAndAuthenticate()
-    await createWorkspaceAndAddMember(cookieHeader, userId)
+    await createWorkspaceAndAddMember(cookieHeader)
 
     const response = await app.inject({
       method: 'GET',
@@ -95,8 +81,8 @@ describe('GET /workspaces', () => {
   })
 
   it('should return itemCount of 0 when a workspace has no items', async () => {
-    const { userId, cookieHeader } = await createUserAndAuthenticate()
-    await createWorkspaceAndAddMember(cookieHeader, userId)
+    const { cookieHeader } = await createUserAndAuthenticate()
+    await createWorkspaceAndAddMember(cookieHeader)
 
     const response = await app.inject({
       method: 'GET',
@@ -109,8 +95,8 @@ describe('GET /workspaces', () => {
   })
 
   it('should return the correct itemCount when a workspace has items', async () => {
-    const { userId, cookieHeader } = await createUserAndAuthenticate()
-    const workspaceId = await createWorkspaceAndAddMember(cookieHeader, userId)
+    const { cookieHeader } = await createUserAndAuthenticate()
+    const workspaceId = await createWorkspaceAndAddMember(cookieHeader)
 
     await app.inject({
       method: 'POST',
@@ -154,6 +140,57 @@ describe('GET /workspaces', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.json().workspaces).toHaveLength(0)
+  })
+
+  it('should return memberCount of 1 when a workspace has one member', async () => {
+    const { cookieHeader } = await createUserAndAuthenticate()
+    await createWorkspaceAndAddMember(cookieHeader)
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/workspaces',
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().workspaces[0].memberCount).toBe(1)
+  })
+
+  it('should return the correct memberCount when a workspace has multiple members', async () => {
+    const { cookieHeader } = await createUserAndAuthenticate()
+    const workspaceId = await createWorkspaceAndAddMember(cookieHeader)
+
+    const secondAccountResponse = await app.inject({
+      method: 'POST',
+      url: '/api/accounts',
+      payload: {
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        password: '123456',
+      },
+    })
+    const { userId: secondUserId } =
+      secondAccountResponse.json<{ userId: string }>()
+
+    const [role] = await db
+      .select()
+      .from(schema.workspaceRoles)
+      .where(eq(schema.workspaceRoles.workspaceId, workspaceId))
+
+    await db.insert(schema.workspaceMembers).values({
+      userId: secondUserId,
+      workspaceId,
+      roleId: role.id,
+    })
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/workspaces',
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().workspaces[0].memberCount).toBe(2)
   })
 
   it('should return 401 when no access token cookie is present', async () => {

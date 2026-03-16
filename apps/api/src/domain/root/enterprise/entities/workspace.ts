@@ -6,6 +6,7 @@ export interface WorkspaceProps {
   userId: string
   name: string
   itemCount: number
+  memberCount: number
   createdAt: Date
   updatedAt: Date
 }
@@ -17,6 +18,10 @@ export class Workspace extends Entity<WorkspaceProps> {
 
   get itemCount() {
     return this.props.itemCount
+  }
+
+  get memberCount() {
+    return this.props.memberCount
   }
 
   set name(value: string) {
@@ -41,13 +46,14 @@ export class Workspace extends Entity<WorkspaceProps> {
   }
 
   static create(
-    props: Optional<WorkspaceProps, 'createdAt' | 'updatedAt' | 'itemCount'>,
+    props: Optional<WorkspaceProps, 'createdAt' | 'updatedAt' | 'itemCount' | 'memberCount'>,
     id?: UniqueEntityID,
   ) {
     return new Workspace(
       {
         ...props,
         itemCount: props.itemCount ?? 0,
+        memberCount: props.memberCount ?? 0,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
