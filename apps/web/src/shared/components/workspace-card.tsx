@@ -1,4 +1,5 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
+import { Link } from '@tanstack/react-router'
 import { Folder, PlusIcon, Settings2Icon, Users } from 'lucide-react'
 import type * as React from 'react'
 import { useState } from 'react'
@@ -24,6 +25,7 @@ import { Separator } from './ui/separator'
 import { Skeleton } from './ui/skeleton'
 
 export interface Workspace {
+  id: string
   name: string
   itemCount: number
   updatedAt: string
@@ -42,51 +44,53 @@ function WorkspaceCard({
   ...props
 }: WorkspaceCardProps) {
   return (
-    <div
-      data-slot='workspace-card'
-      className={cn(
-        'flex cursor-pointer flex-col justify-between gap-3 border border-border hover:border-primary/50 bg-card p-5',
-        className,
-      )}
-      {...props}
-    >
-      <div className='flex flex-col gap-2'>
+    <Link to='/$workspaceId' params={workspace.id}>
+      <div
+        data-slot='workspace-card'
+        className={cn(
+          'flex cursor-pointer flex-col justify-between gap-3 border border-border hover:border-primary/50 bg-card p-5',
+          className,
+        )}
+        {...props}
+      >
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2'>
+              <Folder className='size-4 shrink-0 text-primary' />
+              <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
+                {workspace.name}
+              </span>
+            </div>
+            <Button
+              size='icon-sm'
+              className='cursor-pointer group bg-transparent'
+            >
+              <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
+            </Button>
+          </div>
+          <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+            {workspace.itemCount} ITEMS
+          </span>
+          <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+            UPDATED {formatTimeAgo(new Date(workspace.updatedAt))}
+          </span>
+        </div>
+
+        <Separator />
+
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Folder className='size-4 shrink-0 text-primary' />
-            <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
-              {workspace.name}
-            </span>
-          </div>
-          <Button
-            size='icon-sm'
-            className='cursor-pointer group bg-transparent'
-          >
-            <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
-          </Button>
-        </div>
-        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-          {workspace.itemCount} ITEMS
-        </span>
-        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-          UPDATED {formatTimeAgo(new Date(workspace.updatedAt))}
-        </span>
-      </div>
-
-      <Separator />
-
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-1.5'>
-            <Users className='size-3.5 text-muted-foreground' />
-            <span className='font-mono text-sm font-medium text-muted-foreground'>
-              {workspace.memberCount}{' '}
-              {workspace.memberCount === 1 ? 'member' : 'members'}
-            </span>
+          <div className='flex items-center gap-3'>
+            <div className='flex items-center gap-1.5'>
+              <Users className='size-3.5 text-muted-foreground' />
+              <span className='font-mono text-sm font-medium text-muted-foreground'>
+                {workspace.memberCount}{' '}
+                {workspace.memberCount === 1 ? 'member' : 'members'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

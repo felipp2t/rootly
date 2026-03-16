@@ -56,6 +56,7 @@ function WorkspacePage() {
           <WorkspaceCard
             key={ws.id}
             workspace={{
+              id: ws.id,
               name: ws.name,
               updatedAt: ws.updatedAt,
               itemCount: ws.itemCount,
