@@ -21,7 +21,6 @@ import type {
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { fetchWithAuth } from '../../shared/lib/fetch'
-import { QUERY_KEYS } from '../keys'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -50,7 +49,7 @@ export const getHealth = async (
 }
 
 export const getGetHealthQueryKey = () => {
-  return QUERY_KEYS.health()
+  return ['http:', 'localhost:3333', 'health'] as const
 }
 
 export const getGetHealthQueryOptions = <

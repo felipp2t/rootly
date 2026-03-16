@@ -23,7 +23,6 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchWithAuth } from '../../shared/lib/fetch'
-import { QUERY_KEYS } from '../keys'
 import type {
   AssignTagToItem401,
   AssignTagToItem404,
@@ -234,7 +233,13 @@ export const getItems = async (
 }
 
 export const getGetItemsQueryKey = (params?: GetItemsParams) => {
-  return QUERY_KEYS.items(params)
+  return [
+    'http:',
+    'localhost:3333',
+    'api',
+    'items',
+    ...(params ? [params] : []),
+  ] as const
 }
 
 export const getGetItemsQueryOptions = <
