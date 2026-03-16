@@ -1,6 +1,11 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { Link } from '@tanstack/react-router'
-import { Folder, PlusIcon, Settings2Icon, Users } from 'lucide-react'
+import {
+  LayoutPanelLeftIcon,
+  PlusIcon,
+  Settings2Icon,
+  Users,
+} from 'lucide-react'
 import type * as React from 'react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -50,7 +55,7 @@ function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
         <div className='flex flex-col gap-2'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Folder className='size-4 shrink-0 text-primary' />
+              <LayoutPanelLeftIcon className='size-4 shrink-0 text-primary' />
               <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
                 {workspace.name}
               </span>
