@@ -34,17 +34,11 @@ export interface Workspace {
 
 interface WorkspaceCardProps extends React.ComponentProps<'div'> {
   workspace: Workspace
-  onSettings?: () => void
 }
 
-function WorkspaceCard({
-  workspace,
-  onSettings,
-  className,
-  ...props
-}: WorkspaceCardProps) {
+function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
   return (
-    <Link to='/$workspaceId' params={workspace.id}>
+    <Link to='/$workspaceId' params={{ workspaceId: workspace.id }}>
       <div
         data-slot='workspace-card'
         className={cn(
