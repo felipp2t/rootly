@@ -1,7 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { useGetWorkspacesSuspense } from '@/api/workspaces/workspaces'
-import { InlineCode } from '@/shared/components/inline-code'
+import {
+  InlineCodeAddon,
+  InlineCodeRoot,
+  InlineCodeText,
+} from '@/shared/components/inline-code'
 import {
   NewWorkspaceCard,
   WorkspaceCard,
@@ -46,9 +50,12 @@ function WorkspacePage() {
     <>
       <div className='space-y-1.5'>
         <h1 className='text-4xl font-bold text-white'>WORKSPACES</h1>
-        <InlineCode>
-          {workspaces.length} WORKSPACES IN YOUR ORGANIZATION
-        </InlineCode>
+        <InlineCodeRoot>
+          <InlineCodeAddon>{`//`}</InlineCodeAddon>
+          <InlineCodeText>
+            {workspaces.length} WORKSPACES IN YOUR ORGANIZATION
+          </InlineCodeText>
+        </InlineCodeRoot>
       </div>
 
       <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
