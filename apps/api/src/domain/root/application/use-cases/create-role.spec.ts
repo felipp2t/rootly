@@ -1,9 +1,9 @@
-import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { makeUser } from '@test/factories/make-user.ts'
+import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
-import { WorkspaceRole } from '../../enterprise/entities/workspace-role.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
+import { WorkspaceRole } from '../../enterprise/entities/workspace-role.ts'
 import { CreateRoleUseCase } from './create-role.ts'
 import { RoleAlreadyExistsError } from './errors/role-already-exists-error.ts'
 
@@ -24,6 +24,7 @@ describe('CreateRole', () => {
     workspaceRepository.items.push(workspace)
 
     const response = await sut.execute({
+      userId: user.id.toString(),
       name: 'Developer',
       workspaceId: workspace.id.toString(),
     })
@@ -38,13 +39,16 @@ describe('CreateRole', () => {
     workspaceRepository.items.push(workspace)
 
     await sut.execute({
+      userId: user.id.toString(),
       name: 'Developer',
       workspaceId: workspace.id.toString(),
     })
 
     expect(workspaceRoleRepository.items.length).toBe(1)
     expect(workspaceRoleRepository.items[0].name).toBe('Developer')
-    expect(workspaceRoleRepository.items[0].workspaceId).toBe(workspace.id.toString())
+    expect(workspaceRoleRepository.items[0].workspaceId).toBe(
+      workspace.id.toString(),
+    )
   })
 
   it('should return the id matching the persisted role', async () => {
@@ -53,6 +57,7 @@ describe('CreateRole', () => {
     workspaceRepository.items.push(workspace)
 
     const response = await sut.execute({
+      userId: user.id.toString(),
       name: 'Developer',
       workspaceId: workspace.id.toString(),
     })
@@ -65,6 +70,7 @@ describe('CreateRole', () => {
 
   it('should return ResourceNotFoundError when the workspace does not exist', async () => {
     const response = await sut.execute({
+      userId: makeUser().id.toString(),
       name: 'Developer',
       workspaceId: 'non-existent-workspace-id',
     })
@@ -79,6 +85,7 @@ describe('CreateRole', () => {
     workspaceRepository.items.push(workspace)
 
     const response = await sut.execute({
+      userId: user.id.toString(),
       name: 'Owner',
       workspaceId: workspace.id.toString(),
     })
@@ -99,6 +106,7 @@ describe('CreateRole', () => {
     workspaceRoleRepository.items.push(existingRole)
 
     const response = await sut.execute({
+      userId: user.id.toString(),
       name: 'Developer',
       workspaceId: workspace.id.toString(),
     })

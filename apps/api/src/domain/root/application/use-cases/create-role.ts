@@ -9,6 +9,7 @@ import { RoleAlreadyExistsError } from './errors/role-already-exists-error.ts'
 const RESERVED_ROLE_NAMES = ['Owner']
 
 interface CreateRoleUseCaseRequest {
+  userId: string
   name: string
   workspaceId: string
 }
@@ -22,10 +23,14 @@ export class CreateRoleUseCase {
   ) {}
 
   async execute({
+    userId,
     name,
     workspaceId,
   }: CreateRoleUseCaseRequest): Promise<CreateRoleUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))
@@ -35,10 +40,11 @@ export class CreateRoleUseCase {
       return left(new RoleAlreadyExistsError(name))
     }
 
-    const existing = await this.workspaceRoleRepository.findByWorkspaceIdAndName(
-      workspaceId,
-      name,
-    )
+    const existing =
+      await this.workspaceRoleRepository.findByWorkspaceIdAndName(
+        workspaceId,
+        name,
+      )
 
     if (existing) {
       return left(new RoleAlreadyExistsError(name))
