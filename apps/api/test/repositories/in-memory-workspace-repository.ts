@@ -11,9 +11,12 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     private readonly workspaceMemberRepository?: InMemoryWorkspaceMemberRepository,
   ) {}
 
-  async findById(id: string): Promise<Workspace | null> {
+  async findById(userId: string, id: string): Promise<Workspace | null> {
     return (
-      this.items.find((workspace) => workspace.id.toString() === id) ?? null
+      this.items.find(
+        (workspace) =>
+          workspace.id.toString() === id && workspace.userId === userId,
+      ) ?? null
     )
   }
 

@@ -1,4 +1,4 @@
-import { countDistinct, eq, inArray } from 'drizzle-orm'
+import { and, countDistinct, eq, inArray } from 'drizzle-orm'
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
 import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -8,11 +8,13 @@ import { schema } from '../schema/index.ts'
 export class DrizzleWorkspaceRepository implements WorkspaceRepository {
   constructor(private readonly db: DrizzleDatabase) {}
 
-  async findById(id: string): Promise<Workspace | null> {
+  async findById(userId: string, id: string): Promise<Workspace | null> {
     const workspaces = await this.db
       .select()
       .from(schema.workspaces)
-      .where(eq(schema.workspaces.id, id))
+      .where(
+        and(eq(schema.workspaces.id, id), eq(schema.workspaces.userId, userId)),
+      )
 
     if (workspaces.length === 0) {
       return null
@@ -65,13 +67,23 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
         memberCount: countDistinct(schema.workspaceMembers.id),
       })
       .from(schema.workspaces)
-      .leftJoin(schema.items, eq(schema.items.workspaceId, schema.workspaces.id))
-      .leftJoin(schema.workspaceMembers, eq(schema.workspaceMembers.workspaceId, schema.workspaces.id))
+      .leftJoin(
+        schema.items,
+        eq(schema.items.workspaceId, schema.workspaces.id),
+      )
+      .leftJoin(
+        schema.workspaceMembers,
+        eq(schema.workspaceMembers.workspaceId, schema.workspaces.id),
+      )
       .where(inArray(schema.workspaces.id, ids))
       .groupBy(schema.workspaces.id)
 
     return rows.map((row) =>
-      DrizzleWorkspaceMapper.toDomain(row.workspace, row.itemCount, row.memberCount),
+      DrizzleWorkspaceMapper.toDomain(
+        row.workspace,
+        row.itemCount,
+        row.memberCount,
+      ),
     )
   }
 }
