@@ -20,10 +20,16 @@ export const someController: FastifyPluginCallbackZod = async (app) => {
       schema: {
         summary: 'Short title',
         description: 'Longer description',
+        operationId: 'someAction',
         tags: ['TagName'],
         body: z.object({
           field: z.string(),
         }),
+        response: {
+          201: z.object({ id: z.string() }),
+          400: z.object({ message: z.string() }),
+          500: z.object({ message: z.string() }),
+        },
       },
     },
     async (request, reply) => {
@@ -57,6 +63,70 @@ export const someController: FastifyPluginCallbackZod = async (app) => {
 - Use a `switch` on `error.constructor.name` to map domain errors to HTTP status codes.
 - Always include a `default` case returning `500`.
 - Input validation is done by Zod in the `schema` — do not repeat it manually in the handler.
+- Always declare `operationId` (camelCase) and `response` schemas in every route's `schema` object.
+
+### Protected Routes (JWT)
+
+Routes that require authentication must manually verify the JWT from the `accessToken` cookie using `verifyJwt` from `../verify-jwt.ts`. There is no Fastify hook/decorator — each protected handler does this explicitly at the top.
+
+```typescript
+import { verifyJwt } from '../verify-jwt.ts'
+
+// inside handler:
+const token = request.cookies.accessToken
+
+if (!token) {
+  return reply.status(401).send({ message: 'Unauthorized' })
+}
+
+const payload = await verifyJwt(token)
+
+if (!payload) {
+  return reply.status(401).send({ message: 'Unauthorized' })
+}
+
+// payload.userId is now available
+```
+
+`verifyJwt` returns `{ userId: string } | null` (extracted from `payload.sub`). Use `payload.userId` to pass the caller's identity to the use case when needed.
+
+Always include `401: z.object({ message: z.string() })` in the `response` schema of protected routes.
+
+### Auth Token Conventions
+
+- Tokens are stored in **HTTP-only cookies**, never in the response body.
+- `accessToken` cookie: `maxAge: 60 * 15` (15 minutes).
+- `refreshToken` cookie: no `maxAge` (session-scoped).
+- Both cookies use `httpOnly: true, secure: true, sameSite: 'strict', path: '/'`.
+- Setting cookies (login / refresh):
+
+```typescript
+return reply
+  .setCookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    path: '/',
+    maxAge: 60 * 15,
+  })
+  .setCookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    path: '/',
+  })
+  .status(201)
+  .send({})
+```
+
+### Public vs Protected routes
+
+| Route | Protected |
+|-------|-----------|
+| `POST /sessions` | No |
+| `POST /sessions/refresh` | No (uses `refreshToken` cookie directly) |
+| `POST /accounts` | No |
+| All other routes | Yes — verify `accessToken` cookie |
 
 ### Error → HTTP Status mapping
 
