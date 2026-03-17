@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray, isNull } from 'drizzle-orm'
 import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -50,22 +50,40 @@ export class DrizzleItemRepository implements ItemRepository {
     return DrizzleItemMapper.toDomain(rows[0], tagsByItem[rows[0].id] ?? [])
   }
 
-  async findMany(parentId?: string): Promise<Item[]> {
+  async findMany(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<Item[]> {
     const rows = await this.db
-      .select()
+      .selectDistinct({ item: schema.items })
       .from(schema.items)
+      .innerJoin(
+        schema.workspaceMembers,
+        and(
+          eq(schema.workspaceMembers.workspaceId, schema.items.workspaceId),
+          eq(schema.workspaceMembers.userId, userId),
+        ),
+      )
       .where(
-        parentId !== undefined
-          ? eq(schema.items.folderId, parentId)
-          : undefined,
+        workspaceId !== undefined
+          ? and(
+              eq(schema.items.workspaceId, workspaceId),
+              isNull(schema.items.folderId),
+            )
+          : parentId !== undefined
+            ? eq(schema.items.folderId, parentId)
+            : undefined,
       )
 
     if (rows.length === 0) return []
 
-    const tagsByItem = await this.loadTagIdsByItemIds(rows.map((r) => r.id))
+    const tagsByItem = await this.loadTagIdsByItemIds(
+      rows.map((r) => r.item.id),
+    )
 
     return rows.map((row) =>
-      DrizzleItemMapper.toDomain(row, tagsByItem[row.id] ?? []),
+      DrizzleItemMapper.toDomain(row.item, tagsByItem[row.item.id] ?? []),
     )
   }
 

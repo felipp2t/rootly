@@ -3,6 +3,7 @@ import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 
 export class InMemoryItemRepository implements ItemRepository {
   items: Item[] = []
+  workspaceMembers: { userId: string; workspaceId: string }[] = []
 
   async findById(id: string): Promise<Item | null> {
     return this.items.find((item) => item.id.toString() === id) ?? null
@@ -12,9 +13,20 @@ export class InMemoryItemRepository implements ItemRepository {
     return this.items.find((item) => item.title === title) ?? null
   }
 
-  async findMany(parentId?: string): Promise<Item[]> {
-    if (parentId === undefined) return [...this.items]
-    return this.items.filter((item) => item.folderId === parentId)
+  async findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Item[]> {
+    const userWorkspaceIds = this.workspaceMembers
+      .filter((m) => m.userId === userId)
+      .map((m) => m.workspaceId)
+
+    const scoped = this.items.filter((item) => userWorkspaceIds.includes(item.workspaceId))
+
+    if (workspaceId !== undefined) {
+      return scoped.filter(
+        (item) => item.workspaceId === workspaceId && item.folderId === undefined,
+      )
+    }
+    if (parentId === undefined) return scoped
+    return scoped.filter((item) => item.folderId === parentId)
   }
 
   async create(item: Item): Promise<void> {

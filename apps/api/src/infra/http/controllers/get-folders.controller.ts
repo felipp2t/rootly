@@ -9,11 +9,12 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
     {
       schema: {
         summary: 'Get Folders',
-        description: 'List folders. Optionally filter by parentId.',
+        description: 'List folders. Optionally filter by parentId or workspaceId.',
         operationId: 'getFolders',
         tags: ['Folders'],
         querystring: z.object({
           parentId: z.string().optional(),
+          workspaceId: z.string().optional(),
         }),
         response: {
           200: z.object({
@@ -47,10 +48,10 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
         return reply.status(401).send({ message: 'Unauthorized' })
       }
 
-      const { parentId } = request.query
+      const { parentId, workspaceId } = request.query
 
       const useCase = makeGetFoldersUseCase()
-      const result = await useCase.execute({ parentId })
+      const result = await useCase.execute({ userId: payload.userId, parentId, workspaceId })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })

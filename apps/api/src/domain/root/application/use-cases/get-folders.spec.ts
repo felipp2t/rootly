@@ -13,21 +13,17 @@ describe('GetFolders', () => {
     sut = new GetFoldersUseCase(folderRepository)
   })
 
-  it('should return all folders when no parentId is provided', async () => {
+  it('should return all folders from user workspaces when no parentId is provided', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
-    await folderRepository.create(
-      makeFolder({ workspaceId: workspace.id.toString() }),
-    )
-    await folderRepository.create(
-      makeFolder({ workspaceId: workspace.id.toString() }),
-    )
-    await folderRepository.create(
-      makeFolder({ workspaceId: workspace.id.toString() }),
-    )
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
 
-    const response = await sut.execute({})
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString() }))
+
+    const response = await sut.execute({ userId: user.id.toString() })
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
@@ -35,36 +31,44 @@ describe('GetFolders', () => {
     }
   })
 
+  it('should not return folders from workspaces the user does not belong to', async () => {
+    const user = makeUser()
+    const otherUser = makeUser()
+
+    const userWorkspace = makeWorkspace({ userId: user.id.toString() })
+    const otherWorkspace = makeWorkspace({ userId: otherUser.id.toString() })
+
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: userWorkspace.id.toString() })
+
+    await folderRepository.create(makeFolder({ workspaceId: userWorkspace.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: otherWorkspace.id.toString() }))
+
+    const response = await sut.execute({ userId: user.id.toString() })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.folders).toHaveLength(1)
+      expect(response.value.folders[0].workspaceId).toBe(userWorkspace.id.toString())
+    }
+  })
+
   it('should return only subfolders of a given parentId', async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
+
     const parent = makeFolder({ workspaceId: workspace.id.toString() })
     await folderRepository.create(parent)
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString(), parentId: parent.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString(), parentId: parent.id.toString() }))
 
-    await folderRepository.create(
-      makeFolder({
-        workspaceId: workspace.id.toString(),
-        parentId: parent.id.toString(),
-      }),
-    )
-    await folderRepository.create(
-      makeFolder({
-        workspaceId: workspace.id.toString(),
-        parentId: parent.id.toString(),
-      }),
-    )
-
-    const response = await sut.execute({ parentId: parent.id.toString() })
+    const response = await sut.execute({ userId: user.id.toString(), parentId: parent.id.toString() })
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(2)
-      expect(
-        response.value.folders.every(
-          (f) => f.parentId === parent.id.toString(),
-        ),
-      ).toBe(true)
+      expect(response.value.folders.every((f) => f.parentId === parent.id.toString())).toBe(true)
     }
   })
 
@@ -72,25 +76,16 @@ describe('GetFolders', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
+
     const parentA = makeFolder({ workspaceId: workspace.id.toString() })
     const parentB = makeFolder({ workspaceId: workspace.id.toString() })
     await folderRepository.create(parentA)
     await folderRepository.create(parentB)
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString(), parentId: parentA.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString(), parentId: parentB.id.toString() }))
 
-    await folderRepository.create(
-      makeFolder({
-        workspaceId: workspace.id.toString(),
-        parentId: parentA.id.toString(),
-      }),
-    )
-    await folderRepository.create(
-      makeFolder({
-        workspaceId: workspace.id.toString(),
-        parentId: parentB.id.toString(),
-      }),
-    )
-
-    const response = await sut.execute({ parentId: parentA.id.toString() })
+    const response = await sut.execute({ userId: user.id.toString(), parentId: parentA.id.toString() })
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
@@ -103,10 +98,12 @@ describe('GetFolders', () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
+
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
     await folderRepository.create(folder)
 
-    const response = await sut.execute({ parentId: folder.id.toString() })
+    const response = await sut.execute({ userId: user.id.toString(), parentId: folder.id.toString() })
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
@@ -114,12 +111,55 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should return an empty list when there are no folders', async () => {
-    const response = await sut.execute({})
+  it('should return an empty list when user has no workspace memberships', async () => {
+    const user = makeUser()
+
+    const response = await sut.execute({ userId: user.id.toString() })
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(0)
+    }
+  })
+
+  it('should return only root folders of a workspace when workspaceId is provided', async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
+    folderRepository.workspaceMembers.push({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
+
+    const root = makeFolder({ workspaceId: workspace.id.toString() })
+    await folderRepository.create(root)
+    await folderRepository.create(makeFolder({ workspaceId: workspace.id.toString(), parentId: root.id.toString() }))
+
+    const response = await sut.execute({ userId: user.id.toString(), workspaceId: workspace.id.toString() })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.folders).toHaveLength(1)
+      expect(response.value.folders[0].id.toString()).toBe(root.id.toString())
+    }
+  })
+
+  it('should not return folders from other workspaces when workspaceId is provided', async () => {
+    const user = makeUser()
+    const workspaceA = makeWorkspace({ userId: user.id.toString() })
+    const workspaceB = makeWorkspace({ userId: user.id.toString() })
+
+    folderRepository.workspaceMembers.push(
+      { userId: user.id.toString(), workspaceId: workspaceA.id.toString() },
+      { userId: user.id.toString(), workspaceId: workspaceB.id.toString() },
+    )
+
+    await folderRepository.create(makeFolder({ workspaceId: workspaceA.id.toString() }))
+    await folderRepository.create(makeFolder({ workspaceId: workspaceB.id.toString() }))
+
+    const response = await sut.execute({ userId: user.id.toString(), workspaceId: workspaceA.id.toString() })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.folders).toHaveLength(1)
+      expect(response.value.folders[0].workspaceId).toBe(workspaceA.id.toString())
     }
   })
 })
