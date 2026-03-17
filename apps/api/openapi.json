@@ -478,7 +478,7 @@
         "tags": [
           "Folders"
         ],
-        "description": "List folders. Optionally filter by parentId.",
+        "description": "List folders. Optionally filter by parentId or workspaceId.",
         "parameters": [
           {
             "schema": {
@@ -486,6 +486,14 @@
             },
             "in": "query",
             "name": "parentId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "workspaceId",
             "required": false
           }
         ],
@@ -742,7 +750,7 @@
         "tags": [
           "Items"
         ],
-        "description": "List items. Optionally filter by parentId.",
+        "description": "List items. Optionally filter by parentId or workspaceId.",
         "parameters": [
           {
             "schema": {
@@ -750,6 +758,14 @@
             },
             "in": "query",
             "name": "parentId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "workspaceId",
             "required": false
           }
         ],

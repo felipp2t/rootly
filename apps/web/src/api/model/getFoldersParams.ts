@@ -7,4 +7,5 @@
 
 export type GetFoldersParams = {
   parentId?: string
+  workspaceId?: string
 }

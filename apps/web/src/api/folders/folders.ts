@@ -184,7 +184,7 @@ export const useCreateFolder = <
   return useMutation(getCreateFolderMutationOptions(options), queryClient)
 }
 /**
- * List folders. Optionally filter by parentId.
+ * List folders. Optionally filter by parentId or workspaceId.
  * @summary Get Folders
  */
 export type getFoldersResponse200 = {

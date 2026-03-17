@@ -7,4 +7,5 @@
 
 export type GetItemsParams = {
   parentId?: string
+  workspaceId?: string
 }

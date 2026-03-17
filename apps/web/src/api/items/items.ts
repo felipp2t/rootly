@@ -176,7 +176,7 @@ export const useCreateItem = <
   return useMutation(getCreateItemMutationOptions(options), queryClient)
 }
 /**
- * List items. Optionally filter by parentId.
+ * List items. Optionally filter by parentId or workspaceId.
  * @summary Get Items
  */
 export type getItemsResponse200 = {
