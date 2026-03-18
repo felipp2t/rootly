@@ -10,6 +10,7 @@ import { createWorkspaceController } from './controllers/create-workspace.contro
 import { getFoldersController } from './controllers/get-folders.controller.ts'
 import { getItemsController } from './controllers/get-items.controller.ts'
 import { getMeController } from './controllers/get-me.controller.ts'
+import { getWorkspaceController } from './controllers/get-workspace.controller.ts'
 import { getWorkspacesController } from './controllers/get-workspaces.controller.ts'
 import { refreshAccessTokenController } from './controllers/refresh-access-token.controller.ts'
 
@@ -27,4 +28,5 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(getFoldersController)
   app.register(getItemsController)
   app.register(getWorkspacesController)
+  app.register(getWorkspaceController)
 }
