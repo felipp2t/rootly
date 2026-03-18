@@ -11,7 +11,7 @@ interface GetWorkspaceRequest {
 
 type GetWorkspaceResponse = Either<BaseError, { workspace: Workspace }>
 
-export class GetWorkspacesUseCase {
+export class GetWorkspaceUseCase {
   constructor(private readonly workspaceRepository: WorkspaceRepository) {}
 
   async execute({

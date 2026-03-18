@@ -2,15 +2,15 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
-import { GetWorkspacesUseCase } from './get-workspace.ts'
+import { GetWorkspaceUseCase } from './get-workspace.ts'
 
 let workspaceRepository: InMemoryWorkspaceRepository
-let sut: GetWorkspacesUseCase
+let sut: GetWorkspaceUseCase
 
-describe('GetWorkspacesUseCase', () => {
+describe('GetWorkspaceUseCase', () => {
   beforeEach(() => {
     workspaceRepository = new InMemoryWorkspaceRepository()
-    sut = new GetWorkspacesUseCase(workspaceRepository)
+    sut = new GetWorkspaceUseCase(workspaceRepository)
   })
 
   it('should return the workspace when it belongs to the user', async () => {
@@ -29,7 +29,9 @@ describe('GetWorkspacesUseCase', () => {
       expect(response.value.workspace).toMatchObject({
         userId: user.id.toString(),
       })
-      expect(response.value.workspace.id.toString()).toBe(workspace.id.toString())
+      expect(response.value.workspace.id.toString()).toBe(
+        workspace.id.toString(),
+      )
     }
   })
 
