@@ -6,6 +6,9 @@ import { DrizzleRefreshTokenRepository } from '@/infra/db/drizzle/repositories/d
 export function makeRefreshAccessTokenUseCase() {
   const refreshTokenRepository = new DrizzleRefreshTokenRepository(db)
   const encrypter = new JwtEncrypter()
-  const useCase = new RefreshAccessTokenUseCase(refreshTokenRepository, encrypter)
+  const useCase = new RefreshAccessTokenUseCase(
+    refreshTokenRepository,
+    encrypter,
+  )
   return useCase
 }

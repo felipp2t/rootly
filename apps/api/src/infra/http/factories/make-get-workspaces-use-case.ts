@@ -6,5 +6,8 @@ import { DrizzleWorkspaceRepository } from '@/infra/db/drizzle/repositories/work
 export function makeGetWorkspacesUseCase() {
   const workspaceRepository = new DrizzleWorkspaceRepository(db)
   const workspaceMemberRepository = new DrizzleWorkspaceMemberRepository(db)
-  return new GetWorkspacesUseCase(workspaceRepository, workspaceMemberRepository)
+  return new GetWorkspacesUseCase(
+    workspaceRepository,
+    workspaceMemberRepository,
+  )
 }
