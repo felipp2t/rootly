@@ -29,14 +29,14 @@ function FolderCard({ name, itemCount, className, ...props }: FolderCardProps) {
     <div
       data-slot='folder-card'
       className={cn(
-        'flex cursor-pointer flex-col justify-between gap-2.5 border border-border hover:border-primary/50 bg-card p-4 transition-all',
+        'flex cursor-pointer flex-col justify-between gap-2.5 border-2 border-border hover:border-primary/50 bg-card p-4 transition-all',
         className,
       )}
       {...props}
     >
       <div className='flex w-full items-center gap-2'>
-        <Folder className='size-3.5 shrink-0 text-primary' />
-        <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
+        <Folder className='size-4 text-muted-foreground shrink-0' />
+        <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
           {name}
         </span>
       </div>
