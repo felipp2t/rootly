@@ -18,6 +18,7 @@ import {
 } from './ui/dialog'
 import { Field, FieldError, FieldGroup } from './ui/field'
 import { Input } from './ui/input'
+import { Skeleton } from './ui/skeleton'
 
 interface FolderCardProps extends React.ComponentProps<'div'> {
   name: string
@@ -35,7 +36,7 @@ function FolderCard({ name, itemCount, className, ...props }: FolderCardProps) {
       {...props}
     >
       <div className='flex w-full items-center gap-2'>
-        <Folder className='size-4 text-muted-foreground shrink-0' />
+        <Folder className='size-4.5 text-muted-foreground shrink-0' />
         <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
           {name}
         </span>
@@ -162,4 +163,23 @@ function NewFolderCard({
   )
 }
 
-export { FolderCard, NewFolderCard }
+function FolderCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      data-slot='folder-card-skeleton'
+      className={cn(
+        'flex flex-col justify-between gap-2.5 border-2 border-border bg-card p-4',
+        className,
+      )}
+    >
+      <div className='flex w-full items-center gap-2'>
+        <Skeleton className='size-4.5 shrink-0 rounded-none' />
+        <Skeleton className='h-4 w-32 rounded-none' />
+      </div>
+
+      <Skeleton className='h-3 w-20 rounded-none' />
+    </div>
+  )
+}
+
+export { FolderCard, FolderCardSkeleton, NewFolderCard }
