@@ -72,3 +72,8 @@ pnpm --filter api test:cov    # com cobertura
 pnpm --filter api openapi     # gera openapi.json
 pnpm --filter web generate    # gera clientes HTTP a partir do openapi.json
 ```
+
+## MCP
+
+- ALWAYS use Serena MCP (when available) for semantic code retrieval and editing tools.
+- ALWAYS use Context7 MCP (when available) for up to date documentaion on third party code.
