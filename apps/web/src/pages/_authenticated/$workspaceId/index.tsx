@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { FolderIcon, PlusIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { useGetFoldersSuspense } from '@/api/folders/folders'
+import { useGetItemsSuspense } from '@/api/items/items'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
 import {
   FolderCard,
@@ -14,6 +15,7 @@ import {
   InlineCodeSeparator,
   InlineCodeText,
 } from '@/shared/components/inline-code'
+import { NewItemCard } from '@/shared/components/item-card'
 import { Button } from '@/shared/components/ui/button'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/')({
@@ -50,9 +52,11 @@ function RoutePage() {
   const { workspaceId } = Route.useParams()
   const { data: workspaceResult } = useGetWorkspaceSuspense(workspaceId)
   const { data: foldersResult } = useGetFoldersSuspense({ workspaceId })
+  const { data: itemsResult } = useGetItemsSuspense({ workspaceId })
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
+  const items = itemsResult.status === 200 ? itemsResult.data.items : []
 
   return (
     <div className='space-y-6'>
@@ -84,20 +88,34 @@ function RoutePage() {
                 New Folder
               </Button>
             </NewFolderCard>
-            <Button className='cursor-pointer'>
-              <PlusIcon size={16} />
-              New Item
-            </Button>
+            <NewItemCard>
+              <Button className='cursor-pointer'>
+                <PlusIcon size={16} />
+                New Item
+              </Button>
+            </NewItemCard>
           </div>
         </div>
       </div>
+
       <div className='flex flex-col gap-2'>
-        <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
-          Folders
+        <h2 className='font-mono text-XS font-semibold text-muted-foreground'>
+          FOLDERS
         </h2>
         <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
           {folders.map((folder) => (
             <FolderCard key={folder.id} itemCount={0} name={folder.name} />
+          ))}
+        </div>
+      </div>
+
+      <div className='flex flex-col gap-2'>
+        <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
+          ITEMS
+        </h2>
+        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+          {items.map((item) => (
+            <div>{item.title}</div>
           ))}
         </div>
       </div>
