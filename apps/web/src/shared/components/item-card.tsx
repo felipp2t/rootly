@@ -1,17 +1,7 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import {
-  type File,
-  FileText,
-  FileTextIcon,
-  Key,
-  KeyIcon,
-  Link,
-  LinkIcon,
-  PilcrowIcon,
-} from 'lucide-react'
+import { FileTextIcon, KeyIcon, LinkIcon, PilcrowIcon } from 'lucide-react'
 import * as React from 'react'
 import z from 'zod'
-import { Badge } from '@/shared/components/ui/badge'
 import { cn } from '@/shared/lib/utils'
 import {
   Dialog,
@@ -21,6 +11,8 @@ import {
   DialogTrigger,
 } from './ui/dialog'
 import { FieldGroup } from './ui/field'
+import { FileInput } from './ui/file-input'
+import { Input } from './ui/input'
 
 export const itemTypes = [
   {
@@ -98,34 +90,48 @@ export function NewItemCard({ children }: NewItemCardProps) {
           <FieldGroup>
             <createItemForm.Field
               name='type'
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
+              children={(field) => (
+                <div className='flex items-center'>
+                  {itemTypes.map((itemType) => {
+                    const Icon = itemType.icon
+                    const isActive = field.state.value === itemType.label
+                    return (
+                      <button
+                        type='button'
+                        className={cn(
+                          'bg-outline border border-accent px-4 py-2.5 not-first:border-l-0 cursor-pointer text-muted-foreground text-xs font-mono font-medium flex gap-2 items-center',
+                          isActive &&
+                            'bg-background border-x-0 border-t-0 border-b-2 border-primary text-primary',
+                        )}
+                        key={itemType.label}
+                        onClick={() => field.handleChange(itemType.label)}
+                      >
+                        <Icon className='size-4' />
+                        {itemType.label.toUpperCase()}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            />
 
-                return (
-                  <div className='flex items-center'>
-                    {itemTypes.map((itemType) => {
-                      const Icon = itemType.icon
-                      const isActive = field.state.value === itemType.label
-                      return (
-                        <button
-                          type='button'
-                          className={cn(
-                            'bg-outline border border-accent px-4 py-2.5 not-first:border-l-0 cursor-pointer text-muted-foreground text-xs font-mono font-medium flex gap-2 items-center',
-                            isActive &&
-                              'bg-background border-x-0 border-t-0 border-b-2 border-primary text-primary',
-                          )}
-                          key={itemType.label}
-                          onClick={() => field.handleChange(itemType.label)}
-                        >
-                          <Icon className='size-4' />
-                          {itemType.label.toUpperCase()}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )
-              }}
+            <createItemForm.Subscribe
+              selector={(state) => state.values.type}
+              children={(type) => (
+                <>
+                  <React.Activity
+                    mode={type === 'document' ? 'visible' : 'hidden'}
+                  >
+                    <FileInput />
+                  </React.Activity>
+
+                  <React.Activity
+                    mode={type !== 'document' ? 'visible' : 'hidden'}
+                  >
+                    <Input />
+                  </React.Activity>
+                </>
+              )}
             />
           </FieldGroup>
         </form>
