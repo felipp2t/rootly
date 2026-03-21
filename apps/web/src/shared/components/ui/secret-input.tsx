@@ -32,7 +32,6 @@ export function SecretInput({
         aria-invalid={ariaInvalid}
         autoComplete='off'
         type={showSecret ? 'text' : 'password'}
-        placeholder='Enter secret value'
         className='flex-1 px-3 py-2.5 border-0 outline-none focus-visible:ring-0 focus-visible:outline-none text-amber-500 placeholder:text-amber-500/40'
       />
       <button
