@@ -65,6 +65,11 @@ function NewFolderCard({
 }: NewFolderCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
 
+  function handleOpenDialog(open: boolean, callback?: () => void) {
+    setDialogIsOpen(open)
+    callback?.()
+  }
+
   const createFolderForm = useForm({
     validators: { onSubmit: newFolderSchema },
     validationLogic: revalidateLogic({
@@ -92,8 +97,8 @@ function NewFolderCard({
           ],
         })
         toast.success('Folder created successfully')
-        createFolderForm.reset()
-        setDialogIsOpen(false)
+
+        handleOpenDialog(false, () => createFolderForm.reset())
       }
 
       if (response.status === 500) {
@@ -103,7 +108,7 @@ function NewFolderCard({
   })
 
   return (
-    <Dialog open={dialogIsOpen} onOpenChange={(open) => setDialogIsOpen(open)}>
+    <Dialog open={dialogIsOpen} onOpenChange={(open) => handleOpenDialog(open)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
