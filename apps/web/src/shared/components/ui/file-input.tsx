@@ -5,8 +5,15 @@ import { CheckCircleIcon, FileTextIcon, UploadIcon } from 'lucide-react'
 import React from 'react'
 import { formatFileSize } from '@/shared/utils/format-file-size'
 
-export function FileInput() {
-  const [imageFile, setImageFile] = React.useState<File | null>(null)
+interface FileInputProps {
+  value?: File | null
+  onChange?: (file: File) => void
+  onBlur?: () => void
+}
+
+export function FileInput({ value, onChange, onBlur }: FileInputProps) {
+  const [internalFile, setInternalFile] = React.useState<File | null>(null)
+  const imageFile = value !== undefined ? value : internalFile
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   const handleImageUploadClick = () => {
@@ -16,7 +23,8 @@ export function FileInput() {
   const updateImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.[0]) {
       const file = event.target.files[0]
-      setImageFile(file)
+      setInternalFile(file)
+      onChange?.(file)
     }
   }
 
@@ -28,7 +36,8 @@ export function FileInput() {
     event.preventDefault()
     if (event.dataTransfer.files?.[0]) {
       const file = event.dataTransfer.files[0]
-      setImageFile(file)
+      setInternalFile(file)
+      onChange?.(file)
     }
   }
 
@@ -38,6 +47,7 @@ export function FileInput() {
         onDragOver={handleDragOver}
         onDrop={handleFileDrop}
         onClick={handleImageUploadClick}
+        onBlur={onBlur}
       >
         {imageFile ? (
           <div className='flex flex-col items-center gap-2'>
