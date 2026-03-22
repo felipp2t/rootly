@@ -114,7 +114,7 @@ export function NewItemCard({ children }: NewItemCardProps) {
                 field.state.meta.isTouched && !field.state.meta.isValid
 
               return (
-                <Field className='gap-1.5' data-invalid={isInvalid}>
+                <Field data-invalid={isInvalid}>
                   <FieldLabel
                     htmlFor={field.name}
                     className='font-mono text-sm text-muted-foreground block'
@@ -144,7 +144,7 @@ export function NewItemCard({ children }: NewItemCardProps) {
           <createItemForm.Field
             name='type'
             children={(field) => (
-              <Field className='gap-1.5'>
+              <Field>
                 <label
                   htmlFor={field.name}
                   className='font-mono text-sm text-muted-foreground block'
@@ -198,7 +198,7 @@ export function NewItemCard({ children }: NewItemCardProps) {
                       const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid
                       return (
-                        <Field className='gap-1.5'>
+                        <Field>
                           <FieldLabel
                             htmlFor={`${type}-content`}
                             className='font-mono text-sm text-muted-foreground block'
@@ -227,7 +227,7 @@ export function NewItemCard({ children }: NewItemCardProps) {
                       const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid
                       return (
-                        <Field className='gap-1.5' data-invalid={isInvalid}>
+                        <Field data-invalid={isInvalid}>
                           <FieldLabel
                             htmlFor={`${type}-content`}
                             className='font-mono text-sm text-muted-foreground block'
@@ -321,7 +321,7 @@ export function NewItemCard({ children }: NewItemCardProps) {
                       const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid
                       return (
-                        <Field className='gap-1.5' data-invalid={isInvalid}>
+                        <Field data-invalid={isInvalid}>
                           <FieldLabel
                             htmlFor={`${type}-content`}
                             className='font-mono text-sm text-muted-foreground block'
