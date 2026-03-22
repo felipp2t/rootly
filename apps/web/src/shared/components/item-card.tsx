@@ -249,11 +249,14 @@ export function NewItemCard({ children }: NewItemCardProps) {
                               autoComplete='off'
                               type='text'
                               className={cn(
-                                'flex-1 px-3 py-2.5 border-0 outline-none',
+                                'flex-1 px-3 py-2.5 border-0 outline-none rounded-none',
                                 'focus-visible:ring-0 focus-visible:outline-none',
                               )}
                             />
                           </div>
+                          <FieldError className='ml-26'>
+                            {field.state.meta.errors[0]?.message}
+                          </FieldError>
                         </Field>
                       )
                     }}
