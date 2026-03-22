@@ -3,15 +3,22 @@
 
 import { CheckCircleIcon, FileTextIcon, UploadIcon } from 'lucide-react'
 import React from 'react'
+import { cn } from '@/shared/lib/utils'
 import { formatFileSize } from '@/shared/utils/format-file-size'
 
 interface FileInputProps {
   value?: File | null
+  isInvalid: boolean
   onChange?: (file: File) => void
   onBlur?: () => void
 }
 
-export function FileInput({ value, onChange, onBlur }: FileInputProps) {
+export function FileInput({
+  isInvalid,
+  value,
+  onChange,
+  onBlur,
+}: FileInputProps) {
   const [internalFile, setInternalFile] = React.useState<File | null>(null)
   const imageFile = value !== undefined ? value : internalFile
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -42,7 +49,7 @@ export function FileInput({ value, onChange, onBlur }: FileInputProps) {
   }
 
   return (
-    <div className='container'>
+    <div className={cn('container')}>
       <div
         onDragOver={handleDragOver}
         onDrop={handleFileDrop}
@@ -66,7 +73,13 @@ export function FileInput({ value, onChange, onBlur }: FileInputProps) {
             </p>
           </div>
         ) : (
-          <div className='flex flex-col gap-2 bg-outline border border-dashed border-accent cursor-pointer items-center justify-center h-40'>
+          <div
+            aria-invalid={isInvalid}
+            className={cn(
+              'flex flex-col gap-2 bg-outline border border-dashed border-accent cursor-pointer items-center justify-center h-40',
+              'aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
+            )}
+          >
             <UploadIcon className='text-muted-foreground' />
             <p className='text-muted-foreground font-mono text-sm'>
               DRAG &amp; DROP OR CLICK TO UPLOAD

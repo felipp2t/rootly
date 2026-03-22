@@ -195,6 +195,8 @@ export function NewItemCard({ children }: NewItemCardProps) {
                   <createItemForm.Field
                     name='content'
                     children={(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid
                       return (
                         <Field className='gap-1.5'>
                           <FieldLabel
@@ -207,7 +209,11 @@ export function NewItemCard({ children }: NewItemCardProps) {
                             value={field.state.value as File | null}
                             onChange={(file) => field.handleChange(file)}
                             onBlur={field.handleBlur}
+                            isInvalid={isInvalid}
                           />
+                          <FieldError>
+                            {field.state.meta.errors[0]?.message}
+                          </FieldError>
                         </Field>
                       )
                     }}
