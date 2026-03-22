@@ -640,7 +640,8 @@
                 "required": [
                   "title",
                   "workspaceId",
-                  "type"
+                  "type",
+                  "content"
                 ]
               }
             }

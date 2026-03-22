@@ -11,7 +11,7 @@ interface CreateItemUseCaseRequest {
   folderId?: string
   type: ItemType
   title: string
-  content?: string
+  content: string
 }
 
 type CreateItemUseCaseResponse = Either<BaseError, { itemId: string }>

@@ -11,5 +11,5 @@ export type CreateItemBody = {
   folderId?: string
   workspaceId: string
   type: CreateItemBodyType
-  content?: string
+  content: string
 }

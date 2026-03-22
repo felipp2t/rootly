@@ -17,7 +17,7 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
           folderId: z.string().optional(),
           workspaceId: z.string(),
           type: z.enum(['link', 'document', 'text', 'secret']),
-          content: z.string().optional(),
+          content: z.string(),
         }),
         response: {
           201: z.object({ itemId: z.string() }),
