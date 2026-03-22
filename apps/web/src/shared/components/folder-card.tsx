@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
-import { Field, FieldError, FieldGroup } from './ui/field'
+import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
 
@@ -131,6 +131,12 @@ function NewFolderCard({
                   field.state.meta.isTouched && !field.state.meta.isValid
                 return (
                   <Field data-invalid={isInvalid}>
+                    <FieldLabel
+                      htmlFor={field.name}
+                      className='font-mono text-sm text-muted-foreground block'
+                    >
+                      FOLDER NAME
+                    </FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
