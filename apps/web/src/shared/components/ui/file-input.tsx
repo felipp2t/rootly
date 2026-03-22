@@ -42,7 +42,7 @@ export function FileInput({ value, onChange, onBlur }: FileInputProps) {
   }
 
   return (
-    <div className={'container'}>
+    <div className='container'>
       <div
         onDragOver={handleDragOver}
         onDrop={handleFileDrop}
