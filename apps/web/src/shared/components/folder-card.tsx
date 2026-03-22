@@ -112,7 +112,9 @@ function NewFolderCard({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>NEW FOLDER</DialogTitle>
+          <DialogTitle>
+            <span className='text-primary'>{`//`}</span> NEW FOLDER
+          </DialogTitle>
         </DialogHeader>
         <form
           className='space-y-6 mt-6'
