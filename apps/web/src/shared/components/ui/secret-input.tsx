@@ -1,5 +1,6 @@
 import { EyeIcon, EyeOffIcon, KeyIcon } from 'lucide-react'
 import * as React from 'react'
+import { cn } from '@/shared/lib/utils'
 import { Input } from './input'
 
 interface SecretInputProps {
@@ -22,7 +23,12 @@ export function SecretInput({
   const [showSecret, setShowSecret] = React.useState(false)
 
   return (
-    <div className='flex items-center border border-amber-600/20 focus-within:border-amber-600 rounded-none'>
+    <div
+      className={cn(
+        'flex items-center border border-amber-600/20 rounded-none',
+        'focus-within:border-amber-600',
+      )}
+    >
       <Input
         id={id}
         name={name}
@@ -32,12 +38,16 @@ export function SecretInput({
         aria-invalid={ariaInvalid}
         autoComplete='off'
         type={showSecret ? 'text' : 'password'}
-        className='flex-1 px-3 py-2.5 border-0 outline-none focus-visible:ring-0 focus-visible:outline-none text-amber-500 placeholder:text-amber-500/40'
+        className={cn(
+          'flex-1 px-3 py-2.5 rounded-none border-0 outline-none  text-amber-500',
+          'focus-visible:ring-0 focus-visible:outline-none',
+          'placeholder:text-amber-500/40',
+        )}
       />
       <button
         type='button'
         onClick={() => setShowSecret((v) => !v)}
-        className='px-3 py-2.5 dark:bg-input/30 cursor-pointer'
+        className={cn('px-3 py-2.5 cursor-pointer', 'dark:bg-input/30')}
       >
         {showSecret ? (
           <EyeOffIcon className='size-4 text-muted-foreground' />
