@@ -1,4 +1,4 @@
-import { EyeIcon, EyeOffIcon, KeyIcon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '@/shared/lib/utils'
 import { Input } from './input'
