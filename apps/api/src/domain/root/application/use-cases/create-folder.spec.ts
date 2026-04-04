@@ -15,7 +15,9 @@ describe('CreateFolder', () => {
     sut = new CreateFolderUseCase(folderRepository)
   })
 
-  it('should be able create a folder', async () => {
+  it('should be able create a folder', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -29,7 +31,9 @@ describe('CreateFolder', () => {
     expect(folderRepository.items.length).toBe(1)
   })
 
-  it('should not be able to create a folder with the same name in the same parent folder', async () => {
+  it('should not be able to create a folder with the same name in the same parent folder', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const parentFolder = Folder.create({
@@ -48,7 +52,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(FolderAlreadyExistsError)
   })
 
-  it('should not be possible to create a folder with fewer than 3 characters', async () => {
+  it('should not be possible to create a folder with fewer than 3 characters', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const response = await sut.execute({
@@ -60,7 +66,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidFolderNameError)
   })
 
-  it('should not be possible to create a folder with more than 32 characters', async () => {
+  it('should not be possible to create a folder with more than 32 characters', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const response = await sut.execute({
@@ -72,7 +80,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidFolderNameError)
   })
 
-  it('should be able create a folder with 32 characters', async () => {
+  it('should be able create a folder with 32 characters', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const response = await sut.execute({
@@ -84,7 +94,9 @@ describe('CreateFolder', () => {
     expect(response.value).toMatchObject({ folderId: expect.any(String) })
   })
 
-  it('should be able create a folder into a parent folder', async () => {
+  it('should be able create a folder into a parent folder', {
+    tags: ['create-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const parentFolder = Folder.create({

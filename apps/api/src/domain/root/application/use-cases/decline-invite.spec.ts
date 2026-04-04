@@ -17,7 +17,9 @@ describe('DeclineInvite', () => {
     sut = new DeclineInviteUseCase(workspaceInviteRepository)
   })
 
-  it('should be able to decline an invite', async () => {
+  it('should be able to decline an invite', {
+    tags: ['decline-invite'],
+  }, async () => {
     const inviteId = new UniqueEntityID()
     const userId = new UniqueEntityID().toString()
 
@@ -42,7 +44,9 @@ describe('DeclineInvite', () => {
     expect(response.value).toBeUndefined()
   })
 
-  it('should update the invite status to declined in the repository', async () => {
+  it('should update the invite status to declined in the repository', {
+    tags: ['decline-invite'],
+  }, async () => {
     const inviteId = new UniqueEntityID()
     const userId = new UniqueEntityID().toString()
 
@@ -68,7 +72,9 @@ describe('DeclineInvite', () => {
     )
   })
 
-  it('should return ResourceNotFoundError when the invite does not exist', async () => {
+  it('should return ResourceNotFoundError when the invite does not exist', {
+    tags: ['decline-invite'],
+  }, async () => {
     const response = await sut.execute({
       inviteId: new UniqueEntityID().toString(),
       userId: new UniqueEntityID().toString(),
@@ -78,7 +84,9 @@ describe('DeclineInvite', () => {
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
-  it('should return WorkspaceInviteAlreadyAcceptedError when the invite is not pending', async () => {
+  it('should return WorkspaceInviteAlreadyAcceptedError when the invite is not pending', {
+    tags: ['decline-invite'],
+  }, async () => {
     const inviteId = new UniqueEntityID()
     const userId = new UniqueEntityID().toString()
 
@@ -104,7 +112,9 @@ describe('DeclineInvite', () => {
     expect(response.value).toBeInstanceOf(WorkspaceInviteAlreadyAcceptedError)
   })
 
-  it('should return WorkspaceInviteExpiredError when the invite has expired', async () => {
+  it('should return WorkspaceInviteExpiredError when the invite has expired', {
+    tags: ['decline-invite'],
+  }, async () => {
     const inviteId = new UniqueEntityID()
     const userId = new UniqueEntityID().toString()
 
@@ -132,7 +142,9 @@ describe('DeclineInvite', () => {
     expect(response.value).toBeInstanceOf(WorkspaceInviteExpiredError)
   })
 
-  it('should return NotAllowedError when userId does not match invitedUserId', async () => {
+  it('should return NotAllowedError when userId does not match invitedUserId', {
+    tags: ['decline-invite'],
+  }, async () => {
     const inviteId = new UniqueEntityID()
     const invitedUserId = new UniqueEntityID().toString()
     const differentUserId = new UniqueEntityID().toString()

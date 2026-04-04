@@ -20,7 +20,9 @@ describe('CreateFolder', () => {
     sut = new CreateItemUseCase(itemRepository)
   })
 
-  it('should be able create a item with text type without content', async () => {
+  it('should be able create a item with text type without content', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -40,7 +42,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items[0].content).toBeUndefined()
   })
 
-  it('should be able create a item with text type and defined content', async () => {
+  it('should be able create a item with text type and defined content', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -61,7 +65,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items[0].content).toBe('This is a test item')
   })
 
-  it('should be able create a item with link type', async () => {
+  it('should be able create a item with link type', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -82,7 +88,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items[0].content).toBe('https://www.example.com')
   })
 
-  it('should not be able create a item with link type with invalid content', async () => {
+  it('should not be able create a item with link type with invalid content', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -101,7 +109,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
-  it('should be able create a item with document type', async () => {
+  it('should be able create a item with document type', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -121,7 +131,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items.length).toBe(1)
   })
 
-  it('should not be able create a item with document type with invalid content', async () => {
+  it('should not be able create a item with document type with invalid content', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -140,7 +152,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
-  it('should be able create a item with secret type', async () => {
+  it('should be able create a item with secret type', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -160,7 +174,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items.length).toBe(1)
   })
 
-  it('should not be able create a item with secret type with invalid content', async () => {
+  it('should not be able create a item with secret type with invalid content', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     folderRepository.create(
@@ -179,7 +195,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidItemTypeError)
   })
 
-  it('should be able to create an item without a folder', async () => {
+  it('should be able to create an item without a folder', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -195,7 +213,9 @@ describe('CreateFolder', () => {
     expect(itemRepository.items[0].folderId).toBeUndefined()
   })
 
-  it('should not be able create a item with the same title in the same folder', async () => {
+  it('should not be able create a item with the same title in the same folder', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -219,7 +239,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(ItemAlreadyExistsError)
   })
 
-  it('should not be possible to create a item with title fewer than 3 characters', async () => {
+  it('should not be possible to create a item with title fewer than 3 characters', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const response = await sut.execute(
@@ -230,7 +252,9 @@ describe('CreateFolder', () => {
     expect(response.value).toBeInstanceOf(InvalidItemTitleError)
   })
 
-  it('should not be possible to create a item with title more than 32 characters', async () => {
+  it('should not be possible to create a item with title more than 32 characters', {
+    tags: ['create-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const response = await sut.execute(

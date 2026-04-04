@@ -26,7 +26,9 @@ describe('GetWorkspaces', () => {
     )
   })
 
-  it('should return all workspaces the user is a member of', async () => {
+  it('should return all workspaces the user is a member of', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
 
@@ -58,7 +60,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return only workspaces the user is a member of, not all workspaces', async () => {
+  it('should return only workspaces the user is a member of, not all workspaces', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const otherUserId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
@@ -87,7 +91,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return an empty list when the user has no workspace memberships', async () => {
+  it('should return an empty list when the user has no workspace memberships', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
 
     const response = await sut.execute({ userId })
@@ -98,7 +104,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return itemCount reflecting the number of items in each workspace', async () => {
+  it('should return itemCount reflecting the number of items in each workspace', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
 
@@ -144,7 +152,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return itemCount of 0 for a workspace with no items', async () => {
+  it('should return itemCount of 0 for a workspace with no items', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
 
@@ -167,7 +177,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return memberCount reflecting the number of members in each workspace', async () => {
+  it('should return memberCount reflecting the number of members in each workspace', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const otherUserId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
@@ -215,7 +227,9 @@ describe('GetWorkspaces', () => {
     }
   })
 
-  it('should return memberCount of 0 for a workspace with no members', async () => {
+  it('should return memberCount of 0 for a workspace with no members', {
+    tags: ['get-workspaces'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const roleId = new UniqueEntityID().toString()
 

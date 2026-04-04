@@ -18,7 +18,9 @@ describe('CreateRole', () => {
     sut = new CreateRoleUseCase(workspaceRoleRepository, workspaceRepository)
   })
 
-  it('should be able to create a role', async () => {
+  it('should be able to create a role', {
+    tags: ['create-role'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     workspaceRepository.items.push(workspace)
@@ -33,7 +35,9 @@ describe('CreateRole', () => {
     expect(response.value).toMatchObject({ roleId: expect.any(String) })
   })
 
-  it('should persist the role with the correct name and workspaceId', async () => {
+  it('should persist the role with the correct name and workspaceId', {
+    tags: ['create-role'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     workspaceRepository.items.push(workspace)
@@ -51,7 +55,9 @@ describe('CreateRole', () => {
     )
   })
 
-  it('should return the id matching the persisted role', async () => {
+  it('should return the id matching the persisted role', {
+    tags: ['create-role'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     workspaceRepository.items.push(workspace)
@@ -68,7 +74,9 @@ describe('CreateRole', () => {
     })
   })
 
-  it('should return ResourceNotFoundError when the workspace does not exist', async () => {
+  it('should return ResourceNotFoundError when the workspace does not exist', {
+    tags: ['create-role'],
+  }, async () => {
     const response = await sut.execute({
       userId: makeUser().id.toString(),
       name: 'Developer',
@@ -79,7 +87,9 @@ describe('CreateRole', () => {
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
-  it('should return RoleAlreadyExistsError when the name is a reserved role name', async () => {
+  it('should return RoleAlreadyExistsError when the name is a reserved role name', {
+    tags: ['create-role'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     workspaceRepository.items.push(workspace)
@@ -94,7 +104,9 @@ describe('CreateRole', () => {
     expect(response.value).toBeInstanceOf(RoleAlreadyExistsError)
   })
 
-  it('should return RoleAlreadyExistsError when a role with the same name already exists in the workspace', async () => {
+  it('should return RoleAlreadyExistsError when a role with the same name already exists in the workspace', {
+    tags: ['create-role'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     workspaceRepository.items.push(workspace)

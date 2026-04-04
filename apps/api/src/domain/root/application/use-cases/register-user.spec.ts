@@ -15,7 +15,9 @@ describe('Register User', () => {
     sut = new RegisterUserUseCase(inMemoryUserRepository, fakeHasher)
   })
 
-  it('should be able to register a new user', async () => {
+  it('should be able to register a new user', {
+    tags: ['register-user'],
+  }, async () => {
     const result = await sut.execute({
       name: 'John Doe',
       email: 'johndoe@example.com',
@@ -28,7 +30,9 @@ describe('Register User', () => {
     })
   })
 
-  it('should hash user password upon registration', async () => {
+  it('should hash user password upon registration', {
+    tags: ['register-user'],
+  }, async () => {
     const result = await sut.execute({
       name: 'John Doe',
       email: 'johndoe@example.com',

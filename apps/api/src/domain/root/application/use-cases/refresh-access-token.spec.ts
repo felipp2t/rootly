@@ -21,7 +21,9 @@ describe('RefreshAccessToken', () => {
     )
   })
 
-  it('should be able to refresh an access token', async () => {
+  it('should be able to refresh an access token', {
+    tags: ['refresh-access-token'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
 
     const refreshToken = makeRefreshToken({ userId })
@@ -36,7 +38,9 @@ describe('RefreshAccessToken', () => {
     })
   })
 
-  it('should remove the old refresh token and persist a new one on success', async () => {
+  it('should remove the old refresh token and persist a new one on success', {
+    tags: ['refresh-access-token'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
 
     const refreshToken = makeRefreshToken({ userId })
@@ -50,14 +54,18 @@ describe('RefreshAccessToken', () => {
     expect(inMemoryRefreshTokenRepository.items[0].userId).toBe(userId)
   })
 
-  it('should return InvalidRefreshTokenError when token does not exist', async () => {
+  it('should return InvalidRefreshTokenError when token does not exist', {
+    tags: ['refresh-access-token'],
+  }, async () => {
     const result = await sut.execute({ token: 'nonexistent-token' })
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(InvalidRefreshTokenError)
   })
 
-  it('should return InvalidRefreshTokenError when token is expired', async () => {
+  it('should return InvalidRefreshTokenError when token is expired', {
+    tags: ['refresh-access-token'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const pastDate = new Date(Date.now() - 1000)
 
@@ -70,7 +78,9 @@ describe('RefreshAccessToken', () => {
     expect(result.value).toBeInstanceOf(InvalidRefreshTokenError)
   })
 
-  it('should remove an expired refresh token from the repository', async () => {
+  it('should remove an expired refresh token from the repository', {
+    tags: ['refresh-access-token'],
+  }, async () => {
     const userId = new UniqueEntityID().toString()
     const pastDate = new Date(Date.now() - 1000)
 

@@ -26,7 +26,9 @@ describe('CreateWorkspace', () => {
     )
   })
 
-  it('should be able to create a workspace', async () => {
+  it('should be able to create a workspace', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     const response = await sut.execute({
@@ -38,7 +40,9 @@ describe('CreateWorkspace', () => {
     expect(response.value).toMatchObject({ workspaceId: expect.any(String) })
   })
 
-  it('should persist the workspace in the repository', async () => {
+  it('should persist the workspace in the repository', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -51,7 +55,9 @@ describe('CreateWorkspace', () => {
     expect(workspaceRepository.items[0].userId).toBe(user.id.toString())
   })
 
-  it('should return the id of the created workspace', async () => {
+  it('should return the id of the created workspace', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     const response = await sut.execute({
@@ -65,7 +71,9 @@ describe('CreateWorkspace', () => {
     })
   })
 
-  it('should create an Owner role for the workspace', async () => {
+  it('should create an Owner role for the workspace', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -77,7 +85,9 @@ describe('CreateWorkspace', () => {
     expect(workspaceRoleRepository.items[0].name).toBe('Owner')
   })
 
-  it('should associate the Owner role with the created workspace', async () => {
+  it('should associate the Owner role with the created workspace', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -91,7 +101,9 @@ describe('CreateWorkspace', () => {
     expect(role.workspaceId).toBe(workspace.id.toString())
   })
 
-  it('should create one permission per resource with action "all"', async () => {
+  it('should create one permission per resource with action "all"', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -112,7 +124,9 @@ describe('CreateWorkspace', () => {
     }
   })
 
-  it('should bind all permissions to the Owner role', async () => {
+  it('should bind all permissions to the Owner role', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -127,7 +141,9 @@ describe('CreateWorkspace', () => {
     }
   })
 
-  it('should create a workspace member for the creator', async () => {
+  it('should create a workspace member for the creator', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -138,7 +154,9 @@ describe('CreateWorkspace', () => {
     expect(workspaceMemberRepository.items.length).toBe(1)
   })
 
-  it('should associate the workspace member with the creator', async () => {
+  it('should associate the workspace member with the creator', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -149,7 +167,9 @@ describe('CreateWorkspace', () => {
     expect(workspaceMemberRepository.items[0].userId).toBe(user.id.toString())
   })
 
-  it('should associate the workspace member with the created workspace', async () => {
+  it('should associate the workspace member with the created workspace', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({
@@ -164,7 +184,9 @@ describe('CreateWorkspace', () => {
     )
   })
 
-  it('should assign the Owner role to the workspace member', async () => {
+  it('should assign the Owner role to the workspace member', {
+    tags: ['create-workspace'],
+  }, async () => {
     const user = makeUser()
 
     await sut.execute({

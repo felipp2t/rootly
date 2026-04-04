@@ -19,7 +19,9 @@ describe('AssignTagToFolder', () => {
     sut = new AssignTagToFolderUseCase(folderRepository, tagRepository)
   })
 
-  it('should be able to assign a tag to a folder', async () => {
+  it('should be able to assign a tag to a folder', {
+    tags: ['assign-tag-to-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -37,7 +39,9 @@ describe('AssignTagToFolder', () => {
     expect(folderRepository.items[0].tagIds).toContain(tag.id.toString())
   })
 
-  it('should be able to assign multiple tags to a folder', async () => {
+  it('should be able to assign multiple tags to a folder', {
+    tags: ['assign-tag-to-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -62,7 +66,9 @@ describe('AssignTagToFolder', () => {
     expect(folderRepository.items[0].tagIds).toContain(tagB.id.toString())
   })
 
-  it('should be idempotent when assigning the same tag twice', async () => {
+  it('should be idempotent when assigning the same tag twice', {
+    tags: ['assign-tag-to-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -84,7 +90,9 @@ describe('AssignTagToFolder', () => {
     expect(folderRepository.items[0].tagIds).toHaveLength(1)
   })
 
-  it('should not be able to assign a tag to a non-existing folder', async () => {
+  it('should not be able to assign a tag to a non-existing folder', {
+    tags: ['assign-tag-to-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
@@ -100,7 +108,9 @@ describe('AssignTagToFolder', () => {
     expect(response.value).toBeInstanceOf(FolderNotFoundError)
   })
 
-  it('should not be able to assign a non-existing tag to a folder', async () => {
+  it('should not be able to assign a non-existing tag to a folder', {
+    tags: ['assign-tag-to-folder'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })

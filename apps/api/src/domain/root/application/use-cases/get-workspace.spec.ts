@@ -13,7 +13,9 @@ describe('GetWorkspaceUseCase', () => {
     sut = new GetWorkspaceUseCase(workspaceRepository)
   })
 
-  it('should return the workspace when it belongs to the user', async () => {
+  it('should return the workspace when it belongs to the user', {
+    tags: ['get-workspace'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -35,7 +37,9 @@ describe('GetWorkspaceUseCase', () => {
     }
   })
 
-  it('should return ResourceNotFoundError when workspace does not exist', async () => {
+  it('should return ResourceNotFoundError when workspace does not exist', {
+    tags: ['get-workspace'],
+  }, async () => {
     const user = makeUser()
 
     const response = await sut.execute({
@@ -49,7 +53,9 @@ describe('GetWorkspaceUseCase', () => {
     }
   })
 
-  it('should return ResourceNotFoundError when workspace belongs to a different user', async () => {
+  it('should return ResourceNotFoundError when workspace belongs to a different user', {
+    tags: ['get-workspace'],
+  }, async () => {
     const owner = makeUser()
     const otherUser = makeUser()
     const workspace = makeWorkspace({ userId: owner.id.toString() })

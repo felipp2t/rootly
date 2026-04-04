@@ -13,7 +13,9 @@ describe('GetFolders', () => {
     sut = new GetFoldersUseCase(folderRepository)
   })
 
-  it('should return all folders from user workspaces when no parentId is provided', async () => {
+  it('should return all folders from user workspaces when no parentId is provided', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -31,7 +33,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should not return folders from workspaces the user does not belong to', async () => {
+  it('should not return folders from workspaces the user does not belong to', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const otherUser = makeUser()
 
@@ -52,7 +56,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should return only subfolders of a given parentId', async () => {
+  it('should return only subfolders of a given parentId', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -72,7 +78,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should not return folders from a different parent', async () => {
+  it('should not return folders from a different parent', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -94,7 +102,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should return an empty list when parentId has no subfolders', async () => {
+  it('should return an empty list when parentId has no subfolders', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -111,7 +121,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should return an empty list when user has no workspace memberships', async () => {
+  it('should return an empty list when user has no workspace memberships', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
 
     const response = await sut.execute({ userId: user.id.toString() })
@@ -122,7 +134,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should return only root folders of a workspace when workspaceId is provided', async () => {
+  it('should return only root folders of a workspace when workspaceId is provided', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -141,7 +155,9 @@ describe('GetFolders', () => {
     }
   })
 
-  it('should not return folders from other workspaces when workspaceId is provided', async () => {
+  it('should not return folders from other workspaces when workspaceId is provided', {
+    tags: ['get-folders'],
+  }, async () => {
     const user = makeUser()
     const workspaceA = makeWorkspace({ userId: user.id.toString() })
     const workspaceB = makeWorkspace({ userId: user.id.toString() })

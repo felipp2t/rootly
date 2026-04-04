@@ -12,7 +12,9 @@ describe('GetMe', () => {
     sut = new GetMeUseCase(userRepository)
   })
 
-  it('should return the user when a valid userId is provided', async () => {
+  it('should return the user when a valid userId is provided', {
+    tags: ['get-me'],
+  }, async () => {
     const user = makeUser()
     userRepository.items.push(user)
 
@@ -22,7 +24,9 @@ describe('GetMe', () => {
     expect(result.value).toMatchObject({ user })
   })
 
-  it('should return the correct user entity from the repository', async () => {
+  it('should return the correct user entity from the repository', {
+    tags: ['get-me'],
+  }, async () => {
     const user = makeUser({ name: 'John Doe', email: 'john@example.com' })
     userRepository.items.push(user)
 
@@ -36,7 +40,9 @@ describe('GetMe', () => {
     }
   })
 
-  it('should return NotAllowedError when the userId does not exist', async () => {
+  it('should return NotAllowedError when the userId does not exist', {
+    tags: ['get-me'],
+  }, async () => {
     const result = await sut.execute({ userId: 'non-existent-id' })
 
     expect(result.isLeft()).toBe(true)

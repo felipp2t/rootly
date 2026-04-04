@@ -16,7 +16,9 @@ describe('InviteUser', () => {
     sut = new InviteUserUseCase(userRepository, workspaceInviteRepository)
   })
 
-  it('should be able to invite a user to a workspace', async () => {
+  it('should be able to invite a user to a workspace', {
+    tags: ['invite-user'],
+  }, async () => {
     const invitedUser = makeUser()
     await userRepository.create(invitedUser)
 
@@ -31,7 +33,9 @@ describe('InviteUser', () => {
     expect(response.value).toMatchObject({ workspaceInviteId: expect.any(String) })
   })
 
-  it('should persist the invite in the repository with correct fields', async () => {
+  it('should persist the invite in the repository with correct fields', {
+    tags: ['invite-user'],
+  }, async () => {
     const invitedUser = makeUser()
     await userRepository.create(invitedUser)
 
@@ -53,7 +57,9 @@ describe('InviteUser', () => {
     expect(workspaceInviteRepository.items[0].roleId).toBe(roleId)
   })
 
-  it('should persist the invite with status pending', async () => {
+  it('should persist the invite with status pending', {
+    tags: ['invite-user'],
+  }, async () => {
     const invitedUser = makeUser()
     await userRepository.create(invitedUser)
 
@@ -67,7 +73,9 @@ describe('InviteUser', () => {
     expect(workspaceInviteRepository.items[0].status).toBe('pending')
   })
 
-  it('should return the id matching the persisted invite', async () => {
+  it('should return the id matching the persisted invite', {
+    tags: ['invite-user'],
+  }, async () => {
     const invitedUser = makeUser()
     await userRepository.create(invitedUser)
 
@@ -84,7 +92,9 @@ describe('InviteUser', () => {
     })
   })
 
-  it('should return ResourceNotFoundError when no user is found for the given email', async () => {
+  it('should return ResourceNotFoundError when no user is found for the given email', {
+    tags: ['invite-user'],
+  }, async () => {
     const response = await sut.execute({
       email: 'nonexistent@example.com',
       inviterId: new UniqueEntityID().toString(),

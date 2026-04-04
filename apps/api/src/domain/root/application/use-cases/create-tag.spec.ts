@@ -14,7 +14,9 @@ describe('CreateTag', () => {
     sut = new CreateTagUseCase(tagRepository)
   })
 
-  it('should be able to create a tag', async () => {
+  it('should be able to create a tag', {
+    tags: ['create-tag'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -29,7 +31,9 @@ describe('CreateTag', () => {
     expect(tagRepository.items.length).toBe(1)
   })
 
-  it('should not be able to create a tag with the same name in the same workspace', async () => {
+  it('should not be able to create a tag with the same name in the same workspace', {
+    tags: ['create-tag'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -49,7 +53,9 @@ describe('CreateTag', () => {
     expect(response.value).toBeInstanceOf(TagAlreadyExistsError)
   })
 
-  it('should be able to create a tag with the same name in a different workspace', async () => {
+  it('should be able to create a tag with the same name in a different workspace', {
+    tags: ['create-tag'],
+  }, async () => {
     const user = makeUser()
     const workspaceA = makeWorkspace({ userId: user.id.toString() })
     const workspaceB = makeWorkspace({ userId: user.id.toString() })
@@ -70,7 +76,9 @@ describe('CreateTag', () => {
     expect(tagRepository.items.length).toBe(2)
   })
 
-  it('should be able to create tags with different colors', async () => {
+  it('should be able to create tags with different colors', {
+    tags: ['create-tag'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 

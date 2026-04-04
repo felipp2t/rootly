@@ -14,7 +14,9 @@ describe('GetItems', () => {
     sut = new GetItemsUseCase(itemRepository)
   })
 
-  it('should return items from user workspaces when no parentId is provided', async () => {
+  it('should return items from user workspaces when no parentId is provided', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
 
@@ -31,7 +33,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should not return items from workspaces the user does not belong to', async () => {
+  it('should not return items from workspaces the user does not belong to', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const otherUser = makeUser()
 
@@ -52,7 +56,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should return items inside a folder', async () => {
+  it('should return items inside a folder', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -71,7 +77,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should return only items belonging to the given folder', async () => {
+  it('should return only items belonging to the given folder', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folderA = makeFolder({ workspaceId: workspace.id.toString() })
@@ -91,7 +99,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should return an empty list when folder has no items', async () => {
+  it('should return an empty list when folder has no items', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -106,7 +116,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should return an empty list when user has no workspace memberships', async () => {
+  it('should return an empty list when user has no workspace memberships', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
 
     const response = await sut.execute({ userId: user.id.toString() })
@@ -117,7 +129,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should return only root items of a workspace when workspaceId is provided', async () => {
+  it('should return only root items of a workspace when workspaceId is provided', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -136,7 +150,9 @@ describe('GetItems', () => {
     }
   })
 
-  it('should not return items from other workspaces when workspaceId is provided', async () => {
+  it('should not return items from other workspaces when workspaceId is provided', {
+    tags: ['get-items'],
+  }, async () => {
     const user = makeUser()
     const workspaceA = makeWorkspace({ userId: user.id.toString() })
     const workspaceB = makeWorkspace({ userId: user.id.toString() })

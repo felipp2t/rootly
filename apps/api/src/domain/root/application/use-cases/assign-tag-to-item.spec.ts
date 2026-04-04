@@ -20,7 +20,9 @@ describe('AssignTagToItem', () => {
     sut = new AssignTagToItemUseCase(itemRepository, tagRepository)
   })
 
-  it('should be able to assign a tag to an item', async () => {
+  it('should be able to assign a tag to an item', {
+    tags: ['assign-tag-to-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -42,7 +44,9 @@ describe('AssignTagToItem', () => {
     expect(itemRepository.items[0].tagIds).toContain(tag.id.toString())
   })
 
-  it('should be able to assign multiple tags to an item', async () => {
+  it('should be able to assign multiple tags to an item', {
+    tags: ['assign-tag-to-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -65,7 +69,9 @@ describe('AssignTagToItem', () => {
     expect(itemRepository.items[0].tagIds).toContain(tagB.id.toString())
   })
 
-  it('should be idempotent when assigning the same tag twice', async () => {
+  it('should be idempotent when assigning the same tag twice', {
+    tags: ['assign-tag-to-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const folder = makeFolder({ workspaceId: workspace.id.toString() })
@@ -88,7 +94,9 @@ describe('AssignTagToItem', () => {
     expect(itemRepository.items[0].tagIds).toHaveLength(1)
   })
 
-  it('should not be able to assign a tag to a non-existing item', async () => {
+  it('should not be able to assign a tag to a non-existing item', {
+    tags: ['assign-tag-to-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const tag = makeTag({ workspaceId: workspace.id.toString() })
@@ -104,7 +112,9 @@ describe('AssignTagToItem', () => {
     expect(response.value).toBeInstanceOf(ItemNotFoundError)
   })
 
-  it('should not be able to assign a non-existing tag to an item', async () => {
+  it('should not be able to assign a non-existing tag to an item', {
+    tags: ['assign-tag-to-item'],
+  }, async () => {
     const user = makeUser()
     const workspace = makeWorkspace({ userId: user.id.toString() })
     const item = makeItem({ workspaceId: workspace.id.toString() })

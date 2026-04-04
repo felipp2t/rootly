@@ -28,7 +28,9 @@ describe('AuthenticateUser', () => {
     )
   })
 
-  it('should be able to authenticate a user', async () => {
+  it('should be able to authenticate a user', {
+    tags: ['authenticate-user'],
+  }, async () => {
     const user = makeUser({
       email: 'johndoe@example.com',
       passwordHash: await fakeHasher.hash('123456'),
@@ -48,7 +50,9 @@ describe('AuthenticateUser', () => {
     })
   })
 
-  it('should persist a refresh token in the repository on successful authentication', async () => {
+  it('should persist a refresh token in the repository on successful authentication', {
+    tags: ['authenticate-user'],
+  }, async () => {
     const user = makeUser({
       email: 'johndoe@example.com',
       passwordHash: await fakeHasher.hash('123456'),
@@ -65,7 +69,9 @@ describe('AuthenticateUser', () => {
     expect(inMemoryRefreshTokenRepository.items[0].userId).toBe(user.id.toString())
   })
 
-  it('should return WrongCredentialsError when email does not exist', async () => {
+  it('should return WrongCredentialsError when email does not exist', {
+    tags: ['authenticate-user'],
+  }, async () => {
     const result = await sut.execute({
       email: 'nonexistent@example.com',
       password: '123456',
@@ -75,7 +81,9 @@ describe('AuthenticateUser', () => {
     expect(result.value).toBeInstanceOf(WrongCredentialsError)
   })
 
-  it('should return WrongCredentialsError when password is wrong', async () => {
+  it('should return WrongCredentialsError when password is wrong', {
+    tags: ['authenticate-user'],
+  }, async () => {
     const user = makeUser({
       email: 'johndoe@example.com',
       passwordHash: await fakeHasher.hash('correct-password'),
