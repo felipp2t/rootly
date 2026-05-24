@@ -4,20 +4,23 @@ import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { InMemoryItemRepository } from '@test/repositories/in-memory-item-repository.ts'
+import { InMemoryStorageRepository } from '@test/repositories/in-memory-storage-repository.ts'
 import { InvalidItemTypeError } from '../../enterprise/validators/_errors/invalid-item-type.ts'
+import { CreateItemUseCase } from './create-item.ts'
 import { InvalidItemTitleError } from './errors/invalid-item-title-error.ts'
 import { ItemAlreadyExistsError } from './errors/item-already-exists-error.ts'
-import { CreateItemUseCase } from './create-item.ts'
 
 let itemRepository: InMemoryItemRepository
 let folderRepository: InMemoryFolderRepository
+let storageRepository: InMemoryStorageRepository
 let sut: CreateItemUseCase
 
 describe('CreateFolder', () => {
   beforeEach(() => {
     itemRepository = new InMemoryItemRepository()
     folderRepository = new InMemoryFolderRepository()
-    sut = new CreateItemUseCase(itemRepository)
+    storageRepository = new InMemoryStorageRepository()
+    sut = new CreateItemUseCase(itemRepository, storageRepository)
   })
 
   it('should be able create a item with text type without content', {
@@ -263,5 +266,79 @@ describe('CreateFolder', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(InvalidItemTitleError)
+  })
+
+  it('should upload file to storage and set content to the returned key when type is document and fileBuffer is provided', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.create(
+      makeFolder({ workspaceId: workspace.id.toString() }),
+    )
+
+    const fileName = 'report.pdf'
+
+    const response = await sut.execute({
+      workspaceId: workspace.id.toString(),
+      folderId: folderRepository.items[0].id.toString(),
+      title: 'My Report',
+      type: 'document',
+      fileBuffer: Buffer.from('fake pdf content'),
+      fileName,
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(storageRepository.items.length).toBe(1)
+    expect(itemRepository.items[0].content).toBe('in-memory/report.pdf')
+  })
+
+  it('should not call storage upload when type is document but no fileBuffer is provided', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.create(
+      makeFolder({ workspaceId: workspace.id.toString() }),
+    )
+
+    const response = await sut.execute({
+      workspaceId: workspace.id.toString(),
+      folderId: folderRepository.items[0].id.toString(),
+      title: 'My Doc',
+      type: 'document',
+      content: 'some plain text content',
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(storageRepository.items.length).toBe(0)
+    expect(itemRepository.items[0].content).toBe('some plain text content')
+  })
+
+  it('should not call storage upload when type is not document even if fileBuffer is provided', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.create(
+      makeFolder({ workspaceId: workspace.id.toString() }),
+    )
+
+    const storageRepository = new InMemoryStorageRepository()
+    sut = new CreateItemUseCase(itemRepository, storageRepository)
+
+    const response = await sut.execute({
+      workspaceId: workspace.id.toString(),
+      folderId: folderRepository.items[0].id.toString(),
+      title: 'My Text',
+      type: 'text',
+      content: 'hello world',
+      fileBuffer: Buffer.from('ignored'),
+      fileName: 'ignored.txt',
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(storageRepository.items.length).toBe(0)
+    expect(itemRepository.items[0].content).toBe('hello world')
   })
 })

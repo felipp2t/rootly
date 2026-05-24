@@ -2,6 +2,9 @@ import { writeFileSync } from 'node:fs'
 
 process.env.DATABASE_URL ??= 'postgresql://placeholder:placeholder@localhost/placeholder'
 process.env.JWT_SECRET ??= 'placeholder-secret'
+process.env.MINIO_ACCESS_KEY ??= 'placeholder'
+process.env.MINIO_SECRET_KEY ??= 'placeholder'
+process.env.MINIO_BUCKET ??= 'placeholder'
 
 const { app } = await import('./app.ts')
 
