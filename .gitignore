@@ -88,3 +88,5 @@ Thumbs.db
 .node_repl_history
 .tern-port
 build/Release
+
+# claude
