@@ -7,6 +7,12 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string('DATABASE_URL is required'),
   JWT_SECRET: z.string('JWT_SECRET is required'),
+  MINIO_ENDPOINT: z.string().default('localhost'),
+  MINIO_PORT: z.number().default(9000),
+  MINIO_USE_SSL: z.literal(false).default(false),
+  MINIO_ACCESS_KEY: z.string(),
+  MINIO_SECRET_KEY: z.string(),
+  MINIO_BUCKET: z.string(),
 })
 
 const _env = envSchema.safeParse(process.env)
