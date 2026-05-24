@@ -37,6 +37,12 @@ import type {
   GetItems401,
   GetItems500,
   GetItemsParams,
+  UploadItem201,
+  UploadItem400,
+  UploadItem401,
+  UploadItem409,
+  UploadItem500,
+  UploadItemBody,
 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -492,6 +498,147 @@ export function useGetItemsSuspense<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
+/**
+ * Create a document item by uploading a file via multipart/form-data
+ * @summary Upload Item
+ */
+export type uploadItemResponse201 = {
+  data: UploadItem201
+  status: 201
+}
+
+export type uploadItemResponse400 = {
+  data: UploadItem400
+  status: 400
+}
+
+export type uploadItemResponse401 = {
+  data: UploadItem401
+  status: 401
+}
+
+export type uploadItemResponse409 = {
+  data: UploadItem409
+  status: 409
+}
+
+export type uploadItemResponse500 = {
+  data: UploadItem500
+  status: 500
+}
+
+export type uploadItemResponseSuccess = uploadItemResponse201 & {
+  headers: Headers
+}
+export type uploadItemResponseError = (
+  | uploadItemResponse400
+  | uploadItemResponse401
+  | uploadItemResponse409
+  | uploadItemResponse500
+) & {
+  headers: Headers
+}
+
+export type uploadItemResponse =
+  | uploadItemResponseSuccess
+  | uploadItemResponseError
+
+export const getUploadItemUrl = () => {
+  return `http://localhost:3333/api/items/upload`
+}
+
+export const uploadItem = async (
+  uploadItemBody: UploadItemBody,
+  options?: RequestInit,
+): Promise<uploadItemResponse> => {
+  const formData = new FormData()
+  formData.append(`title`, uploadItemBody.title)
+  formData.append(`workspaceId`, uploadItemBody.workspaceId)
+  if (uploadItemBody.folderId !== undefined) {
+    formData.append(`folderId`, uploadItemBody.folderId)
+  }
+  formData.append(`file`, uploadItemBody.file)
+
+  return fetchWithAuth<uploadItemResponse>(getUploadItemUrl(), {
+    ...options,
+    method: 'POST',
+    body: formData,
+  })
+}
+
+export const getUploadItemMutationOptions = <
+  TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadItem>>,
+    TError,
+    { data: UploadItemBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof uploadItem>>,
+  TError,
+  { data: UploadItemBody },
+  TContext
+> => {
+  const mutationKey = ['uploadItem']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof uploadItem>>,
+    { data: UploadItemBody }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return uploadItem(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type UploadItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof uploadItem>>
+>
+export type UploadItemMutationBody = UploadItemBody
+export type UploadItemMutationError =
+  | UploadItem400
+  | UploadItem401
+  | UploadItem409
+  | UploadItem500
+
+/**
+ * @summary Upload Item
+ */
+export const useUploadItem = <
+  TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof uploadItem>>,
+      TError,
+      { data: UploadItemBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof uploadItem>>,
+  TError,
+  { data: UploadItemBody },
+  TContext
+> => {
+  return useMutation(getUploadItemMutationOptions(options), queryClient)
+}
 /**
  * Assign an existing tag to an item
  * @summary Assign Tag to Item
