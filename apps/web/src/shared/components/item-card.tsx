@@ -1,4 +1,6 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
+import { useQueryClient } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import {
   FileTextIcon,
   KeyIcon,
@@ -9,7 +11,14 @@ import {
 } from 'lucide-react'
 import * as React from 'react'
 import z from 'zod'
+import {
+  createItem,
+  getGetItemsQueryKey,
+  uploadItem,
+} from '@/api/items/items'
 import { cn } from '@/shared/lib/utils'
+
+const workspaceRoute = getRouteApi('/_authenticated/$workspaceId/')
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -74,6 +83,8 @@ interface NewItemCardProps {
 
 export function NewItemCard({ children }: NewItemCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
+  const { workspaceId } = workspaceRoute.useParams()
+  const queryClient = useQueryClient()
 
   const createItemForm = useForm({
     validators: { onSubmit: createItemSchema },
@@ -83,11 +94,33 @@ export function NewItemCard({ children }: NewItemCardProps) {
     }),
     defaultValues: {
       title: '',
-      type: 'document',
+      type: 'document' as ItemType,
       content: '' as File | string,
     },
-    onSubmit: async ({ value }) => {
-      console.info('Form submitted with values:', value)
+    onSubmit: async ({ value, formApi }) => {
+      const result =
+        value.type === 'document' && value.content instanceof File
+          ? await uploadItem({
+              title: value.title,
+              workspaceId,
+              file: value.content,
+            })
+          : await createItem({
+              title: value.title,
+              type: value.type,
+              content: value.content as string,
+              workspaceId,
+            })
+
+      if (result.status !== 201) {
+        return
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: getGetItemsQueryKey({ workspaceId }),
+      })
+      formApi.reset()
+      setDialogIsOpen(false)
     },
   })
 
