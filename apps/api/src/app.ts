@@ -10,6 +10,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
+import { ensureMinioBucket } from './infra/storage/minio/minio.ts'
 import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -31,6 +32,28 @@ await app.register(swagger, {
     },
   },
   transform: jsonSchemaTransform,
+  transformObject: (documentObject) => {
+    if (!('openapiObject' in documentObject)) return documentObject.swaggerObject
+
+    const doc = documentObject.openapiObject
+
+    for (const pathItem of Object.values(doc.paths ?? {})) {
+      if (!pathItem) continue
+      for (const value of Object.values(pathItem)) {
+        if (!value || typeof value !== 'object' || !('requestBody' in value)) continue
+        const requestBody = value.requestBody
+        if (!requestBody || '$ref' in requestBody) continue
+        const multipart = requestBody.content?.['multipart/form-data']
+        if (!multipart?.schema || '$ref' in multipart.schema) continue
+        const properties = multipart.schema.properties
+        if (properties?.['file'] !== undefined) {
+          properties['file'] = { type: 'string', format: 'binary' }
+        }
+      }
+    }
+
+    return doc
+  },
 })
 
 await app.register(swaggerUi, {
@@ -43,6 +66,8 @@ app.setSerializerCompiler(serializerCompiler)
 app.get('/health', async () => {
   return { status: 'ok' }
 })
+
+await ensureMinioBucket()
 
 app.register(routes, { prefix: '/api' })
 
