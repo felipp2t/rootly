@@ -1,5 +1,6 @@
 ﻿import { makeFolder } from '@test/factories/make-folder.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
 import { InMemoryFolderRepository } from './in-memory-folder-repository.ts'
 
 describe('InMemoryFolderRepository', () => {
@@ -15,6 +16,115 @@ describe('InMemoryFolderRepository', () => {
       await repo.create(folder)
       expect(repo.items).toHaveLength(1)
       expect(repo.items[0]).toBe(folder)
+    })
+
+    it('should throw UniqueConstraintViolationError when same (workspaceId, name, parentId) exists at root', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const duplicate = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+
+      await expect(repo.create(duplicate)).rejects.toThrow(
+        UniqueConstraintViolationError,
+      )
+    })
+
+    it('should throw UniqueConstraintViolationError when same (workspaceId, name, parentId) exists in a nested folder', async () => {
+      const folder = makeFolder({
+        workspaceId: 'ws-1',
+        name: 'docs',
+        parentId: 'parent-1',
+      })
+      await repo.create(folder)
+
+      const duplicate = makeFolder({
+        workspaceId: 'ws-1',
+        name: 'docs',
+        parentId: 'parent-1',
+      })
+
+      await expect(repo.create(duplicate)).rejects.toThrow(
+        UniqueConstraintViolationError,
+      )
+    })
+
+    it('should not throw when name matches but parentId differs', async () => {
+      const folder = makeFolder({
+        workspaceId: 'ws-1',
+        name: 'docs',
+        parentId: 'parent-1',
+      })
+      await repo.create(folder)
+
+      const other = makeFolder({
+        workspaceId: 'ws-1',
+        name: 'docs',
+        parentId: 'parent-2',
+      })
+
+      await expect(repo.create(other)).resolves.not.toThrow()
+      expect(repo.items).toHaveLength(2)
+    })
+
+    it('should not throw when name matches but workspaceId differs', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const other = makeFolder({ workspaceId: 'ws-2', name: 'docs' })
+
+      await expect(repo.create(other)).resolves.not.toThrow()
+      expect(repo.items).toHaveLength(2)
+    })
+  })
+
+  describe('findByNameInParent', () => {
+    it('should return the folder when workspaceId, name, and parentId (undefined/root) all match', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const result = await repo.findByNameInParent('ws-1', 'docs', undefined)
+
+      expect(result).toBe(folder)
+    })
+
+    it('should return the folder when workspaceId, name, and parentId (nested) all match', async () => {
+      const folder = makeFolder({
+        workspaceId: 'ws-1',
+        name: 'docs',
+        parentId: 'parent-1',
+      })
+      await repo.create(folder)
+
+      const result = await repo.findByNameInParent('ws-1', 'docs', 'parent-1')
+
+      expect(result).toBe(folder)
+    })
+
+    it('should return null when workspaceId differs', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const result = await repo.findByNameInParent('ws-2', 'docs', undefined)
+
+      expect(result).toBeNull()
+    })
+
+    it('should return null when name differs', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const result = await repo.findByNameInParent('ws-1', 'other', undefined)
+
+      expect(result).toBeNull()
+    })
+
+    it('should return null when parentId differs (root vs nested)', async () => {
+      const folder = makeFolder({ workspaceId: 'ws-1', name: 'docs' })
+      await repo.create(folder)
+
+      const result = await repo.findByNameInParent('ws-1', 'docs', 'parent-1')
+
+      expect(result).toBeNull()
     })
   })
 
