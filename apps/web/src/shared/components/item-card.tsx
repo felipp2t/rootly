@@ -11,14 +11,9 @@ import {
 } from 'lucide-react'
 import * as React from 'react'
 import z from 'zod'
-import {
-  createItem,
-  getGetItemsQueryKey,
-  uploadItem,
-} from '@/api/items/items'
+import { createItem, getGetItemsQueryKey, uploadItem } from '@/api/items/items'
+import type { GetItems200ItemsItem } from '@/api/model'
 import { cn } from '@/shared/lib/utils'
-
-const workspaceRoute = getRouteApi('/_authenticated/$workspaceId/')
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -31,6 +26,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { FileInput } from './ui/file-input'
 import { Input } from './ui/input'
 import { SecretInput } from './ui/secret-input'
+import { Skeleton } from './ui/skeleton'
 
 export const itemTypes = [
   {
@@ -77,13 +73,102 @@ const createItemSchema = z.discriminatedUnion('type', [
   }),
 ])
 
+const itemTypeIconMap = {
+  document: FileTextIcon,
+  link: LinkIcon,
+  secret: KeyIcon,
+  text: PilcrowIcon,
+} as const
+
+interface ItemCardProps extends React.ComponentProps<'div'> {
+  item: GetItems200ItemsItem
+}
+
+function ItemCard({ item, className, ...props }: ItemCardProps) {
+  const Icon = itemTypeIconMap[item.type]
+  const isSecret = item.type === 'secret'
+
+  const contentPreview = isSecret
+    ? '••••••••••••'
+    : item.content
+      ? item.content.length > 60
+        ? `${item.content.slice(0, 60)}…`
+        : item.content
+      : null
+
+  return (
+    <div
+      data-slot='item-card'
+      className={cn(
+        'flex cursor-pointer flex-col justify-between gap-3 border-2 border-border hover:border-primary/50 bg-card p-4 transition-all',
+        isSecret && 'hover:border-amber-500/50',
+        className,
+      )}
+      {...props}
+    >
+      <div className='flex w-full items-start justify-between gap-2'>
+        <div className='flex items-center gap-2 min-w-0'>
+          <Icon
+            className={cn(
+              'size-4 shrink-0',
+              isSecret ? 'text-amber-500' : 'text-muted-foreground',
+            )}
+          />
+          <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
+            {item.title}
+          </span>
+        </div>
+        <span
+          className={cn(
+            'font-mono text-[10px] font-semibold uppercase px-1.5 py-0.5 shrink-0',
+            isSecret
+              ? 'bg-amber-500/10 text-amber-500'
+              : 'bg-muted text-muted-foreground',
+          )}
+        >
+          {item.type}
+        </span>
+      </div>
+
+      {contentPreview && (
+        <p className='font-mono text-xs text-muted-foreground truncate'>
+          {contentPreview}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function ItemCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      data-slot='item-card-skeleton'
+      className={cn(
+        'flex flex-col justify-between gap-3 border-2 border-border bg-card p-4',
+        className,
+      )}
+    >
+      <div className='flex w-full items-center justify-between gap-2'>
+        <div className='flex items-center gap-2'>
+          <Skeleton className='size-4 shrink-0 rounded-none' />
+          <Skeleton className='h-4 w-36 rounded-none' />
+        </div>
+        <Skeleton className='h-4 w-14 rounded-none' />
+      </div>
+      <Skeleton className='h-3 w-48 rounded-none' />
+    </div>
+  )
+}
+
 interface NewItemCardProps {
   children: React.ReactNode
 }
 
 export function NewItemCard({ children }: NewItemCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
-  const { workspaceId } = workspaceRoute.useParams()
+  const { workspaceId } = getRouteApi(
+    '/_authenticated/$workspaceId/',
+  ).useParams()
   const queryClient = useQueryClient()
 
   const createItemForm = useForm({
@@ -411,3 +496,5 @@ export function NewItemCard({ children }: NewItemCardProps) {
     </Dialog>
   )
 }
+
+export { ItemCard, ItemCardSkeleton }

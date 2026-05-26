@@ -15,7 +15,11 @@ import {
   InlineCodeSeparator,
   InlineCodeText,
 } from '@/shared/components/inline-code'
-import { NewItemCard } from '@/shared/components/item-card'
+import {
+  ItemCard,
+  ItemCardSkeleton,
+  NewItemCard,
+} from '@/shared/components/item-card'
 import { Button } from '@/shared/components/ui/button'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/')({
@@ -43,6 +47,17 @@ function RouteSuspense() {
         {Array.from({ length: 3 }).map((_, i) => (
           <FolderCardSkeleton key={i} />
         ))}
+      </div>
+
+      <div className='flex flex-col gap-2'>
+        <h2 className='font-mono text-xs font-semibold text-muted-foreground'>
+          ITEMS
+        </h2>
+        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <ItemCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     </>
   )
@@ -115,7 +130,7 @@ function RoutePage() {
         </h2>
         <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
           {items.map((item) => (
-            <div>{item.title}</div>
+            <ItemCard key={item.id} item={item} />
           ))}
         </div>
       </div>
