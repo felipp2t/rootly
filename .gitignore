@@ -90,3 +90,4 @@ Thumbs.db
 build/Release
 
 # claude
+.claude/**
