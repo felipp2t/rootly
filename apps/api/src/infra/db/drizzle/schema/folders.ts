@@ -1,4 +1,10 @@
-import { foreignKey, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  foreignKey,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from 'drizzle-orm/pg-core'
 import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 import { now } from '@/infra/db/drizzle/helpers/now.ts'
 import { workspaces } from './workspaces.ts'
@@ -29,5 +35,8 @@ export const folders = pgTable(
       foreignColumns: [table.id],
       name: 'folders_parent_id_fkey',
     }).onDelete('restrict'),
+    unique('folders_unique_name_per_parent')
+      .on(table.workspaceId, table.parentId, table.name)
+      .nullsNotDistinct(),
   ],
 )

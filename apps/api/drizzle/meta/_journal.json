@@ -71,6 +71,13 @@
       "when": 1773174669870,
       "tag": "0009_material_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1779824206660,
+      "tag": "0010_strong_magneto",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "folders" ADD CONSTRAINT "folders_unique_name_per_parent" UNIQUE NULLS NOT DISTINCT("workspace_id","parent_id","name");
