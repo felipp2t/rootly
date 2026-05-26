@@ -6,10 +6,13 @@ import { Item } from '@/domain/root/enterprise/entities/item.ts'
 
 export class InMemoryStorageRepository implements StorageRepository {
   items: Item[] = []
+  uploads: UploadStorageRepositoryParams[] = []
 
   async upload(params: UploadStorageRepositoryParams) {
     const { fileName } = params
     const key = `in-memory/${fileName}`
+
+    this.uploads.push(params)
 
     const item = Item.create({
       title: fileName,

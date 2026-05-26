@@ -341,4 +341,48 @@ describe('CreateFolder', () => {
     expect(storageRepository.items.length).toBe(0)
     expect(itemRepository.items[0].content).toBe('hello world')
   })
+
+  it('should use application/octet-stream as mimeType when fileName is undefined', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.create(
+      makeFolder({ workspaceId: workspace.id.toString() }),
+    )
+
+    const response = await sut.execute({
+      workspaceId: workspace.id.toString(),
+      folderId: folderRepository.items[0].id.toString(),
+      title: 'My Doc',
+      type: 'document',
+      fileBuffer: Buffer.from('binary content'),
+      fileName: undefined,
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(storageRepository.uploads[0].mimeType).toBe('application/octet-stream')
+  })
+
+  it('should use application/octet-stream as mimeType when fileName has an unknown extension', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    folderRepository.create(
+      makeFolder({ workspaceId: workspace.id.toString() }),
+    )
+
+    const response = await sut.execute({
+      workspaceId: workspace.id.toString(),
+      folderId: folderRepository.items[0].id.toString(),
+      title: 'My Doc',
+      type: 'document',
+      fileBuffer: Buffer.from('binary content'),
+      fileName: 'file.unknownext',
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(storageRepository.uploads[0].mimeType).toBe('application/octet-stream')
+  })
 })
