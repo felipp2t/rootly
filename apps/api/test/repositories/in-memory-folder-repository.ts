@@ -14,19 +14,28 @@ export class InMemoryFolderRepository implements FolderRepository {
   }
 
   async findByWorkspaceId(workspaceId: string): Promise<Folder[]> {
-    return this.items.filter((folder) => folder.workspaceId === workspaceId) ?? []
+    return (
+      this.items.filter((folder) => folder.workspaceId === workspaceId) ?? []
+    )
   }
 
-  async findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Folder[]> {
+  async findMany(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<Folder[]> {
     const userWorkspaceIds = this.workspaceMembers
       .filter((m) => m.userId === userId)
       .map((m) => m.workspaceId)
 
-    const scoped = this.items.filter((folder) => userWorkspaceIds.includes(folder.workspaceId))
+    const scoped = this.items.filter((folder) =>
+      userWorkspaceIds.includes(folder.workspaceId),
+    )
 
     if (workspaceId !== undefined) {
       return scoped.filter(
-        (folder) => folder.workspaceId === workspaceId && folder.parentId === undefined,
+        (folder) =>
+          folder.workspaceId === workspaceId && folder.parentId === undefined,
       )
     }
     if (parentId === undefined) return scoped

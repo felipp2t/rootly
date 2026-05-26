@@ -1,7 +1,9 @@
 import type { WorkspaceRoleRepository } from '@/domain/root/application/repositories/workspace-role-repository.ts'
 import type { WorkspaceRole } from '@/domain/root/enterprise/entities/workspace-role.ts'
 
-export class InMemoryWorkspaceRoleRepository implements WorkspaceRoleRepository {
+export class InMemoryWorkspaceRoleRepository
+  implements WorkspaceRoleRepository
+{
   items: WorkspaceRole[] = []
 
   async findById(id: string): Promise<WorkspaceRole | null> {
@@ -12,7 +14,10 @@ export class InMemoryWorkspaceRoleRepository implements WorkspaceRoleRepository 
     return this.items.filter((role) => role.workspaceId === workspaceId)
   }
 
-  async findByWorkspaceIdAndName(workspaceId: string, name: string): Promise<WorkspaceRole | null> {
+  async findByWorkspaceIdAndName(
+    workspaceId: string,
+    name: string,
+  ): Promise<WorkspaceRole | null> {
     return (
       this.items.find(
         (role) => role.workspaceId === workspaceId && role.name === name,

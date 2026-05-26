@@ -1,8 +1,8 @@
 import type { WorkspaceInviteRepository } from '@/domain/root/application/repositories/workspace-invite-repository.ts'
 import {
-  workspaceInviteStatus,
   type WorkspaceInvite,
   type WorkspaceInviteStatus,
+  workspaceInviteStatus,
 } from '@/domain/root/enterprise/entities/workspace-invite.ts'
 
 export class InMemoryWorkspaceInviteRepository

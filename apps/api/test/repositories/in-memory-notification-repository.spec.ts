@@ -1,5 +1,5 @@
+﻿import { makeNotification } from '@test/factories/make-notification.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeNotification } from 'test/factories/make-notification.ts'
 import { InMemoryNotificationRepository } from './in-memory-notification-repository.ts'
 
 describe('InMemoryNotificationRepository', () => {

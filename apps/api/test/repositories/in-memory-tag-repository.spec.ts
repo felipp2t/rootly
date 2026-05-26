@@ -1,5 +1,5 @@
+﻿import { makeTag } from '@test/factories/make-tag.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeTag } from 'test/factories/make-tag.ts'
 import { InMemoryTagRepository } from './in-memory-tag-repository.ts'
 
 describe('InMemoryTagRepository', () => {

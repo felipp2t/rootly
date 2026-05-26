@@ -1,5 +1,5 @@
+﻿import { makeFolder } from '@test/factories/make-folder.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeFolder } from 'test/factories/make-folder.ts'
 import { InMemoryFolderRepository } from './in-memory-folder-repository.ts'
 
 describe('InMemoryFolderRepository', () => {
@@ -96,7 +96,10 @@ describe('InMemoryFolderRepository', () => {
 
     it('should return root folders (no parentId) filtered by workspaceId', async () => {
       const root = makeFolder({ workspaceId: 'ws-1' })
-      const child = makeFolder({ workspaceId: 'ws-1', parentId: root.id.toString() })
+      const child = makeFolder({
+        workspaceId: 'ws-1',
+        parentId: root.id.toString(),
+      })
       await repo.create(root)
       await repo.create(child)
 
@@ -108,8 +111,14 @@ describe('InMemoryFolderRepository', () => {
 
     it('should return folders by parentId', async () => {
       const parent = makeFolder({ workspaceId: 'ws-1' })
-      const child1 = makeFolder({ workspaceId: 'ws-1', parentId: parent.id.toString() })
-      const child2 = makeFolder({ workspaceId: 'ws-1', parentId: parent.id.toString() })
+      const child1 = makeFolder({
+        workspaceId: 'ws-1',
+        parentId: parent.id.toString(),
+      })
+      const child2 = makeFolder({
+        workspaceId: 'ws-1',
+        parentId: parent.id.toString(),
+      })
       const other = makeFolder({ workspaceId: 'ws-1' })
       await repo.create(parent)
       await repo.create(child1)

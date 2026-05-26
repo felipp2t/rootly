@@ -1,7 +1,7 @@
+﻿import { makeItem } from '@test/factories/make-item.ts'
+import { makeWorkspace } from '@test/factories/make-workspace.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeItem } from 'test/factories/make-item.ts'
-import { makeWorkspace } from 'test/factories/make-workspace.ts'
-import { makeWorkspaceMember } from 'test/factories/make-workspace-member.ts'
 import { InMemoryItemRepository } from './in-memory-item-repository.ts'
 import { InMemoryWorkspaceMemberRepository } from './in-memory-workspace-member-repository.ts'
 import { InMemoryWorkspaceRepository } from './in-memory-workspace-repository.ts'
@@ -160,7 +160,11 @@ describe('InMemoryWorkspaceRepository', () => {
       const ws = makeWorkspace({ userId: 'u-1' }, id)
       await repo.create(ws)
 
-      const member = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-mc', roleId: 'r-1' })
+      const member = makeWorkspaceMember({
+        userId: 'u-1',
+        workspaceId: 'ws-mc',
+        roleId: 'r-1',
+      })
       await memberRepo.create(member)
 
       const result = await repo.findManyByIds(['ws-mc'])

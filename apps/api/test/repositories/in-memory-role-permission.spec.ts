@@ -1,9 +1,12 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+﻿import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { RolePermission } from '@/domain/root/enterprise/entities/role-permission.ts'
 import { InMemoryRolePermissionRepository } from './in-memory-role-permission.ts'
 
 function makeRolePermission(roleId: string, id?: UniqueEntityID) {
-  return RolePermission.create({ roleId, resource: 'folder', action: 'read' }, id)
+  return RolePermission.create(
+    { roleId, resource: 'folder', action: 'read' },
+    id,
+  )
 }
 
 describe('InMemoryRolePermissionRepository', () => {

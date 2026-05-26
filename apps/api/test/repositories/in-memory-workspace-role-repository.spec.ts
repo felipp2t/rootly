@@ -1,8 +1,12 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+﻿import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { WorkspaceRole } from '@/domain/root/enterprise/entities/workspace-role.ts'
 import { InMemoryWorkspaceRoleRepository } from './in-memory-workspace-role-repository.ts'
 
-function makeWorkspaceRole(workspaceId: string, name: string, id?: UniqueEntityID) {
+function makeWorkspaceRole(
+  workspaceId: string,
+  name: string,
+  id?: UniqueEntityID,
+) {
   return WorkspaceRole.create({ workspaceId, name }, id)
 }
 

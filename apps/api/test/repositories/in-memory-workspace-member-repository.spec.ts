@@ -1,5 +1,5 @@
+﻿import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeWorkspaceMember } from 'test/factories/make-workspace-member.ts'
 import { InMemoryWorkspaceMemberRepository } from './in-memory-workspace-member-repository.ts'
 
 describe('InMemoryWorkspaceMemberRepository', () => {
@@ -11,7 +11,11 @@ describe('InMemoryWorkspaceMemberRepository', () => {
 
   describe('create', () => {
     it('should add a member to items', async () => {
-      const member = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' })
+      const member = makeWorkspaceMember({
+        userId: 'u-1',
+        workspaceId: 'ws-1',
+        roleId: 'r-1',
+      })
       await repo.create(member)
       expect(repo.items).toHaveLength(1)
       expect(repo.items[0]).toBe(member)
@@ -21,7 +25,10 @@ describe('InMemoryWorkspaceMemberRepository', () => {
   describe('findById', () => {
     it('should return the member when found', async () => {
       const id = new UniqueEntityID('m-1')
-      const member = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' }, id)
+      const member = makeWorkspaceMember(
+        { userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' },
+        id,
+      )
       await repo.create(member)
 
       const result = await repo.findById('m-1')
@@ -37,9 +44,21 @@ describe('InMemoryWorkspaceMemberRepository', () => {
 
   describe('findByUserId', () => {
     it('should return all members for a given userId', async () => {
-      const m1 = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' })
-      const m2 = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-2', roleId: 'r-1' })
-      const m3 = makeWorkspaceMember({ userId: 'u-2', workspaceId: 'ws-1', roleId: 'r-1' })
+      const m1 = makeWorkspaceMember({
+        userId: 'u-1',
+        workspaceId: 'ws-1',
+        roleId: 'r-1',
+      })
+      const m2 = makeWorkspaceMember({
+        userId: 'u-1',
+        workspaceId: 'ws-2',
+        roleId: 'r-1',
+      })
+      const m3 = makeWorkspaceMember({
+        userId: 'u-2',
+        workspaceId: 'ws-1',
+        roleId: 'r-1',
+      })
       await repo.create(m1)
       await repo.create(m2)
       await repo.create(m3)
@@ -60,7 +79,10 @@ describe('InMemoryWorkspaceMemberRepository', () => {
   describe('delete', () => {
     it('should remove the member by id', async () => {
       const id = new UniqueEntityID('m-del')
-      const member = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' }, id)
+      const member = makeWorkspaceMember(
+        { userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' },
+        id,
+      )
       await repo.create(member)
 
       await repo.delete('m-del')
@@ -69,7 +91,11 @@ describe('InMemoryWorkspaceMemberRepository', () => {
     })
 
     it('should do nothing when id does not exist', async () => {
-      const member = makeWorkspaceMember({ userId: 'u-1', workspaceId: 'ws-1', roleId: 'r-1' })
+      const member = makeWorkspaceMember({
+        userId: 'u-1',
+        workspaceId: 'ws-1',
+        roleId: 'r-1',
+      })
       await repo.create(member)
 
       await repo.delete('nonexistent')

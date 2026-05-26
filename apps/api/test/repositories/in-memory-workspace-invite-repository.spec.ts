@@ -1,6 +1,6 @@
+﻿import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { workspaceInviteStatus } from '@/domain/root/enterprise/entities/workspace-invite.ts'
-import { makeWorkspaceInvite } from 'test/factories/make-workspace-invite.ts'
 import { InMemoryWorkspaceInviteRepository } from './in-memory-workspace-invite-repository.ts'
 
 describe('InMemoryWorkspaceInviteRepository', () => {
@@ -28,7 +28,12 @@ describe('InMemoryWorkspaceInviteRepository', () => {
     it('should return the invite when found', async () => {
       const id = new UniqueEntityID('inv-1')
       const invite = makeWorkspaceInvite(
-        { workspaceId: 'ws-1', invitedUserId: 'u-1', invitedByUserId: 'u-2', roleId: 'r-1' },
+        {
+          workspaceId: 'ws-1',
+          invitedUserId: 'u-1',
+          invitedByUserId: 'u-2',
+          roleId: 'r-1',
+        },
         id,
       )
       await repo.create(invite)
@@ -112,7 +117,12 @@ describe('InMemoryWorkspaceInviteRepository', () => {
     it('should update an existing invite', async () => {
       const id = new UniqueEntityID('inv-save')
       const invite = makeWorkspaceInvite(
-        { workspaceId: 'ws-1', invitedUserId: 'u-1', invitedByUserId: 'u-2', roleId: 'r-1' },
+        {
+          workspaceId: 'ws-1',
+          invitedUserId: 'u-1',
+          invitedByUserId: 'u-2',
+          roleId: 'r-1',
+        },
         id,
       )
       await repo.create(invite)
@@ -141,7 +151,12 @@ describe('InMemoryWorkspaceInviteRepository', () => {
     it('should set status to revoked', async () => {
       const id = new UniqueEntityID('inv-rev')
       const invite = makeWorkspaceInvite(
-        { workspaceId: 'ws-1', invitedUserId: 'u-1', invitedByUserId: 'u-2', roleId: 'r-1' },
+        {
+          workspaceId: 'ws-1',
+          invitedUserId: 'u-1',
+          invitedByUserId: 'u-2',
+          roleId: 'r-1',
+        },
         id,
       )
       await repo.create(invite)

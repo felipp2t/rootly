@@ -1,5 +1,5 @@
+﻿import { makeRefreshToken } from '@test/factories/make-refresh-token.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { makeRefreshToken } from 'test/factories/make-refresh-token.ts'
 import { InMemoryRefreshTokenRepository } from './in-memory-refresh-token-repository.ts'
 
 describe('InMemoryRefreshTokenRepository', () => {

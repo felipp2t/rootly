@@ -13,16 +13,23 @@ export class InMemoryItemRepository implements ItemRepository {
     return this.items.find((item) => item.title === title) ?? null
   }
 
-  async findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Item[]> {
+  async findMany(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<Item[]> {
     const userWorkspaceIds = this.workspaceMembers
       .filter((m) => m.userId === userId)
       .map((m) => m.workspaceId)
 
-    const scoped = this.items.filter((item) => userWorkspaceIds.includes(item.workspaceId))
+    const scoped = this.items.filter((item) =>
+      userWorkspaceIds.includes(item.workspaceId),
+    )
 
     if (workspaceId !== undefined) {
       return scoped.filter(
-        (item) => item.workspaceId === workspaceId && item.folderId === undefined,
+        (item) =>
+          item.workspaceId === workspaceId && item.folderId === undefined,
       )
     }
     if (parentId === undefined) return scoped
