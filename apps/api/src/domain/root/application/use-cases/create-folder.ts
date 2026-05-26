@@ -1,4 +1,5 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
+import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import { Folder } from '../../enterprise/entities/folder.ts'
 import type { FolderRepository } from '../repositories/folder-repository.ts'
@@ -21,18 +22,20 @@ export class CreateFolderUseCase {
     parentId,
     workspaceId,
   }: CreateFolderUseCaseRequest): Promise<CreateFolderUseCaseResponse> {
-    const folder = await this.folderRepositoy.findByName(name)
+    const trimmedLength = name.trim().length
 
-    if (folder && folder.name === name && folder.parentId === parentId) {
+    if (trimmedLength < 3 || trimmedLength > 32) {
+      return left(new InvalidFolderNameError())
+    }
+
+    const existing = await this.folderRepositoy.findByNameInParent(
+      workspaceId,
+      name,
+      parentId,
+    )
+
+    if (existing) {
       return left(new FolderAlreadyExistsError())
-    }
-
-    if (typeof name === 'string' && name.trim().length < 3) {
-      return left(new InvalidFolderNameError())
-    }
-
-    if (typeof name === 'string' && name.trim().length > 32) {
-      return left(new InvalidFolderNameError())
     }
 
     const newFolder = Folder.create({
@@ -41,7 +44,14 @@ export class CreateFolderUseCase {
       workspaceId,
     })
 
-    await this.folderRepositoy.create(newFolder)
+    try {
+      await this.folderRepositoy.create(newFolder)
+    } catch (error) {
+      if (error instanceof UniqueConstraintViolationError) {
+        return left(new FolderAlreadyExistsError())
+      }
+      throw error
+    }
 
     return right({
       folderId: newFolder.id.toString(),

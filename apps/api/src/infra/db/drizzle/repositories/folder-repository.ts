@@ -1,4 +1,8 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm'
+import {
+  isPgUniqueViolation,
+  UniqueConstraintViolationError,
+} from '@/core/errors/unique-constraint-violation-error.ts'
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -42,6 +46,31 @@ export class DrizzleFolderRepository implements FolderRepository {
       .select()
       .from(schema.folders)
       .where(eq(schema.folders.name, name))
+
+    if (rows.length === 0) return null
+
+    const tagsByFolder = await this.loadTagIdsByFolderIds([rows[0].id])
+
+    return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[rows[0].id] ?? [])
+  }
+
+  async findByNameInParent(
+    workspaceId: string,
+    name: string,
+    parentId?: string,
+  ): Promise<Folder | null> {
+    const rows = await this.db
+      .select()
+      .from(schema.folders)
+      .where(
+        and(
+          eq(schema.folders.workspaceId, workspaceId),
+          eq(schema.folders.name, name),
+          parentId === undefined
+            ? isNull(schema.folders.parentId)
+            : eq(schema.folders.parentId, parentId),
+        ),
+      )
 
     if (rows.length === 0) return null
 
@@ -94,9 +123,16 @@ export class DrizzleFolderRepository implements FolderRepository {
   }
 
   async create(folder: Folder): Promise<void> {
-    await this.db
-      .insert(schema.folders)
-      .values(DrizzleFolderMapper.toDrizzle(folder))
+    try {
+      await this.db
+        .insert(schema.folders)
+        .values(DrizzleFolderMapper.toDrizzle(folder))
+    } catch (error) {
+      if (isPgUniqueViolation(error)) {
+        throw new UniqueConstraintViolationError(error.constraint ?? 'unknown')
+      }
+      throw error
+    }
 
     if (folder.tagIds.length > 0) {
       await this.db.insert(schema.folderTags).values(

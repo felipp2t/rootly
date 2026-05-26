@@ -1,3 +1,4 @@
+import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
 import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 
@@ -11,6 +12,21 @@ export class InMemoryFolderRepository implements FolderRepository {
 
   async findByName(name: string): Promise<Folder | null> {
     return this.items.find((folder) => folder.name === name) ?? null
+  }
+
+  async findByNameInParent(
+    workspaceId: string,
+    name: string,
+    parentId?: string,
+  ): Promise<Folder | null> {
+    return (
+      this.items.find(
+        (folder) =>
+          folder.workspaceId === workspaceId &&
+          folder.name === name &&
+          folder.parentId === parentId,
+      ) ?? null
+    )
   }
 
   async findByWorkspaceId(workspaceId: string): Promise<Folder[]> {
@@ -43,6 +59,19 @@ export class InMemoryFolderRepository implements FolderRepository {
   }
 
   async create(folder: Folder): Promise<void> {
+    const conflict = this.items.find(
+      (existing) =>
+        existing.workspaceId === folder.workspaceId &&
+        existing.name === folder.name &&
+        existing.parentId === folder.parentId,
+    )
+
+    if (conflict) {
+      throw new UniqueConstraintViolationError(
+        'folders_unique_name_per_parent',
+      )
+    }
+
     this.items.push(folder)
   }
 
