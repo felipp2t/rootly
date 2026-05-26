@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { FolderIcon, PlusIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { useGetFoldersSuspense } from '@/api/folders/folders'
@@ -119,7 +119,13 @@ function RoutePage() {
         </h2>
         <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
           {folders.map((folder) => (
-            <FolderCard key={folder.id} itemCount={0} name={folder.name} />
+            <Link
+              key={folder.id}
+              to='/$workspaceId/$'
+              params={{ workspaceId, _splat: folder.id }}
+            >
+              <FolderCard itemCount={0} name={folder.name} />
+            </Link>
           ))}
         </div>
       </div>

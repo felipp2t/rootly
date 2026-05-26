@@ -14,6 +14,7 @@ import { Route as SessionRouteImport } from './pages/session'
 import { Route as AuthenticatedLayoutRouteImport } from './pages/_authenticated/layout'
 import { Route as AuthenticateddashboardIndexRouteImport } from './pages/_authenticated/(dashboard)/index'
 import { Route as AuthenticatedWorkspaceIdIndexRouteImport } from './pages/_authenticated/$workspaceId/index'
+import { Route as AuthenticatedWorkspaceIdSplatRouteImport } from './pages/_authenticated/$workspaceId/$'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -41,16 +42,24 @@ const AuthenticatedWorkspaceIdIndexRoute =
     path: '/$workspaceId/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedWorkspaceIdSplatRoute =
+  AuthenticatedWorkspaceIdSplatRouteImport.update({
+    id: '/$workspaceId/$',
+    path: '/$workspaceId/$',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticateddashboardIndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/$workspaceId': typeof AuthenticatedWorkspaceIdIndexRoute
   '/': typeof AuthenticateddashboardIndexRoute
 }
@@ -59,19 +68,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedLayoutRouteWithChildren
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/_authenticated/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
   '/_authenticated/(dashboard)/': typeof AuthenticateddashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/session' | '/signup' | '/$workspaceId/'
+  fullPaths: '/' | '/session' | '/signup' | '/$workspaceId/$' | '/$workspaceId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/session' | '/signup' | '/$workspaceId' | '/'
+  to: '/session' | '/signup' | '/$workspaceId/$' | '/$workspaceId' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/session'
     | '/signup'
+    | '/_authenticated/$workspaceId/$'
     | '/_authenticated/$workspaceId/'
     | '/_authenticated/(dashboard)/'
   fileRoutesById: FileRoutesById
@@ -119,15 +130,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIdIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticated/$workspaceId/$': {
+      id: '/_authenticated/$workspaceId/$'
+      path: '/$workspaceId/$'
+      fullPath: '/$workspaceId/$'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSplatRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
   }
 }
 
 interface AuthenticatedLayoutRouteChildren {
+  AuthenticatedWorkspaceIdSplatRoute: typeof AuthenticatedWorkspaceIdSplatRoute
   AuthenticatedWorkspaceIdIndexRoute: typeof AuthenticatedWorkspaceIdIndexRoute
   AuthenticateddashboardIndexRoute: typeof AuthenticateddashboardIndexRoute
 }
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticatedWorkspaceIdSplatRoute: AuthenticatedWorkspaceIdSplatRoute,
   AuthenticatedWorkspaceIdIndexRoute: AuthenticatedWorkspaceIdIndexRoute,
   AuthenticateddashboardIndexRoute: AuthenticateddashboardIndexRoute,
 }
