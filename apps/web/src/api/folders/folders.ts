@@ -37,6 +37,11 @@ import type {
   GetFolders401,
   GetFolders500,
   GetFoldersParams,
+  ResolveFolderPath200,
+  ResolveFolderPath401,
+  ResolveFolderPath404,
+  ResolveFolderPath500,
+  ResolveFolderPathParams,
 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -630,4 +635,362 @@ export const useAssignTagToFolder = <
   TContext
 > => {
   return useMutation(getAssignTagToFolderMutationOptions(options), queryClient)
+}
+/**
+ * Resolve a folder path (list of ids separated by /) into the ordered chain of folder names. Validates that every id belongs to the workspace and that each folder is a child of the previous.
+ * @summary Resolve Folder Path
+ */
+export type resolveFolderPathResponse200 = {
+  data: ResolveFolderPath200
+  status: 200
+}
+
+export type resolveFolderPathResponse401 = {
+  data: ResolveFolderPath401
+  status: 401
+}
+
+export type resolveFolderPathResponse404 = {
+  data: ResolveFolderPath404
+  status: 404
+}
+
+export type resolveFolderPathResponse500 = {
+  data: ResolveFolderPath500
+  status: 500
+}
+
+export type resolveFolderPathResponseSuccess = resolveFolderPathResponse200 & {
+  headers: Headers
+}
+export type resolveFolderPathResponseError = (
+  | resolveFolderPathResponse401
+  | resolveFolderPathResponse404
+  | resolveFolderPathResponse500
+) & {
+  headers: Headers
+}
+
+export type resolveFolderPathResponse =
+  | resolveFolderPathResponseSuccess
+  | resolveFolderPathResponseError
+
+export const getResolveFolderPathUrl = (params: ResolveFolderPathParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `http://localhost:3333/api/folders/resolve-path?${stringifiedParams}`
+    : `http://localhost:3333/api/folders/resolve-path`
+}
+
+export const resolveFolderPath = async (
+  params: ResolveFolderPathParams,
+  options?: RequestInit,
+): Promise<resolveFolderPathResponse> => {
+  return fetchWithAuth<resolveFolderPathResponse>(
+    getResolveFolderPathUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export const getResolveFolderPathQueryKey = (
+  params?: ResolveFolderPathParams,
+) => {
+  return [
+    'http:',
+    'localhost:3333',
+    'api',
+    'folders',
+    'resolve-path',
+    ...(params ? [params] : []),
+  ] as const
+}
+
+export const getResolveFolderPathQueryOptions = <
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey =
+    queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params)
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof resolveFolderPath>>
+  > = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions })
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof resolveFolderPath>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ResolveFolderPathQueryResult = NonNullable<
+  Awaited<ReturnType<typeof resolveFolderPath>>
+>
+export type ResolveFolderPathQueryError =
+  | ResolveFolderPath401
+  | ResolveFolderPath404
+  | ResolveFolderPath500
+
+export function useResolveFolderPath<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveFolderPath>>,
+          TError,
+          Awaited<ReturnType<typeof resolveFolderPath>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useResolveFolderPath<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveFolderPath>>,
+          TError,
+          Awaited<ReturnType<typeof resolveFolderPath>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useResolveFolderPath<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+/**
+ * @summary Resolve Folder Path
+ */
+
+export function useResolveFolderPath<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+} {
+  const queryOptions = getResolveFolderPathQueryOptions(params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+
+  return { ...query, queryKey: queryOptions.queryKey }
+}
+
+export const getResolveFolderPathSuspenseQueryOptions = <
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey =
+    queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params)
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof resolveFolderPath>>
+  > = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions })
+
+  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
+    Awaited<ReturnType<typeof resolveFolderPath>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ResolveFolderPathSuspenseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof resolveFolderPath>>
+>
+export type ResolveFolderPathSuspenseQueryError =
+  | ResolveFolderPath401
+  | ResolveFolderPath404
+  | ResolveFolderPath500
+
+export function useResolveFolderPathSuspense<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options: {
+    query: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useResolveFolderPathSuspense<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+export function useResolveFolderPathSuspense<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+}
+/**
+ * @summary Resolve Folder Path
+ */
+
+export function useResolveFolderPathSuspense<
+  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
+  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
+>(
+  params: ResolveFolderPathParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof resolveFolderPath>>,
+        TError,
+        TData
+      >
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>
+} {
+  const queryOptions = getResolveFolderPathSuspenseQueryOptions(params, options)
+
+  const query = useSuspenseQuery(
+    queryOptions,
+    queryClient,
+  ) as UseSuspenseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  return { ...query, queryKey: queryOptions.queryKey }
 }
