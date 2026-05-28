@@ -131,26 +131,48 @@ function RoutePage() {
                 {workspace ? workspace.name : 'Workspace'}
               </InlineCodeText>
             </Link>
-            {resolvedPath.map(({ id, name }, idx) => {
-              const splatTo = folderPath.slice(0, idx + 1).join('/')
-              const isLast = idx === resolvedPath.length - 1
-              return (
-                <span key={id} className='flex items-center'>
-                  <InlineCodeSeparator />
-                  {isLast ? (
-                    <InlineCodeText>{name}</InlineCodeText>
-                  ) : (
-                    <Link
-                      to='/$workspaceId/$'
-                      params={{ workspaceId, _splat: splatTo }}
-                      className='hover:text-primary transition-colors'
-                    >
-                      <InlineCodeText>{name}</InlineCodeText>
-                    </Link>
-                  )}
-                </span>
-              )
-            })}
+            {(() => {
+              const truncate = resolvedPath.length > 3
+              const visible = truncate
+                ? [resolvedPath[0], null, ...resolvedPath.slice(-2)]
+                : resolvedPath
+
+              return visible.map((item, idx) => {
+                if (item === null) {
+                  return (
+                    <span key='ellipsis' className='flex items-center'>
+                      <InlineCodeSeparator />
+                      <InlineCodeText className='text-muted-foreground'>
+                        ...
+                      </InlineCodeText>
+                    </span>
+                  )
+                }
+                const originalIdx = truncate
+                  ? idx === 0
+                    ? 0
+                    : resolvedPath.length - (visible.length - 1 - idx)
+                  : idx
+                const splatTo = folderPath.slice(0, originalIdx + 1).join('/')
+                const isLast = originalIdx === resolvedPath.length - 1
+                return (
+                  <span key={item.id} className='flex items-center'>
+                    <InlineCodeSeparator />
+                    {isLast ? (
+                      <InlineCodeText>{item.name}</InlineCodeText>
+                    ) : (
+                      <Link
+                        to='/$workspaceId/$'
+                        params={{ workspaceId, _splat: splatTo }}
+                        className='hover:text-primary transition-colors'
+                      >
+                        <InlineCodeText>{item.name}</InlineCodeText>
+                      </Link>
+                    )}
+                  </span>
+                )
+              })
+            })()}
             <InlineCodeSeparator className='px-0' />
           </InlineCodeContent>
         </InlineCodeRoot>
