@@ -162,9 +162,10 @@ function ItemCardSkeleton({ className }: { className?: string }) {
 interface NewItemCardProps {
   children: React.ReactNode
   workspaceId: string
+  folderId?: string
 }
 
-export function NewItemCard({ children, workspaceId }: NewItemCardProps) {
+export function NewItemCard({ children, workspaceId, folderId }: NewItemCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
   const queryClient = useQueryClient()
 
@@ -185,6 +186,7 @@ export function NewItemCard({ children, workspaceId }: NewItemCardProps) {
           ? await uploadItem({
               title: value.title,
               workspaceId,
+              folderId,
               file: value.content,
             })
           : await createItem({
@@ -192,6 +194,7 @@ export function NewItemCard({ children, workspaceId }: NewItemCardProps) {
               type: value.type,
               content: value.content as string,
               workspaceId,
+              folderId,
             })
 
       if (result.status !== 201) {
@@ -199,7 +202,7 @@ export function NewItemCard({ children, workspaceId }: NewItemCardProps) {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: getGetItemsQueryKey({ workspaceId }),
+        queryKey: getGetItemsQueryKey({ workspaceId, parentId: folderId }),
       })
       formApi.reset()
       setDialogIsOpen(false)

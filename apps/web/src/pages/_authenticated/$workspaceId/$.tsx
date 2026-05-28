@@ -146,7 +146,7 @@ function RoutePage() {
                 New Folder
               </Button>
             </NewFolderCard>
-            <NewItemCard workspaceId={workspaceId}>
+            <NewItemCard workspaceId={workspaceId} folderId={currentFolderId}>
               <Button className='cursor-pointer'>
                 <PlusIcon size={16} />
                 New Item
