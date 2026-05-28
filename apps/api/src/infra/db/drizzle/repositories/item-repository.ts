@@ -66,13 +66,13 @@ export class DrizzleItemRepository implements ItemRepository {
         ),
       )
       .where(
-        workspaceId !== undefined
-          ? and(
-              eq(schema.items.workspaceId, workspaceId),
-              isNull(schema.items.folderId),
-            )
-          : parentId !== undefined
-            ? eq(schema.items.folderId, parentId)
+        parentId !== undefined
+          ? eq(schema.items.folderId, parentId)
+          : workspaceId !== undefined
+            ? and(
+                eq(schema.items.workspaceId, workspaceId),
+                isNull(schema.items.folderId),
+              )
             : undefined,
       )
 
