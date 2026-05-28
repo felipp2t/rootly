@@ -117,28 +117,44 @@ function RoutePage() {
         <h2 className='font-mono text-XS font-semibold text-muted-foreground'>
           FOLDERS
         </h2>
-        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-          {folders.map((folder) => (
-            <Link
-              key={folder.id}
-              to='/$workspaceId/$'
-              params={{ workspaceId, _splat: folder.id }}
-            >
-              <FolderCard itemCount={0} name={folder.name} />
-            </Link>
-          ))}
-        </div>
+        {folders.length === 0 ? (
+          <div className='flex items-center justify-center py-8'>
+            <p className='font-mono text-xs text-muted-foreground'>
+              No folders yet
+            </p>
+          </div>
+        ) : (
+          <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+            {folders.map((folder) => (
+              <Link
+                key={folder.id}
+                to='/$workspaceId/$'
+                params={{ workspaceId, _splat: folder.id }}
+              >
+                <FolderCard itemCount={0} name={folder.name} />
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className='flex flex-col gap-2'>
         <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
           ITEMS
         </h2>
-        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-          {items.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-        </div>
+        {items.length === 0 ? (
+          <div className='flex items-center justify-center py-8'>
+            <p className='font-mono text-xs text-muted-foreground'>
+              No items yet
+            </p>
+          </div>
+        ) : (
+          <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+            {items.map((item) => (
+              <ItemCard key={item.id} item={item} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
