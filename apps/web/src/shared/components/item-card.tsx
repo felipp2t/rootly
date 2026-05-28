@@ -1,6 +1,5 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { useQueryClient } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import {
   FileTextIcon,
   KeyIcon,
@@ -162,13 +161,11 @@ function ItemCardSkeleton({ className }: { className?: string }) {
 
 interface NewItemCardProps {
   children: React.ReactNode
+  workspaceId: string
 }
 
-export function NewItemCard({ children }: NewItemCardProps) {
+export function NewItemCard({ children, workspaceId }: NewItemCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
-  const { workspaceId } = getRouteApi(
-    '/_authenticated/$workspaceId/',
-  ).useParams()
   const queryClient = useQueryClient()
 
   const createItemForm = useForm({
