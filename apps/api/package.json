@@ -18,7 +18,8 @@
     "test:cov": "vitest run --coverage",
     "start:cov": "start coverage/index.html",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
-    "openapi": "tsx ./src/openapi.ts"
+    "openapi": "tsx ./src/openapi.ts",
+    "db:seed": "tsx --env-file=.env ./src/infra/db/drizzle/scripts/seed.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

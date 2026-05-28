@@ -1,0 +1,293 @@
+import 'dotenv/config'
+import { faker } from '@faker-js/faker'
+import { hash } from 'argon2'
+import { nanoid } from '../helpers/nanoid.ts'
+import { db } from '../index.ts'
+import { schema } from '../schema/index.ts'
+
+faker.seed(42)
+
+type Resource = 'workspace' | 'folder' | 'item' | 'tag' | 'member' | 'role'
+type Action = 'read' | 'create' | 'update' | 'delete' | 'invite' | 'all'
+type ItemType = 'link' | 'document' | 'secret' | 'text'
+type TagColor = 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'
+
+const RESOURCES: Resource[] = ['workspace', 'folder', 'item', 'tag', 'member', 'role']
+const TAG_COLORS: TagColor[] = ['blue', 'green', 'orange', 'purple', 'red', 'yellow']
+const ITEM_TYPES: ItemType[] = ['link', 'document', 'secret', 'text']
+
+function adminPerms(roleId: string) {
+  return RESOURCES.map((resource) => ({
+    id: nanoid(),
+    roleId,
+    resource,
+    action: 'all' as Action,
+  }))
+}
+
+function editorPerms(roleId: string) {
+  const perms: { resource: Resource; action: Action }[] = [
+    { resource: 'workspace', action: 'read' },
+    { resource: 'folder', action: 'read' },
+    { resource: 'folder', action: 'create' },
+    { resource: 'folder', action: 'update' },
+    { resource: 'item', action: 'read' },
+    { resource: 'item', action: 'create' },
+    { resource: 'item', action: 'update' },
+    { resource: 'tag', action: 'read' },
+    { resource: 'tag', action: 'create' },
+    { resource: 'member', action: 'read' },
+    { resource: 'role', action: 'read' },
+  ]
+  return perms.map((p) => ({ id: nanoid(), roleId, ...p }))
+}
+
+function viewerPerms(roleId: string) {
+  return RESOURCES.map((resource) => ({
+    id: nanoid(),
+    roleId,
+    resource,
+    action: 'read' as Action,
+  }))
+}
+
+function fakeItemContent(type: ItemType): string {
+  switch (type) {
+    case 'link':
+      return faker.internet.url()
+    case 'document':
+      return `# ${faker.lorem.sentence()}\n\n${faker.lorem.paragraphs(2, '\n\n')}`
+    case 'secret':
+      return `${faker.hacker.noun().toUpperCase().replace(/\s+/g, '_')}_KEY=${faker.string.alphanumeric(32)}`
+    case 'text':
+      return faker.lorem.paragraph()
+  }
+}
+
+const ROLE_TIERS = [
+  { name: 'Admin', perms: adminPerms },
+  { name: 'Editor', perms: editorPerms },
+  { name: 'Viewer', perms: viewerPerms },
+] as const
+
+async function seed() {
+  console.log('🌱 Seeding database...')
+
+  // ── Cleanup (ordem inversa das FKs) ──────────────────────────────────────
+  // workspace_members tem ON DELETE RESTRICT no roleId, então membros
+  // precisam ser deletados antes das roles. O restante cascateia via users/workspaces.
+  await db.delete(schema.itemTags)
+  await db.delete(schema.folderTags)
+  await db.delete(schema.items)
+  await db.delete(schema.folders)
+  await db.delete(schema.tags)
+  await db.delete(schema.workspaceInvites)
+  await db.delete(schema.workspaceMembers)
+  await db.delete(schema.rolePermissions)
+  await db.delete(schema.workspaceRoles)
+  await db.delete(schema.refreshTokens)
+  await db.delete(schema.workspaces)
+  await db.delete(schema.users)
+
+  console.log('  ✓ banco limpo')
+
+
+  // ── Users ────────────────────────────────────────────────────────────────
+  const passwordHash = await hash('password123')
+
+  const users = await db
+    .insert(schema.users)
+    .values(
+      Array.from({ length: 5 }, () => ({
+        id: nanoid(),
+        name: faker.person.fullName(),
+        email: faker.internet.email({ provider: 'rootly.dev' }).toLowerCase(),
+        passwordHash,
+      })),
+    )
+    .returning()
+
+  console.log(`  ✓ ${users.length} users`)
+
+  // ── Workspaces ───────────────────────────────────────────────────────────
+  const workspaceNames = faker.helpers.uniqueArray(
+    () => faker.hacker.noun().toLowerCase().replace(/\s+/g, '-'),
+    4,
+  )
+
+  const workspaces = await db
+    .insert(schema.workspaces)
+    .values([
+      { id: nanoid(), userId: users[0].id, name: workspaceNames[0] },
+      { id: nanoid(), userId: users[0].id, name: workspaceNames[1] },
+      { id: nanoid(), userId: users[1].id, name: workspaceNames[2] },
+      { id: nanoid(), userId: users[2].id, name: workspaceNames[3] },
+    ])
+    .returning()
+
+  console.log(`  ✓ ${workspaces.length} workspaces`)
+
+  // ── Roles + Permissions ──────────────────────────────────────────────────
+  const allRoles: { id: string; workspaceId: string; name: string }[] = []
+
+  for (const ws of workspaces) {
+    const rows = await db
+      .insert(schema.workspaceRoles)
+      .values(
+        ROLE_TIERS.map((t) => ({
+          id: nanoid(),
+          workspaceId: ws.id,
+          name: t.name,
+        })),
+      )
+      .returning()
+    allRoles.push(...rows)
+  }
+
+  console.log(`  ✓ ${allRoles.length} roles`)
+
+  const allPermissions = allRoles.flatMap((role) => {
+    const tier = ROLE_TIERS.find((t) => t.name === role.name)!
+    return tier.perms(role.id)
+  })
+
+  await db.insert(schema.rolePermissions).values(allPermissions)
+  console.log(`  ✓ ${allPermissions.length} permissions`)
+
+  // ── Members ──────────────────────────────────────────────────────────────
+  const memberRows: {
+    id: string
+    userId: string
+    workspaceId: string
+    roleId: string
+  }[] = []
+
+  for (const ws of workspaces) {
+    const wsRoles = allRoles.filter((r) => r.workspaceId === ws.id)
+    const adminRole = wsRoles.find((r) => r.name === 'Admin')!
+    const editorRole = wsRoles.find((r) => r.name === 'Editor')!
+    const viewerRole = wsRoles.find((r) => r.name === 'Viewer')!
+
+    // workspace owner → Admin
+    memberRows.push({
+      id: nanoid(),
+      userId: ws.userId,
+      workspaceId: ws.id,
+      roleId: adminRole.id,
+    })
+
+    // remaining users split between Editor and Viewer
+    const others = faker.helpers.shuffle(users.filter((u) => u.id !== ws.userId))
+    for (const u of others.slice(0, 2)) {
+      memberRows.push({ id: nanoid(), userId: u.id, workspaceId: ws.id, roleId: editorRole.id })
+    }
+    for (const u of others.slice(2)) {
+      memberRows.push({ id: nanoid(), userId: u.id, workspaceId: ws.id, roleId: viewerRole.id })
+    }
+  }
+
+  await db.insert(schema.workspaceMembers).values(memberRows)
+  console.log(`  ✓ ${memberRows.length} workspace members`)
+
+  // ── Tags ─────────────────────────────────────────────────────────────────
+  const tagRows = workspaces.flatMap((ws) => {
+    const names = faker.helpers.uniqueArray(
+      faker.hacker.adjective,
+      faker.number.int({ min: 3, max: 5 }),
+    )
+    return names.map((name) => ({
+      id: nanoid(),
+      workspaceId: ws.id,
+      name: name.toLowerCase(),
+      color: faker.helpers.arrayElement(TAG_COLORS),
+    }))
+  })
+
+  const tags = await db.insert(schema.tags).values(tagRows).returning()
+  console.log(`  ✓ ${tags.length} tags`)
+
+  // ── Folders ──────────────────────────────────────────────────────────────
+  const rootFolderRows = workspaces.flatMap((ws) => {
+    const count = faker.number.int({ min: 3, max: 5 })
+    const names = faker.helpers.uniqueArray(
+      () => faker.system.directoryPath().split('/').filter(Boolean).pop() ?? faker.hacker.noun(),
+      count,
+    )
+    return names.map((name) => ({
+      id: nanoid(),
+      workspaceId: ws.id,
+      name: name.toLowerCase().replace(/\s+/g, '-'),
+      parentId: null as string | null,
+    }))
+  })
+
+  const rootFolders = await db.insert(schema.folders).values(rootFolderRows).returning()
+
+  // nested subfolders inside the first root folder of each workspace
+  const subFolderRows = workspaces.flatMap((ws) => {
+    const first = rootFolders.find((f) => f.workspaceId === ws.id)
+    if (!first) return []
+    const count = faker.number.int({ min: 1, max: 2 })
+    const names = faker.helpers.uniqueArray(faker.hacker.noun, count)
+    return names.map((name) => ({
+      id: nanoid(),
+      workspaceId: ws.id,
+      name: name.toLowerCase().replace(/\s+/g, '-'),
+      parentId: first.id,
+    }))
+  })
+
+  const subFolders = await db.insert(schema.folders).values(subFolderRows).returning()
+  const folders = [...rootFolders, ...subFolders]
+
+  console.log(`  ✓ ${folders.length} folders`)
+
+  // ── Items ────────────────────────────────────────────────────────────────
+  const itemRows = workspaces.flatMap((ws) => {
+    const wsFolders = folders.filter((f) => f.workspaceId === ws.id)
+    const folderOptions = [...wsFolders.map((f) => f.id), null]
+    const count = faker.number.int({ min: 5, max: 8 })
+
+    return Array.from({ length: count }, () => {
+      const type = faker.helpers.arrayElement(ITEM_TYPES)
+      return {
+        id: nanoid(),
+        workspaceId: ws.id,
+        folderId: faker.helpers.arrayElement(folderOptions),
+        type,
+        title: faker.hacker.phrase().replace(/\b\w/g, (c) => c.toUpperCase()),
+        content: fakeItemContent(type),
+      }
+    })
+  })
+
+  const items = await db.insert(schema.items).values(itemRows).returning()
+  console.log(`  ✓ ${items.length} items`)
+
+  // ── Item tags ────────────────────────────────────────────────────────────
+  const itemTagRows = items.flatMap((item) => {
+    const wsTags = tags.filter((t) => t.workspaceId === item.workspaceId)
+    if (wsTags.length === 0) return []
+    return faker.helpers
+      .arrayElements(wsTags, faker.number.int({ min: 0, max: 2 }))
+      .map((tag) => ({ id: nanoid(), itemId: item.id, tagId: tag.id }))
+  })
+
+  if (itemTagRows.length > 0) {
+    await db.insert(schema.itemTags).values(itemTagRows)
+  }
+  console.log(`  ✓ ${itemTagRows.length} item tags`)
+
+  console.log('\n✅ Seed complete!')
+  console.log('\n📧 Login credentials (password: password123):')
+  for (const u of users) {
+    console.log(`   ${u.email}`)
+  }
+
+  process.exit(0)
+}
+
+seed().catch((err) => {
+  console.error('❌ Seed failed:', err)
+  process.exit(1)
+})
