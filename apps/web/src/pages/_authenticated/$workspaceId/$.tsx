@@ -104,7 +104,7 @@ function RoutePage() {
               params={{ workspaceId }}
               className='hover:text-primary transition-colors'
             >
-              <InlineCodeText className='text-primary'>
+              <InlineCodeText className='max-w-[16ch] truncate text-primary'>
                 {workspace ? workspace.name : 'Workspace'}
               </InlineCodeText>
             </Link>
@@ -136,14 +136,18 @@ function RoutePage() {
                   <span key={item.id} className='flex items-center'>
                     <InlineCodeSeparator />
                     {isLast ? (
-                      <InlineCodeText>{item.name}</InlineCodeText>
+                      <InlineCodeText className='max-w-[16ch] truncate text-primary'>
+                        {item.name}
+                      </InlineCodeText>
                     ) : (
                       <Link
                         to='/$workspaceId/$'
                         params={{ workspaceId, _splat: splatTo }}
                         className='hover:text-primary transition-colors'
                       >
-                        <InlineCodeText>{item.name}</InlineCodeText>
+                        <InlineCodeText className='max-w-[16ch] truncate'>
+                          {item.name}
+                        </InlineCodeText>
                       </Link>
                     )}
                   </span>
@@ -155,9 +159,9 @@ function RoutePage() {
         </InlineCodeRoot>
 
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-4'>
+          <div className='flex min-w-0 items-center gap-4'>
             <FolderIcon className='size-6 shrink-0 text-primary' />
-            <h1 className='text-3xl font-bold font-mono'>
+            <h1 className='truncate text-3xl font-bold font-mono'>
               {currentFolderName ?? 'Folder'}
             </h1>
           </div>

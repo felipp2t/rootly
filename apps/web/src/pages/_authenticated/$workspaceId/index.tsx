@@ -82,7 +82,7 @@ function RoutePage() {
               <InlineCodeText>Workspaces</InlineCodeText>
             </Link>
             <InlineCodeSeparator />
-            <InlineCodeText className='text-primary'>
+            <InlineCodeText className='max-w-[16ch] truncate text-primary'>
               {workspace ? workspace.name : 'Workspace'}
             </InlineCodeText>
             <InlineCodeSeparator />
@@ -90,9 +90,9 @@ function RoutePage() {
         </InlineCodeRoot>
 
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-4'>
+          <div className='flex min-w-0 items-center gap-4'>
             <FolderIcon className='size-6 shrink-0 text-primary' />
-            <h1 className='text-3xl font-bold font-mono'>
+            <h1 className='truncate text-3xl font-bold font-mono'>
               {workspace?.name ? workspace.name : 'Workspace'}
             </h1>
           </div>
