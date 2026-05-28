@@ -123,10 +123,10 @@ export class DrizzleFolderRepository implements FolderRepository {
         ),
       )
       .where(
-        workspaceId !== undefined
-          ? and(eq(schema.folders.workspaceId, workspaceId), isNull(schema.folders.parentId))
-          : parentId !== undefined
-            ? eq(schema.folders.parentId, parentId)
+        parentId !== undefined
+          ? eq(schema.folders.parentId, parentId)
+          : workspaceId !== undefined
+            ? and(eq(schema.folders.workspaceId, workspaceId), isNull(schema.folders.parentId))
             : undefined,
       )
 
