@@ -11,7 +11,6 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 import { routes } from './infra/http/routes.ts'
-import { ensureMinioBucket } from './infra/storage/minio/minio.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -68,8 +67,6 @@ app.setSerializerCompiler(serializerCompiler)
 app.get('/health', async () => {
   return { status: 'ok' }
 })
-
-await ensureMinioBucket()
 
 app.register(routes, { prefix: '/api' })
 
