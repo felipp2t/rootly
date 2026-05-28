@@ -128,7 +128,7 @@ function RoutePage() {
                 </span>
               )
             })}
-            <InlineCodeSeparator />
+            <InlineCodeSeparator className='px-0' />
           </InlineCodeContent>
         </InlineCodeRoot>
 
