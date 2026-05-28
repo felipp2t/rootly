@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ChevronRightIcon, FolderIcon, PlusIcon } from 'lucide-react'
+import { FolderIcon, PlusIcon } from 'lucide-react'
 import { Suspense } from 'react'
-import { useGetFoldersSuspense } from '@/api/folders/folders'
+import {
+  useGetFoldersSuspense,
+  useResolveFolderPathSuspense,
+} from '@/api/folders/folders'
 import { useGetItemsSuspense } from '@/api/items/items'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
 import {
@@ -78,11 +81,18 @@ function RoutePage() {
     workspaceId,
     parentId: currentFolderId,
   })
+  const { data: resolvedPathResult } = useResolveFolderPathSuspense({
+    workspaceId,
+    path: _splat,
+  })
 
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
   const items = itemsResult.status === 200 ? itemsResult.data.items : []
+  const resolvedPath =
+    resolvedPathResult.status === 200 ? resolvedPathResult.data.path : []
+  const currentFolderName = resolvedPath.at(-1)?.name
 
   return (
     <div className='space-y-6'>
@@ -98,21 +108,21 @@ function RoutePage() {
                 {workspace ? workspace.name : 'Workspace'}
               </InlineCodeText>
             </Link>
-            {folderPath.map((id, idx) => {
+            {resolvedPath.map(({ id, name }, idx) => {
               const splatTo = folderPath.slice(0, idx + 1).join('/')
-              const isLast = idx === folderPath.length - 1
+              const isLast = idx === resolvedPath.length - 1
               return (
                 <span key={id} className='flex items-center'>
                   <InlineCodeSeparator />
                   {isLast ? (
-                    <InlineCodeText>{id}</InlineCodeText>
+                    <InlineCodeText>{name}</InlineCodeText>
                   ) : (
                     <Link
                       to='/$workspaceId/$'
                       params={{ workspaceId, _splat: splatTo }}
                       className='hover:text-primary transition-colors'
                     >
-                      <InlineCodeText>{id}</InlineCodeText>
+                      <InlineCodeText>{name}</InlineCodeText>
                     </Link>
                   )}
                 </span>
@@ -125,14 +135,8 @@ function RoutePage() {
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-4'>
             <FolderIcon className='size-6 shrink-0 text-primary' />
-            <h1 className='text-3xl font-bold font-mono flex items-center gap-2'>
-              {workspace?.name ? workspace.name : 'Workspace'}
-              {folderPath.map((id) => (
-                <span key={id} className='flex items-center gap-2'>
-                  <ChevronRightIcon className='size-5 text-muted-foreground' />
-                  <span>{id}</span>
-                </span>
-              ))}
+            <h1 className='text-3xl font-bold font-mono'>
+              {currentFolderName ?? 'Folder'}
             </h1>
           </div>
           <div className='flex items-center gap-2'>
