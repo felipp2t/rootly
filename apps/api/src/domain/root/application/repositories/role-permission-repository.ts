@@ -5,4 +5,5 @@ export abstract class RolePermissionRepository {
   abstract findByRoleId(roleId: string): Promise<RolePermission[]>
   abstract create(rolePermission: RolePermission): Promise<void>
   abstract delete(id: string): Promise<void>
+  abstract deleteByRoleId(roleId: string): Promise<void>
 }

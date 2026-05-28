@@ -49,4 +49,10 @@ export class DrizzleRolePermissionRepository
       .delete(schema.rolePermissions)
       .where(eq(schema.rolePermissions.id, id))
   }
+
+  async deleteByRoleId(roleId: string): Promise<void> {
+    await this.db
+      .delete(schema.rolePermissions)
+      .where(eq(schema.rolePermissions.roleId, roleId))
+  }
 }
