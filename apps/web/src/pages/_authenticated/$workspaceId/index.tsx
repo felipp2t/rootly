@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeftIcon, FolderIcon, PlusIcon } from 'lucide-react'
+import { FolderIcon, PlusIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { useGetFoldersSuspense } from '@/api/folders/folders'
 import { useGetItemsSuspense } from '@/api/items/items'
@@ -76,16 +76,12 @@ function RoutePage() {
   return (
     <div className='space-y-6'>
       <div className='flex flex-col gap-6'>
-        <Link
-          to='/'
-          className='flex w-fit items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground'
-        >
-          <ArrowLeftIcon className='size-3' />
-          Workspaces
-        </Link>
-
         <InlineCodeRoot>
           <InlineCodeContent>
+            <Link to='/' className='hover:text-primary transition-colors'>
+              <InlineCodeText>Workspaces</InlineCodeText>
+            </Link>
+            <InlineCodeSeparator />
             <InlineCodeText className='text-primary'>
               {workspace ? workspace.name : 'Workspace'}
             </InlineCodeText>

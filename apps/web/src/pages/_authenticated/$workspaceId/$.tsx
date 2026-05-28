@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeftIcon, FolderIcon, PlusIcon } from 'lucide-react'
+import { FolderIcon, PlusIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import {
   useGetFoldersSuspense,
@@ -97,29 +97,6 @@ function RoutePage() {
   return (
     <div className='space-y-6'>
       <div className='flex flex-col gap-6'>
-        {folderPath.length === 1 ? (
-          <Link
-            to='/$workspaceId'
-            params={{ workspaceId }}
-            className='flex w-fit items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground'
-          >
-            <ArrowLeftIcon className='size-3' />
-            {workspace?.name ?? 'Workspace'}
-          </Link>
-        ) : (
-          <Link
-            to='/$workspaceId/$'
-            params={{
-              workspaceId,
-              _splat: folderPath.slice(0, -1).join('/'),
-            }}
-            className='flex w-fit items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground'
-          >
-            <ArrowLeftIcon className='size-3' />
-            {resolvedPath.at(-2)?.name ?? 'Back'}
-          </Link>
-        )}
-
         <InlineCodeRoot>
           <InlineCodeContent>
             <Link
@@ -151,7 +128,7 @@ function RoutePage() {
                 const originalIdx = truncate
                   ? idx === 0
                     ? 0
-                    : resolvedPath.length - (visible.length - 1 - idx)
+                    : resolvedPath.length + idx - 4
                   : idx
                 const splatTo = folderPath.slice(0, originalIdx + 1).join('/')
                 const isLast = originalIdx === resolvedPath.length - 1
