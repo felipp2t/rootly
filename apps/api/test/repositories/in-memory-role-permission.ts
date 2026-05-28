@@ -31,4 +31,10 @@ export class InMemoryRolePermissionRepository
       this.items.splice(rolePermissionIndex, 1)
     }
   }
+
+  async deleteByRoleId(roleId: string): Promise<void> {
+    this.items = this.items.filter(
+      (rolePermission) => rolePermission.roleId !== roleId,
+    )
+  }
 }

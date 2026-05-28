@@ -43,6 +43,16 @@ export default defineConfig({
         description: 'Refresh access token use case',
       },
       { name: 'register-user', description: 'Register user use case' },
+      { name: 'get-roles', description: 'Get workspace roles use case' },
+      { name: 'delete-role', description: 'Delete workspace role use case' },
+      {
+        name: 'get-role-permissions',
+        description: 'Get role permissions use case',
+      },
+      {
+        name: 'set-role-permissions',
+        description: 'Set role permissions use case',
+      },
     ],
   },
   plugins: [tsconfigPaths()],
