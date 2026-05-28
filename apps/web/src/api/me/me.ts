@@ -19,7 +19,7 @@ import type {
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { fetchWithAuth } from '../../shared/lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch'
 import type { GetMe200, GetMe401, GetMe500 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]

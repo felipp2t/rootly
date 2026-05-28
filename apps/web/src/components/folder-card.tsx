@@ -4,7 +4,7 @@ import * as React from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
 import { createFolder } from '@/api/folders/folders'
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/lib/utils'
 import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
 import {

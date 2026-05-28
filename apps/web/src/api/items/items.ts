@@ -22,7 +22,7 @@ import type {
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { fetchWithAuth } from '../../shared/lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   AssignTagToItem401,
   AssignTagToItem404,

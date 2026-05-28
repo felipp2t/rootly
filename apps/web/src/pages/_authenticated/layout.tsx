@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { Header } from '@/shared/components/header'
-import GridPattern from '@/shared/components/ui/grid-pattern'
-import { ScrollArea } from '@/shared/components/ui/scroll-area'
+import { Header } from '@/components/header'
+import GridPattern from '@/components/ui/grid-pattern'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: ({ context, location }) => {

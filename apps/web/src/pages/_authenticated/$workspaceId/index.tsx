@@ -8,19 +8,19 @@ import {
   FolderCard,
   FolderCardSkeleton,
   NewFolderCard,
-} from '@/shared/components/folder-card'
+} from '@/components/folder-card'
 import {
   InlineCodeContent,
   InlineCodeRoot,
   InlineCodeSeparator,
   InlineCodeText,
-} from '@/shared/components/inline-code'
+} from '@/components/inline-code'
 import {
   ItemCard,
   ItemCardSkeleton,
   NewItemCard,
-} from '@/shared/components/item-card'
-import { Button } from '@/shared/components/ui/button'
+} from '@/components/item-card'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/')({
   component: RouteComponent,

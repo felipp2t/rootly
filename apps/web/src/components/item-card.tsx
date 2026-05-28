@@ -12,7 +12,7 @@ import * as React from 'react'
 import z from 'zod'
 import { createItem, getGetItemsQueryKey, uploadItem } from '@/api/items/items'
 import type { GetItems200ItemsItem } from '@/api/model'
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import {
   Dialog,

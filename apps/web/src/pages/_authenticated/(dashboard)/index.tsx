@@ -5,12 +5,12 @@ import {
   InlineCodeAddon,
   InlineCodeRoot,
   InlineCodeText,
-} from '@/shared/components/inline-code'
+} from '@/components/inline-code'
 import {
   NewWorkspaceCard,
   WorkspaceCard,
   WorkspaceCardSkeleton,
-} from '@/shared/components/workspace-card'
+} from '@/components/workspace-card'
 
 export const Route = createFileRoute('/_authenticated/(dashboard)/')({
   component: RouteComponent,

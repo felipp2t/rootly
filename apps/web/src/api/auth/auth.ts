@@ -12,7 +12,7 @@ import type {
   UseMutationResult,
 } from '@tanstack/react-query'
 import { useMutation } from '@tanstack/react-query'
-import { fetchWithAuth } from '../../shared/lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   AuthenticateUser201,
   AuthenticateUser401,

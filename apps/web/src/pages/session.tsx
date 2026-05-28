@@ -9,17 +9,17 @@ import {
 } from '@tanstack/react-router'
 import { z } from 'zod'
 import { authenticateUser } from '@/api/auth/auth'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from '@/shared/components/ui/field'
-import { Input } from '@/shared/components/ui/input'
-import { useAuth } from '@/shared/lib/auth'
-import { cn } from '@/shared/lib/utils'
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/lib/auth'
+import { cn } from '@/lib/utils'
 
 const signInSchema = z.object({
   email: z.email('Please enter a valid email address.'),
