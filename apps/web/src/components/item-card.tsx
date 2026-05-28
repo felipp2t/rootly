@@ -143,18 +143,18 @@ function ItemCardSkeleton({ className }: { className?: string }) {
     <div
       data-slot='item-card-skeleton'
       className={cn(
-        'flex flex-col justify-between gap-3 border-2 border-border bg-card p-4',
+        'flex flex-col justify-between gap-3 border-2 border-border bg-muted p-4',
         className,
       )}
     >
-      <div className='flex w-full items-center justify-between gap-2'>
-        <div className='flex items-center gap-2'>
+      <div className='flex w-full items-start justify-between gap-2'>
+        <div className='flex items-center gap-2 min-w-0'>
           <Skeleton className='size-4 shrink-0 rounded-none' />
-          <Skeleton className='h-4 w-36 rounded-none' />
+          <Skeleton className='h-3.5 w-[55%] rounded-none' />
         </div>
-        <Skeleton className='h-4 w-14 rounded-none' />
+        <Skeleton className='h-5 w-12 rounded-none shrink-0' />
       </div>
-      <Skeleton className='h-3 w-48 rounded-none' />
+      <Skeleton className='h-2.5 w-[75%] rounded-none' />
     </div>
   )
 }
@@ -165,7 +165,11 @@ interface NewItemCardProps {
   folderId?: string
 }
 
-export function NewItemCard({ children, workspaceId, folderId }: NewItemCardProps) {
+export function NewItemCard({
+  children,
+  workspaceId,
+  folderId,
+}: NewItemCardProps) {
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false)
   const queryClient = useQueryClient()
 

@@ -210,26 +210,19 @@ function WorkspaceCardSkeleton({ className }: { className?: string }) {
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
             <Skeleton className='size-4 shrink-0 rounded-none' />
-            <Skeleton className='h-4 w-32 rounded-none' />
+            <Skeleton className='h-3.5 w-36 rounded-none' />
           </div>
           <Skeleton className='size-7 rounded-none' />
         </div>
-        <Skeleton className='h-3 w-16 rounded-none' />
-        <Skeleton className='h-3 w-24 rounded-none' />
+        <Skeleton className='h-2.5 w-14 rounded-none' />
+        <Skeleton className='h-2.5 w-28 rounded-none' />
       </div>
 
       <Separator />
 
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-3.5 rounded-none' />
-          <Skeleton className='h-3 w-16 rounded-none' />
-        </div>
-        <Skeleton className='h-3 w-1 rounded-none' />
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-3.5 rounded-none' />
-          <Skeleton className='h-3 w-12 rounded-none' />
-        </div>
+      <div className='flex items-center gap-1.5'>
+        <Skeleton className='size-3.5 rounded-none' />
+        <Skeleton className='h-2.5 w-20 rounded-none' />
       </div>
     </div>
   )

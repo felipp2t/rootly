@@ -15,11 +15,7 @@ import {
   InlineCodeSeparator,
   InlineCodeText,
 } from '@/components/inline-code'
-import {
-  ItemCard,
-  ItemCardSkeleton,
-  NewItemCard,
-} from '@/components/item-card'
+import { ItemCard, ItemCardSkeleton, NewItemCard } from '@/components/item-card'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/')({

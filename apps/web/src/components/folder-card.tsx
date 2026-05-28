@@ -181,16 +181,15 @@ function FolderCardSkeleton({ className }: { className?: string }) {
     <div
       data-slot='folder-card-skeleton'
       className={cn(
-        'flex flex-col justify-between gap-2.5 border-2 border-border bg-card p-4',
+        'flex flex-col justify-between gap-2.5 border-2 border-border bg-muted p-4',
         className,
       )}
     >
       <div className='flex w-full items-center gap-2'>
         <Skeleton className='size-4.5 shrink-0 rounded-none' />
-        <Skeleton className='h-4 w-32 rounded-none' />
+        <Skeleton className='h-3.5 w-[45%] rounded-none' />
       </div>
-
-      <Skeleton className='h-3 w-20 rounded-none' />
+      <Skeleton className='h-2.5 w-14 rounded-none' />
     </div>
   )
 }
