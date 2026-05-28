@@ -63,7 +63,7 @@ export function InlineCodeSeparator({ className }: InlineCodeSeparatorProps) {
   return (
     <p
       className={cn(
-        'text-xs text-[#2f2f2f] font-mono font-bold uppercase',
+        'text-xs text-[#2f2f2f] font-mono font-bold uppercase px-1',
         className,
       )}
     >
