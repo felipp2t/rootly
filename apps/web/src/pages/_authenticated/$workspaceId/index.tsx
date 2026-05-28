@@ -78,8 +78,10 @@ function RoutePage() {
       <div className='flex flex-col gap-6'>
         <InlineCodeRoot>
           <InlineCodeContent>
-            <Link to='/' className='hover:text-primary transition-colors'>
-              <InlineCodeText>Workspaces</InlineCodeText>
+            <Link to='/' className='group'>
+              <InlineCodeText className='transition-colors group-hover:text-foreground'>
+                Workspaces
+              </InlineCodeText>
             </Link>
             <InlineCodeSeparator />
             <InlineCodeText className='max-w-[16ch] truncate text-primary'>

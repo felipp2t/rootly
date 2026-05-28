@@ -102,9 +102,9 @@ function RoutePage() {
             <Link
               to='/$workspaceId'
               params={{ workspaceId }}
-              className='hover:text-primary transition-colors'
+              className='group'
             >
-              <InlineCodeText className='max-w-[16ch] truncate text-primary'>
+              <InlineCodeText className='max-w-[16ch] truncate text-primary transition-colors group-hover:text-foreground'>
                 {workspace ? workspace.name : 'Workspace'}
               </InlineCodeText>
             </Link>
@@ -143,9 +143,9 @@ function RoutePage() {
                       <Link
                         to='/$workspaceId/$'
                         params={{ workspaceId, _splat: splatTo }}
-                        className='hover:text-primary transition-colors'
+                        className='group'
                       >
-                        <InlineCodeText className='max-w-[16ch] truncate'>
+                        <InlineCodeText className='max-w-[16ch] truncate transition-colors group-hover:text-foreground'>
                           {item.name}
                         </InlineCodeText>
                       </Link>
