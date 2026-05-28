@@ -1,15 +1,16 @@
+import { Link } from '@tanstack/react-router'
 import { FoldersIcon } from 'lucide-react'
 
 export function Header() {
   return (
     <header className='sticky top-0 z-10 h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm'>
       <div className='container mx-auto flex h-full items-center gap-4 px-8'>
-        <div className='flex items-center gap-2.5'>
+        <Link to='/' className='flex items-center gap-2.5'>
           <FoldersIcon className='text-primary' size={20} />
           <span className='text-xl font-bold text-white uppercase font-mono tracking-widest'>
             Rootly
           </span>
-        </div>
+        </Link>
 
         <div className='flex-1' />
 
