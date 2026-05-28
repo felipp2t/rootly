@@ -2,6 +2,7 @@ import type { Folder } from '../../enterprise/entities/folder.ts'
 
 export abstract class FolderRepository {
   abstract findById(id: string): Promise<Folder | null>
+  abstract findManyByIds(ids: string[]): Promise<Folder[]>
   abstract findByName(name: string): Promise<Folder | null>
   abstract findByNameInParent(
     workspaceId: string,

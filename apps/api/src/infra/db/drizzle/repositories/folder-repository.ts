@@ -28,6 +28,23 @@ export class DrizzleFolderRepository implements FolderRepository {
     }, {})
   }
 
+  async findManyByIds(ids: string[]): Promise<Folder[]> {
+    if (ids.length === 0) return []
+
+    const rows = await this.db
+      .select()
+      .from(schema.folders)
+      .where(inArray(schema.folders.id, ids))
+
+    if (rows.length === 0) return []
+
+    const tagsByFolder = await this.loadTagIdsByFolderIds(rows.map((r) => r.id))
+
+    return rows.map((row) =>
+      DrizzleFolderMapper.toDomain(row, tagsByFolder[row.id] ?? []),
+    )
+  }
+
   async findById(id: string): Promise<Folder | null> {
     const rows = await this.db
       .select()

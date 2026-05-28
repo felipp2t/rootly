@@ -10,6 +10,11 @@ export class InMemoryFolderRepository implements FolderRepository {
     return this.items.find((folder) => folder.id.toString() === id) ?? null
   }
 
+  async findManyByIds(ids: string[]): Promise<Folder[]> {
+    if (ids.length === 0) return []
+    return this.items.filter((folder) => ids.includes(folder.id.toString()))
+  }
+
   async findByName(name: string): Promise<Folder | null> {
     return this.items.find((folder) => folder.name === name) ?? null
   }
