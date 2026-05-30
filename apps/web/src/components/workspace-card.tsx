@@ -43,29 +43,25 @@ interface WorkspaceCardProps extends React.ComponentProps<'div'> {
 
 function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
   return (
-    <Link to='/$workspaceId' params={{ workspaceId: workspace.id }}>
-      <div
-        data-slot='workspace-card'
-        className={cn(
-          'flex cursor-pointer flex-col justify-between gap-3 border border-border hover:border-primary/50 bg-card p-5',
-          className,
-        )}
-        {...props}
+    <div
+      data-slot='workspace-card'
+      className={cn(
+        'relative flex flex-col justify-between gap-3 border border-border hover:border-primary/50 bg-card p-5',
+        className,
+      )}
+      {...props}
+    >
+      <Link
+        to='/$workspaceId'
+        params={{ workspaceId: workspace.id }}
+        className='flex flex-col gap-3'
       >
         <div className='flex flex-col gap-2'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <LayoutPanelLeftIcon className='size-4 shrink-0 text-primary' />
-              <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
-                {workspace.name}
-              </span>
-            </div>
-            <Button
-              size='icon-sm'
-              className='cursor-pointer group bg-transparent'
-            >
-              <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
-            </Button>
+          <div className='flex items-center gap-2 pr-8'>
+            <LayoutPanelLeftIcon className='size-4 shrink-0 text-primary' />
+            <span className='font-mono text-sm font-bold uppercase tracking-wide text-foreground truncate'>
+              {workspace.name}
+            </span>
           </div>
           <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
             {workspace.itemCount} ITEMS
@@ -77,19 +73,25 @@ function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
 
         <Separator />
 
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            <div className='flex items-center gap-1.5'>
-              <Users className='size-3.5 text-muted-foreground' />
-              <span className='font-mono text-sm font-medium text-muted-foreground'>
-                {workspace.memberCount}{' '}
-                {workspace.memberCount === 1 ? 'member' : 'members'}
-              </span>
-            </div>
-          </div>
+        <div className='flex items-center gap-1.5'>
+          <Users className='size-3.5 text-muted-foreground' />
+          <span className='font-mono text-sm font-medium text-muted-foreground'>
+            {workspace.memberCount}{' '}
+            {workspace.memberCount === 1 ? 'member' : 'members'}
+          </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      <Link
+        to='/$workspaceId/settings'
+        params={{ workspaceId: workspace.id }}
+        className='absolute top-4 right-4'
+      >
+        <Button size='icon-sm' className='cursor-pointer group bg-transparent'>
+          <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
+        </Button>
+      </Link>
+    </div>
   )
 }
 
