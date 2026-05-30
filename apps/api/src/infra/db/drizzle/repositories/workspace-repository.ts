@@ -1,4 +1,4 @@
-import { and, countDistinct, eq, inArray } from 'drizzle-orm'
+import { and, countDistinct, eq, exists, inArray, or } from 'drizzle-orm'
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
 import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -9,11 +9,24 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
   constructor(private readonly db: DrizzleDatabase) {}
 
   async findById(userId: string, id: string): Promise<Workspace | null> {
+    const isMember = this.db
+      .select({ one: eq(schema.workspaceMembers.userId, userId) })
+      .from(schema.workspaceMembers)
+      .where(
+        and(
+          eq(schema.workspaceMembers.workspaceId, schema.workspaces.id),
+          eq(schema.workspaceMembers.userId, userId),
+        ),
+      )
+
     const workspaces = await this.db
       .select()
       .from(schema.workspaces)
       .where(
-        and(eq(schema.workspaces.id, id), eq(schema.workspaces.userId, userId)),
+        and(
+          eq(schema.workspaces.id, id),
+          or(eq(schema.workspaces.userId, userId), exists(isMember)),
+        ),
       )
 
     if (workspaces.length === 0) {
