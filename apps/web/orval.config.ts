@@ -13,7 +13,7 @@ export default defineConfig({
       baseUrl: 'http://localhost:3333',
       override: {
         mutator: {
-          path: './src/shared/lib/fetch.ts',
+          path: './src/lib/fetch.ts',
           name: 'fetchWithAuth',
         },
         query: {
