@@ -1,0 +1,533 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import {
+  CheckIcon,
+  MinusIcon,
+  PlusIcon,
+  SettingsIcon,
+  ShieldIcon,
+  Trash2Icon,
+  UsersIcon,
+} from 'lucide-react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import type {
+  GetRolePermissions200PermissionsItemAction,
+  GetRolePermissions200PermissionsItemResource,
+} from '@/api/model'
+import {
+  getGetRolePermissionsQueryKey,
+  getGetRolesQueryKey,
+  useCreateRole,
+  useDeleteRole,
+  useGetRolePermissionsSuspense,
+  useGetRolesSuspense,
+  useSetRolePermissions,
+} from '@/api/roles/roles'
+import {
+  InlineCodeContent,
+  InlineCodeRoot,
+  InlineCodeSeparator,
+  InlineCodeText,
+} from '@/components/inline-code'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+
+export const Route = createFileRoute('/_authenticated/$workspaceId/settings')({
+  component: RouteComponent,
+})
+
+const RESOURCES = [
+  'workspace',
+  'folder',
+  'item',
+  'tag',
+  'member',
+  'role',
+] as const
+const ACTIONS = ['read', 'create', 'update', 'delete', 'invite', 'all'] as const
+
+type Resource = GetRolePermissions200PermissionsItemResource
+type Action = GetRolePermissions200PermissionsItemAction
+type Permissions = Record<Resource, Partial<Record<Action, boolean>>>
+
+function toMatrix(
+  permissions: { resource: Resource; action: Action }[],
+): Permissions {
+  const matrix = {} as Permissions
+  for (const { resource, action } of permissions) {
+    if (!matrix[resource]) matrix[resource] = {}
+    matrix[resource][action] = true
+  }
+  return matrix
+}
+
+function fromMatrix(
+  matrix: Permissions,
+): { resource: Resource; action: Action }[] {
+  return Object.entries(matrix).flatMap(([resource, actions]) =>
+    Object.entries(actions ?? {})
+      .filter(([, v]) => v)
+      .map(([action]) => ({
+        resource: resource as Resource,
+        action: action as Action,
+      })),
+  )
+}
+
+type SettingsSection = 'general' | 'members' | 'roles'
+
+const NAV_ITEMS: {
+  id: SettingsSection
+  label: string
+  icon: React.ElementType
+}[] = [
+  { id: 'general', label: 'General', icon: SettingsIcon },
+  { id: 'members', label: 'Members', icon: UsersIcon },
+  { id: 'roles', label: 'Roles & Permissions', icon: ShieldIcon },
+]
+
+function RouteComponent() {
+  const { workspaceId } = Route.useParams()
+  const [activeSection, setActiveSection] = useState<SettingsSection>('roles')
+
+  return (
+    <main className='container mx-auto px-8 py-12 space-y-6'>
+      <div className='flex flex-col gap-6'>
+        <InlineCodeRoot>
+          <InlineCodeContent>
+            <Link to='/' className='group'>
+              <InlineCodeText className='transition-colors group-hover:text-foreground'>
+                Workspaces
+              </InlineCodeText>
+            </Link>
+            <InlineCodeSeparator />
+            <Link to='/$workspaceId' params={{ workspaceId }} className='group'>
+              <InlineCodeText className='transition-colors group-hover:text-foreground'>
+                {workspaceId}
+              </InlineCodeText>
+            </Link>
+            <InlineCodeSeparator />
+            <InlineCodeText className='text-primary'>Settings</InlineCodeText>
+            <InlineCodeSeparator />
+          </InlineCodeContent>
+        </InlineCodeRoot>
+
+        <div className='flex items-center gap-4'>
+          <SettingsIcon className='size-6 shrink-0 text-primary' />
+          <h1 className='text-3xl font-bold font-mono'>SETTINGS</h1>
+        </div>
+      </div>
+
+      <div className='flex gap-8'>
+        <nav className='flex flex-col gap-1 w-52 shrink-0'>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = activeSection === item.id
+            return (
+              <button
+                key={item.id}
+                type='button'
+                onClick={() => setActiveSection(item.id)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 text-left font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer',
+                  isActive
+                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30 border-l-2 border-transparent',
+                )}
+              >
+                <Icon className='size-3.5 shrink-0' />
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
+
+        <Separator orientation='vertical' className='h-auto' />
+
+        <div className='flex-1 min-w-0'>
+          {activeSection === 'roles' && (
+            <Suspense fallback={<RolesSectionSkeleton />}>
+              <RolesSectionLoader workspaceId={workspaceId} />
+            </Suspense>
+          )}
+          {activeSection === 'general' && <GeneralSection />}
+          {activeSection === 'members' && <MembersSection />}
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
+  const queryClient = useQueryClient()
+  const { data: rolesRes } = useGetRolesSuspense(workspaceId)
+  const roles = rolesRes.status === 200 ? rolesRes.data.roles : []
+
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null)
+  const roleId = selectedRoleId ?? roles[0]?.id ?? null
+
+  const [creating, setCreating] = useState(false)
+  const [newRoleName, setNewRoleName] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (creating) inputRef.current?.focus()
+  }, [creating])
+
+  const createRoleMutation = useCreateRole()
+  const deleteRoleMutation = useDeleteRole()
+
+  function handleCreateRole() {
+    const name = newRoleName.trim()
+    if (!name) {
+      setCreating(false)
+      return
+    }
+    createRoleMutation.mutate(
+      { workspaceId, data: { name } },
+      {
+        onSuccess: (res) => {
+          if (res.status === 201) {
+            setSelectedRoleId(res.data.roleId)
+            queryClient.invalidateQueries({
+              queryKey: getGetRolesQueryKey(workspaceId),
+            })
+            toast.success(`Role "${name}" created`)
+          } else if (res.status === 409) {
+            toast.error('Role already exists')
+          } else {
+            toast.error('Failed to create role')
+          }
+          setCreating(false)
+          setNewRoleName('')
+        },
+        onError: () => {
+          toast.error('Failed to create role')
+          setCreating(false)
+          setNewRoleName('')
+        },
+      },
+    )
+  }
+
+  function handleDeleteRole(id: string) {
+    deleteRoleMutation.mutate(
+      { workspaceId, roleId: id },
+      {
+        onSuccess: (res) => {
+          if (res.status === 204) {
+            if (selectedRoleId === id) setSelectedRoleId(null)
+            queryClient.invalidateQueries({
+              queryKey: getGetRolesQueryKey(workspaceId),
+            })
+            toast.success('Role deleted')
+          } else {
+            toast.error('Failed to delete role')
+          }
+        },
+        onError: () => toast.error('Failed to delete role'),
+      },
+    )
+  }
+
+  return (
+    <div className='flex gap-6'>
+      {/* Roles list */}
+      <div className='w-52 shrink-0 flex flex-col gap-2'>
+        <div className='flex items-center justify-between mb-1'>
+          <span className='font-mono text-xs font-semibold text-muted-foreground uppercase'>
+            Roles
+          </span>
+          {!creating && (
+            <Button
+              size='icon-sm'
+              variant='ghost'
+              className='cursor-pointer'
+              onClick={() => setCreating(true)}
+            >
+              <PlusIcon className='size-3.5' />
+            </Button>
+          )}
+        </div>
+
+        {creating && (
+          <input
+            ref={inputRef}
+            className='px-3 py-2 border border-primary/50 bg-transparent font-mono text-xs font-semibold uppercase tracking-wide text-foreground outline-none placeholder:text-muted-foreground'
+            placeholder='Role name...'
+            value={newRoleName}
+            onChange={(e) => setNewRoleName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleCreateRole()
+              if (e.key === 'Escape') {
+                setCreating(false)
+                setNewRoleName('')
+              }
+            }}
+            onBlur={handleCreateRole}
+          />
+        )}
+
+        {roles.map((role) => (
+          <button
+            key={role.id}
+            type='button'
+            onClick={() => setSelectedRoleId(role.id)}
+            className={cn(
+              'flex items-center justify-between gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
+              roleId === role.id
+                ? 'border-primary/50 bg-primary/5 text-primary'
+                : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
+            )}
+          >
+            <div className='flex items-center gap-2'>
+              <ShieldIcon className='size-3.5 shrink-0' />
+              {role.name}
+            </div>
+            <Trash2Icon
+              className='size-3 shrink-0 opacity-0 hover:opacity-100 text-destructive transition-opacity'
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDeleteRole(role.id)
+              }}
+            />
+          </button>
+        ))}
+
+        {roles.length === 0 && !creating && (
+          <p className='font-mono text-xs text-muted-foreground px-1'>
+            No roles yet
+          </p>
+        )}
+      </div>
+
+      <Separator orientation='vertical' className='h-auto' />
+
+      {/* Permission matrix */}
+      <div className='flex-1 min-w-0'>
+        {roleId ? (
+          <Suspense fallback={<PermissionsMatrixSkeleton />}>
+            <PermissionsPanel
+              workspaceId={workspaceId}
+              roleId={roleId}
+              roleName={roles.find((r) => r.id === roleId)?.name ?? ''}
+            />
+          </Suspense>
+        ) : (
+          <div className='flex items-center justify-center h-32'>
+            <p className='font-mono text-xs text-muted-foreground'>
+              Select a role to view permissions
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function PermissionsPanel({
+  workspaceId,
+  roleId,
+  roleName,
+}: {
+  workspaceId: string
+  roleId: string
+  roleName: string
+}) {
+  const queryClient = useQueryClient()
+  const { data: permsRes } = useGetRolePermissionsSuspense(workspaceId, roleId)
+  const serverPermissions =
+    permsRes.status === 200 ? permsRes.data.permissions : []
+
+  const [localMatrix, setLocalMatrix] = useState<Permissions>(() =>
+    toMatrix(serverPermissions),
+  )
+
+  useEffect(() => {
+    setLocalMatrix(toMatrix(serverPermissions))
+  }, [roleId])
+
+  const setPermsMutation = useSetRolePermissions()
+
+  function togglePermission(resource: Resource, action: Action) {
+    setLocalMatrix((prev) => ({
+      ...prev,
+      [resource]: {
+        ...prev[resource],
+        [action]: !prev[resource]?.[action],
+      },
+    }))
+  }
+
+  function handleSave() {
+    setPermsMutation.mutate(
+      {
+        workspaceId,
+        roleId,
+        data: { permissions: fromMatrix(localMatrix) },
+      },
+      {
+        onSuccess: (res) => {
+          if (res.status === 204) {
+            queryClient.invalidateQueries({
+              queryKey: getGetRolePermissionsQueryKey(workspaceId, roleId),
+            })
+            toast.success('Permissions saved')
+          } else {
+            toast.error('Failed to save permissions')
+          }
+        },
+        onError: () => toast.error('Failed to save permissions'),
+      },
+    )
+  }
+
+  const totalGranted = Object.values(localMatrix).reduce(
+    (sum, perms) => sum + Object.values(perms).filter(Boolean).length,
+    0,
+  )
+
+  return (
+    <div className='flex flex-col gap-4'>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <ShieldIcon className='size-4 text-primary' />
+          <span className='font-mono text-sm font-bold uppercase tracking-wide'>
+            {roleName}
+          </span>
+        </div>
+        <Button
+          size='sm'
+          variant='outline'
+          className='cursor-pointer font-mono text-xs uppercase'
+          onClick={handleSave}
+          disabled={setPermsMutation.isPending}
+        >
+          {setPermsMutation.isPending ? 'Saving...' : 'Save Changes'}
+        </Button>
+      </div>
+
+      <div className='border border-border overflow-auto'>
+        {/* Header */}
+        <div className='grid grid-cols-[140px_repeat(6,1fr)] bg-muted/30'>
+          <div className='px-4 py-2.5 font-mono text-xs font-semibold text-muted-foreground uppercase border-r border-border'>
+            Resource
+          </div>
+          {ACTIONS.map((action) => (
+            <div
+              key={action}
+              className='px-2 py-2.5 font-mono text-xs font-semibold text-muted-foreground uppercase text-center border-r border-border last:border-r-0'
+            >
+              {action}
+            </div>
+          ))}
+        </div>
+
+        <Separator />
+
+        {/* Rows */}
+        {RESOURCES.map((resource, i) => (
+          <div
+            key={resource}
+            className={cn(
+              'grid grid-cols-[140px_repeat(6,1fr)]',
+              i % 2 === 0 ? 'bg-card' : 'bg-muted/10',
+            )}
+          >
+            <div className='px-4 py-3 font-mono text-xs font-semibold uppercase text-foreground border-r border-border flex items-center'>
+              {resource}
+            </div>
+            {ACTIONS.map((action) => {
+              const checked = localMatrix[resource]?.[action] ?? false
+              return (
+                <div
+                  key={action}
+                  className='flex items-center justify-center border-r border-border last:border-r-0 py-3'
+                >
+                  <button
+                    type='button'
+                    onClick={() => togglePermission(resource, action)}
+                    className={cn(
+                      'size-4 flex items-center justify-center border transition-colors cursor-pointer',
+                      checked
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-transparent hover:border-primary/50',
+                    )}
+                  >
+                    {checked ? (
+                      <CheckIcon className='size-2.5' strokeWidth={3} />
+                    ) : (
+                      <MinusIcon className='size-2.5 opacity-0' />
+                    )}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+
+      <p className='font-mono text-xs text-muted-foreground'>
+        {totalGranted} permissions assigned
+      </p>
+    </div>
+  )
+}
+
+function RolesSectionSkeleton() {
+  return (
+    <div className='flex gap-6'>
+      <div className='w-52 shrink-0 flex flex-col gap-2'>
+        <Skeleton className='h-4 w-12 mb-1' />
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className='h-10 w-full' />
+        ))}
+      </div>
+      <Separator orientation='vertical' className='h-auto' />
+      <div className='flex-1'>
+        <PermissionsMatrixSkeleton />
+      </div>
+    </div>
+  )
+}
+
+function PermissionsMatrixSkeleton() {
+  return (
+    <div className='flex flex-col gap-4'>
+      <div className='flex items-center justify-between'>
+        <Skeleton className='h-5 w-24' />
+        <Skeleton className='h-8 w-28' />
+      </div>
+      <Skeleton className='h-52 w-full' />
+    </div>
+  )
+}
+
+function GeneralSection() {
+  return (
+    <div className='flex flex-col gap-4'>
+      <span className='font-mono text-sm font-bold uppercase tracking-wide'>
+        General
+      </span>
+      <div className='p-6 flex items-center justify-center'>
+        <p className='font-mono text-xs text-muted-foreground'>Coming soon</p>
+      </div>
+    </div>
+  )
+}
+
+function MembersSection() {
+  return (
+    <div className='flex flex-col gap-4'>
+      <span className='font-mono text-sm font-bold uppercase tracking-wide'>
+        Members
+      </span>
+      <div className='p-6 flex items-center justify-center'>
+        <p className='font-mono text-xs text-muted-foreground'>Coming soon</p>
+      </div>
+    </div>
+  )
+}
