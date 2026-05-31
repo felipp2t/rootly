@@ -368,9 +368,12 @@ function PermissionsPanel({
     toMatrix(serverPermissions),
   )
 
+  // Re-sync from the server whenever the query data changes (role switch or
+  // refetch after save). The backend normalizes `all` vs granular actions, so
+  // the local matrix must reflect the persisted result, not the submitted one.
   useEffect(() => {
     setLocalMatrix(toMatrix(serverPermissions))
-  }, [roleId])
+  }, [permsRes])
 
   const setPermsMutation = useSetRolePermissions()
 
