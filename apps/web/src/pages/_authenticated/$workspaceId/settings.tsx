@@ -178,7 +178,7 @@ function RouteComponent() {
 
 function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient()
-  const { data: rolesRes } = useGetRolesSuspense(workspaceId)
+  const { data: rolesRes, isFetching } = useGetRolesSuspense(workspaceId)
   const roles = rolesRes.status === 200 ? rolesRes.data.roles : []
   const { can } = useWorkspacePermissions(workspaceId)
 
@@ -293,27 +293,33 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
             />
           )}
 
-          {roles.map((role) => (
-            <button
-              key={role.id}
-              type='button'
-              onClick={() => setSelectedRoleId(role.id)}
-              className={cn(
-                'flex items-center gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
-                roleId === role.id
-                  ? 'border-primary/50 bg-primary/5 text-primary'
-                  : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
-              )}
-            >
-              <ShieldIcon className='size-3.5 shrink-0' />
-              {role.name}
-            </button>
-          ))}
+          {isFetching ? (
+            <RolesListSkeleton count={Math.max(roles.length, 1)} />
+          ) : (
+            <>
+              {roles.map((role) => (
+                <button
+                  key={role.id}
+                  type='button'
+                  onClick={() => setSelectedRoleId(role.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
+                    roleId === role.id
+                      ? 'border-primary/50 bg-primary/5 text-primary'
+                      : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
+                  )}
+                >
+                  <ShieldIcon className='size-3.5 shrink-0' />
+                  {role.name}
+                </button>
+              ))}
 
-          {roles.length === 0 && !creating && (
-            <p className='font-mono text-xs text-muted-foreground px-1'>
-              No roles yet
-            </p>
+              {roles.length === 0 && !creating && (
+                <p className='font-mono text-xs text-muted-foreground px-1'>
+                  No roles yet
+                </p>
+              )}
+            </>
           )}
         </div>
       </ScrollArea>
@@ -530,14 +536,22 @@ function PermissionsPanel({
   )
 }
 
+function RolesListSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => (
+        <Skeleton key={i} className='h-10.5 w-full' />
+      ))}
+    </>
+  )
+}
+
 function RolesSectionSkeleton() {
   return (
     <div className='flex gap-6'>
       <div className='w-52 shrink-0 flex flex-col gap-2'>
         <Skeleton className='h-4 w-12 mb-1' />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className='h-10 w-full' />
-        ))}
+        <RolesListSkeleton />
       </div>
       <Separator orientation='vertical' className='h-auto' />
       <div className='flex-1'>
