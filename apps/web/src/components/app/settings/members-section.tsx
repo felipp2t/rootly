@@ -1,11 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDownIcon, Loader2Icon, ShieldIcon } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  Loader2Icon,
+  ShieldIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { Suspense } from 'react'
 import { toast } from 'sonner'
 import {
   getGetWorkspaceMembersQueryKey,
   useAssignRoleToMember,
   useGetWorkspaceMembersSuspense,
+  useRemoveMember,
 } from '@/api/members/members'
 import { useGetRolesSuspense } from '@/api/roles/roles'
 import {
@@ -39,8 +45,10 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
 
   const { can } = useWorkspacePermissions(workspaceId)
   const canUpdate = can('member', 'update')
+  const canDelete = can('member', 'delete')
 
   const assignRoleMutation = useAssignRoleToMember()
+  const removeMemberMutation = useRemoveMember()
 
   function handleAssignRole(
     memberId: string,
@@ -61,6 +69,27 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
           }
         },
         onError: () => toast.error('Failed to change role'),
+      },
+    )
+  }
+
+  function handleRemoveMember(memberId: string, memberName: string) {
+    removeMemberMutation.mutate(
+      { workspaceId, memberId },
+      {
+        onSuccess: (res) => {
+          if (res.status === 204) {
+            queryClient.invalidateQueries({
+              queryKey: getGetWorkspaceMembersQueryKey(workspaceId),
+            })
+            toast.success(`"${memberName}" removed`)
+          } else if (res.status === 403) {
+            toast.error('Cannot remove the workspace owner')
+          } else {
+            toast.error('Failed to remove member')
+          }
+        },
+        onError: () => toast.error('Failed to remove member'),
       },
     )
   }
@@ -90,6 +119,10 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
                 const isUpdating =
                   assignRoleMutation.isPending &&
                   assignRoleMutation.variables?.memberId === member.id
+
+                const isRemoving =
+                  removeMemberMutation.isPending &&
+                  removeMemberMutation.variables?.memberId === member.id
 
                 return (
                   <div
@@ -164,6 +197,24 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
                           {member.roleName}
                         </span>
                       </div>
+                    )}
+
+                    {canDelete && (
+                      <button
+                        type='button'
+                        aria-label={`Remove ${member.name}`}
+                        disabled={isRemoving}
+                        onClick={() =>
+                          handleRemoveMember(member.id, member.name)
+                        }
+                        className='flex items-center justify-center shrink-0 size-7 border border-destructive/40 text-destructive outline-none transition-colors cursor-pointer hover:bg-destructive/10 disabled:opacity-60 disabled:cursor-not-allowed'
+                      >
+                        {isRemoving ? (
+                          <Loader2Icon className='size-3.5 animate-spin' />
+                        ) : (
+                          <Trash2Icon className='size-3.5' />
+                        )}
+                      </button>
                     )}
                   </div>
                 )
