@@ -57,6 +57,10 @@ export default defineConfig({
         name: 'get-my-workspace-permissions',
         description: 'Get my workspace permissions use case',
       },
+      {
+        name: 'get-workspace-members',
+        description: 'Get workspace members use case',
+      },
     ],
   },
   plugins: [tsconfigPaths()],
