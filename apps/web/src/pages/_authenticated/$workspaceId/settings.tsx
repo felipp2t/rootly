@@ -50,6 +50,18 @@ const RESOURCES = [
 ] as const
 const ACTIONS = ['read', 'create', 'update', 'delete', 'invite', 'all'] as const
 
+// Combinations that are not meaningful in the domain. Workspaces are created
+// freely by any user, so `workspace:create` cannot be gated by a role.
+const DISALLOWED_PERMISSIONS: { resource: Resource; action: Action }[] = [
+  { resource: 'workspace', action: 'create' },
+]
+
+function isPermissionAllowed(resource: Resource, action: Action): boolean {
+  return !DISALLOWED_PERMISSIONS.some(
+    (p) => p.resource === resource && p.action === action,
+  )
+}
+
 type Resource = GetRolePermissions200PermissionsItemResource
 type Action = GetRolePermissions200PermissionsItemAction
 type Permissions = Record<Resource, Partial<Record<Action, boolean>>>
@@ -74,7 +86,8 @@ function fromMatrix(
       .map(([action]) => ({
         resource: resource as Resource,
         action: action as Action,
-      })),
+      }))
+      .filter(({ resource, action }) => isPermissionAllowed(resource, action)),
   )
 }
 
@@ -451,28 +464,37 @@ function PermissionsPanel({
             </div>
             {ACTIONS.map((action) => {
               const checked = localMatrix[resource]?.[action] ?? false
+              const allowed = isPermissionAllowed(resource, action)
               return (
                 <div
                   key={action}
                   className='flex items-center justify-center border-r border-border last:border-r-0 py-3'
                 >
-                  <button
-                    type='button'
-                    onClick={canUpdate ? () => togglePermission(resource, action) : undefined}
-                    className={cn(
-                      'size-4 flex items-center justify-center border transition-colors',
-                      canUpdate ? 'cursor-pointer' : 'cursor-not-allowed opacity-60',
-                      checked
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-transparent hover:border-primary/50',
-                    )}
-                  >
-                    {checked ? (
-                      <CheckIcon className='size-2.5' strokeWidth={3} />
-                    ) : (
-                      <MinusIcon className='size-2.5 opacity-0' />
-                    )}
-                  </button>
+                  {allowed ? (
+                    <button
+                      type='button'
+                      onClick={
+                        canUpdate
+                          ? () => togglePermission(resource, action)
+                          : undefined
+                      }
+                      className={cn(
+                        'size-4 flex items-center justify-center border transition-colors',
+                        canUpdate
+                          ? 'cursor-pointer'
+                          : 'cursor-not-allowed opacity-60',
+                        checked
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-transparent hover:border-primary/50',
+                      )}
+                    >
+                      {checked ? (
+                        <CheckIcon className='size-2.5' strokeWidth={3} />
+                      ) : (
+                        <MinusIcon className='size-2.5 opacity-0' />
+                      )}
+                    </button>
+                  ) : null}
                 </div>
               )
             })}
