@@ -10,8 +10,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useWorkspacePermissions } from '@/hooks/use-workspace-permissions'
-import { cn } from '@/lib/utils'
 import {
   ACTIONS,
   type Action,
@@ -21,7 +19,9 @@ import {
   RESOURCES,
   type Resource,
   toMatrix,
-} from './permissions'
+} from '@/constants/permissions'
+import { useWorkspacePermissions } from '@/hooks/use-workspace-permissions'
+import { cn } from '@/lib/utils'
 
 export function PermissionsPanel({
   workspaceId,
