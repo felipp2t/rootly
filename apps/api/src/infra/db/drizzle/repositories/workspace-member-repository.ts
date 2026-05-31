@@ -59,6 +59,15 @@ export class DrizzleWorkspaceMemberRepository
     return rows.map(DrizzleWorkspaceMemberMapper.toDomain)
   }
 
+  async findManyByWorkspaceId(workspaceId: string): Promise<WorkspaceMember[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.workspaceMembers)
+      .where(eq(schema.workspaceMembers.workspaceId, workspaceId))
+
+    return rows.map(DrizzleWorkspaceMemberMapper.toDomain)
+  }
+
   async create(member: WorkspaceMember): Promise<void> {
     await this.db
       .insert(schema.workspaceMembers)

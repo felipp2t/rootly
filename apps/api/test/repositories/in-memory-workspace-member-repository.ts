@@ -30,6 +30,10 @@ export class InMemoryWorkspaceMemberRepository
     return this.items.filter((member) => member.roleId === roleId)
   }
 
+  async findManyByWorkspaceId(workspaceId: string): Promise<WorkspaceMember[]> {
+    return this.items.filter((member) => member.workspaceId === workspaceId)
+  }
+
   async create(member: WorkspaceMember): Promise<void> {
     this.items.push(member)
   }
