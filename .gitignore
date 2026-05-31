@@ -91,3 +91,6 @@ build/Release
 
 # claude
 .claude/**
+
+# notes
+.notes/
