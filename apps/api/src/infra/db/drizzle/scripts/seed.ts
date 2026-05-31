@@ -95,13 +95,18 @@ async function seed() {
   // ── Users ────────────────────────────────────────────────────────────────
   const passwordHash = await hash('password123')
 
+  const emails = faker.helpers.uniqueArray(
+    () => faker.internet.email({ provider: 'rootly.dev' }).toLowerCase(),
+    30,
+  )
+
   const users = await db
     .insert(schema.users)
     .values(
-      Array.from({ length: 5 }, () => ({
+      emails.map((email) => ({
         id: nanoid(),
         name: faker.person.fullName(),
-        email: faker.internet.email({ provider: 'rootly.dev' }).toLowerCase(),
+        email,
         passwordHash,
       })),
     )
@@ -176,14 +181,19 @@ async function seed() {
       roleId: adminRole.id,
     })
 
-    // remaining users split between Editor and Viewer
+    // at least 9 more users (→ 10+ members per workspace) split Editor/Viewer
     const others = faker.helpers.shuffle(users.filter((u) => u.id !== ws.userId))
-    for (const u of others.slice(0, 2)) {
-      memberRows.push({ id: nanoid(), userId: u.id, workspaceId: ws.id, roleId: editorRole.id })
-    }
-    for (const u of others.slice(2)) {
-      memberRows.push({ id: nanoid(), userId: u.id, workspaceId: ws.id, roleId: viewerRole.id })
-    }
+    const memberCount = faker.number.int({ min: 9, max: 14 })
+    const picked = others.slice(0, memberCount)
+    const editorCount = Math.ceil(picked.length / 2)
+    picked.forEach((u, i) => {
+      memberRows.push({
+        id: nanoid(),
+        userId: u.id,
+        workspaceId: ws.id,
+        roleId: i < editorCount ? editorRole.id : viewerRole.id,
+      })
+    })
   }
 
   await db.insert(schema.workspaceMembers).values(memberRows)
