@@ -41,6 +41,7 @@ import type {
   GetRoles401,
   GetRoles404,
   GetRoles500,
+  SetRolePermissions400,
   SetRolePermissions401,
   SetRolePermissions404,
   SetRolePermissions500,
@@ -1047,6 +1048,11 @@ export type setRolePermissionsResponse204 = {
   status: 204
 }
 
+export type setRolePermissionsResponse400 = {
+  data: SetRolePermissions400
+  status: 400
+}
+
 export type setRolePermissionsResponse401 = {
   data: SetRolePermissions401
   status: 401
@@ -1067,6 +1073,7 @@ export type setRolePermissionsResponseSuccess =
     headers: Headers
   }
 export type setRolePermissionsResponseError = (
+  | setRolePermissionsResponse400
   | setRolePermissionsResponse401
   | setRolePermissionsResponse404
   | setRolePermissionsResponse500
@@ -1104,6 +1111,7 @@ export const setRolePermissions = async (
 
 export const getSetRolePermissionsMutationOptions = <
   TError =
+    | SetRolePermissions400
     | SetRolePermissions401
     | SetRolePermissions404
     | SetRolePermissions500,
@@ -1148,6 +1156,7 @@ export type SetRolePermissionsMutationResult = NonNullable<
 >
 export type SetRolePermissionsMutationBody = SetRolePermissionsBody
 export type SetRolePermissionsMutationError =
+  | SetRolePermissions400
   | SetRolePermissions401
   | SetRolePermissions404
   | SetRolePermissions500
@@ -1157,6 +1166,7 @@ export type SetRolePermissionsMutationError =
  */
 export const useSetRolePermissions = <
   TError =
+    | SetRolePermissions400
     | SetRolePermissions401
     | SetRolePermissions404
     | SetRolePermissions500,
