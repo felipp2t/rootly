@@ -31,6 +31,7 @@ import {
   InlineCodeText,
 } from '@/components/inline-code'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspacePermissions } from '@/hooks/use-workspace-permissions'
@@ -256,64 +257,66 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
   return (
     <div className='flex gap-6'>
       {/* Roles list */}
-      <div className='w-52 shrink-0 flex flex-col gap-2'>
-        <div className='flex items-center justify-between mb-1'>
-          <span className='font-mono text-xs font-semibold text-muted-foreground uppercase'>
-            Roles
-          </span>
-          {!creating && canCreate && (
-            <Button
-              size='icon-sm'
-              variant='ghost'
-              className='cursor-pointer'
-              onClick={() => setCreating(true)}
+      <ScrollArea>
+        <div className='w-52 max-h-20 shrink-0 flex flex-col gap-2'>
+          <div className='flex items-center justify-between mb-1'>
+            <span className='font-mono text-xs font-semibold text-muted-foreground uppercase'>
+              Roles
+            </span>
+            {!creating && canCreate && (
+              <Button
+                size='icon-sm'
+                variant='ghost'
+                className='cursor-pointer'
+                onClick={() => setCreating(true)}
+              >
+                <PlusIcon className='size-3.5' />
+              </Button>
+            )}
+          </div>
+
+          {creating && (
+            <input
+              ref={inputRef}
+              className='px-3 py-2 border border-primary/50 bg-transparent font-mono text-xs font-semibold uppercase tracking-wide text-foreground outline-none placeholder:text-muted-foreground'
+              placeholder='Role name...'
+              value={newRoleName}
+              onChange={(e) => setNewRoleName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleCreateRole()
+                if (e.key === 'Escape') {
+                  setCreating(false)
+                  setNewRoleName('')
+                }
+              }}
+              onBlur={handleCreateRole}
+            />
+          )}
+
+          {roles.map((role) => (
+            <button
+              key={role.id}
+              type='button'
+              onClick={() => setSelectedRoleId(role.id)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
+                roleId === role.id
+                  ? 'border-primary/50 bg-primary/5 text-primary'
+                  : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
+              )}
             >
-              <PlusIcon className='size-3.5' />
-            </Button>
+              <ShieldIcon className='size-3.5 shrink-0' />
+              {role.name}
+            </button>
+          ))}
+
+          {roles.length === 0 && !creating && (
+            <p className='font-mono text-xs text-muted-foreground px-1'>
+              No roles yet
+            </p>
           )}
         </div>
-
-        {creating && (
-          <input
-            ref={inputRef}
-            className='px-3 py-2 border border-primary/50 bg-transparent font-mono text-xs font-semibold uppercase tracking-wide text-foreground outline-none placeholder:text-muted-foreground'
-            placeholder='Role name...'
-            value={newRoleName}
-            onChange={(e) => setNewRoleName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleCreateRole()
-              if (e.key === 'Escape') {
-                setCreating(false)
-                setNewRoleName('')
-              }
-            }}
-            onBlur={handleCreateRole}
-          />
-        )}
-
-        {roles.map((role) => (
-          <button
-            key={role.id}
-            type='button'
-            onClick={() => setSelectedRoleId(role.id)}
-            className={cn(
-              'flex items-center gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
-              roleId === role.id
-                ? 'border-primary/50 bg-primary/5 text-primary'
-                : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
-            )}
-          >
-            <ShieldIcon className='size-3.5 shrink-0' />
-            {role.name}
-          </button>
-        ))}
-
-        {roles.length === 0 && !creating && (
-          <p className='font-mono text-xs text-muted-foreground px-1'>
-            No roles yet
-          </p>
-        )}
-      </div>
+      </ScrollArea>
 
       <Separator orientation='vertical' className='h-auto' />
 
