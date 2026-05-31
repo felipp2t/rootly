@@ -14,6 +14,8 @@ import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
+app.decorateRequest('userId', '')
+
 await app.register(cookie)
 await app.register(multipart)
 
