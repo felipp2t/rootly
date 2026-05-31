@@ -4,29 +4,35 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
+  AssignRoleToMember401,
+  AssignRoleToMember404,
+  AssignRoleToMember500,
+  AssignRoleToMemberBody,
   GetWorkspaceMembers200,
   GetWorkspaceMembers401,
   GetWorkspaceMembers404,
   GetWorkspaceMembers500,
 } from '../model'
-
-import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -414,4 +420,147 @@ export function useGetWorkspaceMembersSuspense<
   }
 
   return { ...query, queryKey: queryOptions.queryKey }
+}
+
+/**
+ * Assign or change a workspace member's role
+ * @summary Assign Role To Member
+ */
+export type assignRoleToMemberResponse204 = {
+  data: void
+  status: 204
+}
+
+export type assignRoleToMemberResponse401 = {
+  data: AssignRoleToMember401
+  status: 401
+}
+
+export type assignRoleToMemberResponse404 = {
+  data: AssignRoleToMember404
+  status: 404
+}
+
+export type assignRoleToMemberResponse500 = {
+  data: AssignRoleToMember500
+  status: 500
+}
+
+export type assignRoleToMemberResponseSuccess =
+  assignRoleToMemberResponse204 & {
+    headers: Headers
+  }
+export type assignRoleToMemberResponseError = (
+  | assignRoleToMemberResponse401
+  | assignRoleToMemberResponse404
+  | assignRoleToMemberResponse500
+) & {
+  headers: Headers
+}
+
+export type assignRoleToMemberResponse =
+  | assignRoleToMemberResponseSuccess
+  | assignRoleToMemberResponseError
+
+export const getAssignRoleToMemberUrl = (
+  workspaceId: string,
+  memberId: string,
+) => {
+  return `http://localhost:3333/api/workspaces/${workspaceId}/members/${memberId}/role`
+}
+
+export const assignRoleToMember = async (
+  workspaceId: string,
+  memberId: string,
+  assignRoleToMemberBody: AssignRoleToMemberBody,
+  options?: RequestInit,
+): Promise<assignRoleToMemberResponse> => {
+  return fetchWithAuth<assignRoleToMemberResponse>(
+    getAssignRoleToMemberUrl(workspaceId, memberId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(assignRoleToMemberBody),
+    },
+  )
+}
+
+export const getAssignRoleToMemberMutationOptions = <
+  TError =
+    | AssignRoleToMember401
+    | AssignRoleToMember404
+    | AssignRoleToMember500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof assignRoleToMember>>,
+    TError,
+    { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof assignRoleToMember>>,
+  TError,
+  { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
+  TContext
+> => {
+  const mutationKey = ['assignRoleToMember']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof assignRoleToMember>>,
+    { workspaceId: string; memberId: string; data: AssignRoleToMemberBody }
+  > = (props) => {
+    const { workspaceId, memberId, data } = props ?? {}
+
+    return assignRoleToMember(workspaceId, memberId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type AssignRoleToMemberMutationResult = NonNullable<
+  Awaited<ReturnType<typeof assignRoleToMember>>
+>
+export type AssignRoleToMemberMutationBody = AssignRoleToMemberBody
+export type AssignRoleToMemberMutationError =
+  | AssignRoleToMember401
+  | AssignRoleToMember404
+  | AssignRoleToMember500
+
+/**
+ * @summary Assign Role To Member
+ */
+export const useAssignRoleToMember = <
+  TError =
+    | AssignRoleToMember401
+    | AssignRoleToMember404
+    | AssignRoleToMember500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof assignRoleToMember>>,
+      TError,
+      { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof assignRoleToMember>>,
+  TError,
+  { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
+  TContext
+> => {
+  return useMutation(getAssignRoleToMemberMutationOptions(options), queryClient)
 }

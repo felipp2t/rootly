@@ -5,6 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './assignRoleToMember401'
+export * from './assignRoleToMember404'
+export * from './assignRoleToMember500'
+export * from './assignRoleToMemberBody'
 export * from './assignTagToFolder401'
 export * from './assignTagToFolder404'
 export * from './assignTagToFolder500'
