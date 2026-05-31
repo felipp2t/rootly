@@ -7,6 +7,7 @@ export abstract class WorkspaceMemberRepository {
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMember | null>
+  abstract findByRoleId(roleId: string): Promise<WorkspaceMember[]>
   abstract create(member: WorkspaceMember): Promise<void>
   abstract delete(id: string): Promise<void>
 }

@@ -20,6 +20,7 @@ export const deleteRoleController: FastifyPluginCallbackZod = async (app) => {
           204: z.undefined(),
           401: z.object({ message: z.string() }),
           404: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
         },
       },
@@ -47,6 +48,8 @@ export const deleteRoleController: FastifyPluginCallbackZod = async (app) => {
         switch (error.constructor.name) {
           case 'ResourceNotFoundError':
             return reply.status(404).send({ message: error.message })
+          case 'RoleInUseError':
+            return reply.status(409).send({ message: error.message })
           default:
             return reply.status(500).send({ message: 'Internal Server Error' })
         }
