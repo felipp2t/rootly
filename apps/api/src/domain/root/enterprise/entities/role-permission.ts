@@ -24,6 +24,26 @@ export const permissionAction = [
 
 export type PermissionAction = (typeof permissionAction)[number]
 
+/**
+ * Permission combinations that are not meaningful in the domain.
+ * Workspaces are created freely by any user (a workspace models a company,
+ * and a user may belong to many), so `workspace:create` cannot be gated by
+ * a role and is disallowed.
+ */
+export const disallowedPermissions: {
+  resource: PermissionResource
+  action: PermissionAction
+}[] = [{ resource: 'workspace', action: 'create' }]
+
+export function isPermissionAllowed(
+  resource: PermissionResource,
+  action: PermissionAction,
+): boolean {
+  return !disallowedPermissions.some(
+    (p) => p.resource === resource && p.action === action,
+  )
+}
+
 export interface RolePermissionProps {
   roleId: string
   resource: PermissionResource

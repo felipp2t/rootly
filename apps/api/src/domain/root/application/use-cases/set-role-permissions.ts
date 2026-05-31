@@ -1,7 +1,9 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
+import { InvalidPermissionError } from '@/core/errors/errors/invalid-permission-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import {
+  isPermissionAllowed,
   type PermissionAction,
   type PermissionResource,
   RolePermission,
@@ -42,6 +44,12 @@ export class SetRolePermissionsUseCase {
 
     if (!role || role.workspaceId !== workspaceId) {
       return left(new ResourceNotFoundError('Role'))
+    }
+
+    for (const { resource, action } of permissions) {
+      if (!isPermissionAllowed(resource, action)) {
+        return left(new InvalidPermissionError(resource, action))
+      }
     }
 
     await this.rolePermissionRepository.deleteByRoleId(roleId)
