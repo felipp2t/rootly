@@ -11,11 +11,11 @@ import {
 } from 'lucide-react'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useGetWorkspaceMembersSuspense } from '@/api/members/members'
 import type {
   GetRolePermissions200PermissionsItemAction,
   GetRolePermissions200PermissionsItemResource,
 } from '@/api/model'
-import { useGetWorkspaceMembersSuspense } from '@/api/members/members'
 import {
   getGetRolePermissionsQueryKey,
   getGetRolesQueryKey,
@@ -613,35 +613,39 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
           </p>
         </div>
       ) : (
-        <div className='border border-border divide-y divide-border'>
-          {members.map((member, i) => (
-            <div
-              key={member.id}
-              className={cn(
-                'flex items-center gap-3 px-4 py-3',
-                i % 2 === 0 ? 'bg-card' : 'bg-muted/10',
-              )}
-            >
-              <div className='size-8 shrink-0 flex items-center justify-center border border-border bg-muted/30 font-mono text-xs font-bold uppercase text-primary'>
-                {member.name.charAt(0)}
-              </div>
-              <div className='flex flex-col min-w-0 flex-1'>
-                <span className='font-mono text-xs font-semibold uppercase tracking-wide truncate'>
-                  {member.name}
-                </span>
-                <span className='font-mono text-xs text-muted-foreground truncate'>
-                  {member.email}
-                </span>
-              </div>
-              <div className='flex items-center gap-1.5 shrink-0 px-2 py-1 border border-primary/50 bg-primary/5 text-primary'>
-                <ShieldIcon className='size-3 shrink-0' />
-                <span className='font-mono text-xs font-semibold uppercase tracking-wide'>
-                  {member.roleName}
-                </span>
-              </div>
+        <ScrollArea type='always'>
+          <div className='max-h-120'>
+            <div className='border border-border divide-y divide-border'>
+              {members.map((member, i) => (
+                <div
+                  key={member.id}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3',
+                    i % 2 === 0 ? 'bg-card' : 'bg-muted/10',
+                  )}
+                >
+                  <div className='size-8 shrink-0 flex items-center justify-center border border-border bg-muted/30 font-mono text-xs font-bold uppercase text-primary'>
+                    {member.name.charAt(0)}
+                  </div>
+                  <div className='flex flex-col min-w-0 flex-1'>
+                    <span className='font-mono text-xs font-semibold uppercase tracking-wide truncate'>
+                      {member.name}
+                    </span>
+                    <span className='font-mono text-xs text-muted-foreground truncate'>
+                      {member.email}
+                    </span>
+                  </div>
+                  <div className='flex items-center gap-1.5 shrink-0 px-2 py-1 border border-primary/50 bg-primary/5 text-primary'>
+                    <ShieldIcon className='size-3 shrink-0' />
+                    <span className='font-mono text-xs font-semibold uppercase tracking-wide'>
+                      {member.roleName}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        </ScrollArea>
       )}
     </div>
   )
