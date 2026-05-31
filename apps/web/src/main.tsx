@@ -1,12 +1,12 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
-import { StrictMode } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthProvider, useAuth } from '@/lib/auth.tsx'
 import './globals.css'
-import { routeTree } from './route-tree.gen.ts'
 import { Toaster } from './components/ui/sonner.tsx'
 import { queryClient } from './lib/query.tsx'
+import { routeTree } from './route-tree.gen.ts'
 
 const router = createRouter({
   routeTree,
@@ -22,6 +22,10 @@ declare module '@tanstack/react-router' {
 }
 export function App() {
   const auth = useAuth()
+
+  useEffect(() => {
+    router.invalidate()
+  }, [auth.isAuthenticated])
 
   return <RouterProvider context={{ auth }} router={router} />
 }
