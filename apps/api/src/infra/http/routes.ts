@@ -1,4 +1,5 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
+import { assignRoleToMemberController } from './controllers/assign-role-to-member.controller.ts'
 import { assignTagToFolderController } from './controllers/assign-tag-to-folder.controller.ts'
 import { assignTagToItemController } from './controllers/assign-tag-to-item.controller.ts'
 import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
@@ -42,6 +43,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(getWorkspacesController)
   app.register(getWorkspaceController)
   app.register(getWorkspaceMembersController)
+  app.register(assignRoleToMemberController)
   app.register(getRolesController)
   app.register(createRoleController)
   app.register(deleteRoleController)

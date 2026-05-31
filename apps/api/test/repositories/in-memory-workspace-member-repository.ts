@@ -38,6 +38,16 @@ export class InMemoryWorkspaceMemberRepository
     this.items.push(member)
   }
 
+  async save(member: WorkspaceMember): Promise<void> {
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === member.id.toString(),
+    )
+
+    if (index !== -1) {
+      this.items[index] = member
+    }
+  }
+
   async delete(id: string): Promise<void> {
     const index = this.items.findIndex((member) => member.id.toString() === id)
 

@@ -76,6 +76,15 @@ export class DrizzleWorkspaceMemberRepository
     DomainEvents.dispatchEventsForAggregate(member.id)
   }
 
+  async save(member: WorkspaceMember): Promise<void> {
+    await this.db
+      .update(schema.workspaceMembers)
+      .set(DrizzleWorkspaceMemberMapper.toDrizzle(member))
+      .where(eq(schema.workspaceMembers.id, member.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(member.id)
+  }
+
   async delete(id: string): Promise<void> {
     await this.db
       .delete(schema.workspaceMembers)
