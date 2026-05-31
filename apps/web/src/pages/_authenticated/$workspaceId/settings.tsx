@@ -242,6 +242,8 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
               queryKey: getGetRolesQueryKey(workspaceId),
             })
             toast.success('Role deleted')
+          } else if (res.status === 409) {
+            toast.error('Cannot delete role: members are still assigned')
           } else {
             toast.error('Failed to delete role')
           }
@@ -295,25 +297,14 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
             type='button'
             onClick={() => setSelectedRoleId(role.id)}
             className={cn(
-              'flex items-center justify-between gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
+              'flex items-center gap-2 px-3 py-2.5 border font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer text-left',
               roleId === role.id
                 ? 'border-primary/50 bg-primary/5 text-primary'
                 : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground',
             )}
           >
-            <div className='flex items-center gap-2'>
-              <ShieldIcon className='size-3.5 shrink-0' />
-              {role.name}
-            </div>
-            {canDelete && (
-              <Trash2Icon
-                className='size-3 shrink-0 opacity-0 hover:opacity-100 text-destructive transition-opacity'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleDeleteRole(role.id)
-                }}
-              />
-            )}
+            <ShieldIcon className='size-3.5 shrink-0' />
+            {role.name}
           </button>
         ))}
 
@@ -334,6 +325,9 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
               workspaceId={workspaceId}
               roleId={roleId}
               roleName={roles.find((r) => r.id === roleId)?.name ?? ''}
+              canDelete={canDelete}
+              isDeleting={deleteRoleMutation.isPending}
+              onDelete={() => handleDeleteRole(roleId)}
             />
           </Suspense>
         ) : (
@@ -352,10 +346,16 @@ function PermissionsPanel({
   workspaceId,
   roleId,
   roleName,
+  canDelete,
+  isDeleting,
+  onDelete,
 }: {
   workspaceId: string
   roleId: string
   roleName: string
+  canDelete: boolean
+  isDeleting: boolean
+  onDelete: () => void
 }) {
   const queryClient = useQueryClient()
   const { can } = useWorkspacePermissions(workspaceId)
@@ -424,15 +424,30 @@ function PermissionsPanel({
             {roleName}
           </span>
         </div>
-        <Button
-          size='sm'
-          variant='outline'
-          className='cursor-pointer font-mono text-xs uppercase'
-          onClick={handleSave}
-          disabled={setPermsMutation.isPending || !canUpdate}
-        >
-          {setPermsMutation.isPending ? 'Saving...' : 'Save Changes'}
-        </Button>
+        <div className='flex items-center gap-2'>
+          <Button
+            size='sm'
+            variant='outline'
+            className='cursor-pointer font-mono text-xs uppercase'
+            onClick={handleSave}
+            disabled={setPermsMutation.isPending || !canUpdate}
+          >
+            {setPermsMutation.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+          {canDelete && (
+            <Button
+              size='sm'
+              variant='outline'
+              aria-label={`Delete ${roleName}`}
+              className='cursor-pointer font-mono text-xs uppercase border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive'
+              onClick={onDelete}
+              disabled={isDeleting}
+            >
+              <Trash2Icon className='size-3.5' />
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className='border border-border overflow-auto'>

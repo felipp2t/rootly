@@ -32,6 +32,7 @@ import type {
   CreateRoleBody,
   DeleteRole401,
   DeleteRole404,
+  DeleteRole409,
   DeleteRole500,
   GetRolePermissions200,
   GetRolePermissions401,
@@ -519,6 +520,11 @@ export type deleteRoleResponse404 = {
   status: 404
 }
 
+export type deleteRoleResponse409 = {
+  data: DeleteRole409
+  status: 409
+}
+
 export type deleteRoleResponse500 = {
   data: DeleteRole500
   status: 500
@@ -530,6 +536,7 @@ export type deleteRoleResponseSuccess = deleteRoleResponse204 & {
 export type deleteRoleResponseError = (
   | deleteRoleResponse401
   | deleteRoleResponse404
+  | deleteRoleResponse409
   | deleteRoleResponse500
 ) & {
   headers: Headers
@@ -558,7 +565,7 @@ export const deleteRole = async (
 }
 
 export const getDeleteRoleMutationOptions = <
-  TError = DeleteRole401 | DeleteRole404 | DeleteRole500,
+  TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -602,13 +609,14 @@ export type DeleteRoleMutationResult = NonNullable<
 export type DeleteRoleMutationError =
   | DeleteRole401
   | DeleteRole404
+  | DeleteRole409
   | DeleteRole500
 
 /**
  * @summary Delete Role
  */
 export const useDeleteRole = <
-  TError = DeleteRole401 | DeleteRole404 | DeleteRole500,
+  TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
   TContext = unknown,
 >(
   options?: {
