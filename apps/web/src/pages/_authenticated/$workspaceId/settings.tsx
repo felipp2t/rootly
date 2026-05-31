@@ -33,6 +33,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useWorkspacePermissions } from '@/hooks/use-workspace-permissions'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/settings')({
@@ -165,6 +166,10 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient()
   const { data: rolesRes } = useGetRolesSuspense(workspaceId)
   const roles = rolesRes.status === 200 ? rolesRes.data.roles : []
+  const { can } = useWorkspacePermissions(workspaceId)
+
+  const canCreate = can('role', 'create')
+  const canDelete = can('role', 'delete')
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null)
   const roleId = selectedRoleId ?? roles[0]?.id ?? null
@@ -241,7 +246,7 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
           <span className='font-mono text-xs font-semibold text-muted-foreground uppercase'>
             Roles
           </span>
-          {!creating && (
+          {!creating && canCreate && (
             <Button
               size='icon-sm'
               variant='ghost'
@@ -287,13 +292,15 @@ function RolesSectionLoader({ workspaceId }: { workspaceId: string }) {
               <ShieldIcon className='size-3.5 shrink-0' />
               {role.name}
             </div>
-            <Trash2Icon
-              className='size-3 shrink-0 opacity-0 hover:opacity-100 text-destructive transition-opacity'
-              onClick={(e) => {
-                e.stopPropagation()
-                handleDeleteRole(role.id)
-              }}
-            />
+            {canDelete && (
+              <Trash2Icon
+                className='size-3 shrink-0 opacity-0 hover:opacity-100 text-destructive transition-opacity'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeleteRole(role.id)
+                }}
+              />
+            )}
           </button>
         ))}
 
@@ -338,6 +345,8 @@ function PermissionsPanel({
   roleName: string
 }) {
   const queryClient = useQueryClient()
+  const { can } = useWorkspacePermissions(workspaceId)
+  const canUpdate = can('role', 'update')
   const { data: permsRes } = useGetRolePermissionsSuspense(workspaceId, roleId)
   const serverPermissions =
     permsRes.status === 200 ? permsRes.data.permissions : []
@@ -404,7 +413,7 @@ function PermissionsPanel({
           variant='outline'
           className='cursor-pointer font-mono text-xs uppercase'
           onClick={handleSave}
-          disabled={setPermsMutation.isPending}
+          disabled={setPermsMutation.isPending || !canUpdate}
         >
           {setPermsMutation.isPending ? 'Saving...' : 'Save Changes'}
         </Button>
@@ -449,9 +458,10 @@ function PermissionsPanel({
                 >
                   <button
                     type='button'
-                    onClick={() => togglePermission(resource, action)}
+                    onClick={canUpdate ? () => togglePermission(resource, action) : undefined}
                     className={cn(
-                      'size-4 flex items-center justify-center border transition-colors cursor-pointer',
+                      'size-4 flex items-center justify-center border transition-colors',
+                      canUpdate ? 'cursor-pointer' : 'cursor-not-allowed opacity-60',
                       checked
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border bg-transparent hover:border-primary/50',
