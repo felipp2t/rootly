@@ -4,6 +4,7 @@ import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-e
 import { type Either, left, right } from '@/core/types/either.ts'
 import {
   isPermissionAllowed,
+  normalizePermissions,
   type PermissionAction,
   type PermissionResource,
   RolePermission,
@@ -52,9 +53,15 @@ export class SetRolePermissionsUseCase {
       }
     }
 
+    const current = await this.rolePermissionRepository.findByRoleId(roleId)
+    const normalized = normalizePermissions(
+      current.map((p) => ({ resource: p.resource, action: p.action })),
+      permissions,
+    )
+
     await this.rolePermissionRepository.deleteByRoleId(roleId)
 
-    for (const { resource, action } of permissions) {
+    for (const { resource, action } of normalized) {
       const permission = RolePermission.create({ roleId, resource, action })
       await this.rolePermissionRepository.create(permission)
     }
