@@ -14,6 +14,18 @@ export class InMemoryWorkspaceMemberRepository
     return this.items.filter((member) => member.userId === userId)
   }
 
+  async findByUserIdAndWorkspaceId(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMember | null> {
+    return (
+      this.items.find(
+        (member) =>
+          member.userId === userId && member.workspaceId === workspaceId,
+      ) ?? null
+    )
+  }
+
   async create(member: WorkspaceMember): Promise<void> {
     this.items.push(member)
   }

@@ -53,6 +53,10 @@ export default defineConfig({
         name: 'set-role-permissions',
         description: 'Set role permissions use case',
       },
+      {
+        name: 'get-my-workspace-permissions',
+        description: 'Get my workspace permissions use case',
+      },
     ],
   },
   plugins: [tsconfigPaths()],
