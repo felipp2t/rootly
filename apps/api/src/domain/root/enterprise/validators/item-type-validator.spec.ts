@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { validateTypeAndContent } from './item-type-validator.ts'
+import { describe, expect, it } from 'vitest'
 import { InvalidItemTypeError } from './_errors/invalid-item-type.ts'
+import { validateTypeAndContent } from './item-type-validator.ts'
 
 describe('ItemTypeValidator', () => {
   describe('invalid type', () => {
