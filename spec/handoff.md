@@ -2,47 +2,49 @@
 
 ## 🧠 Contexto da Conversa
 
-O objetivo é implementar, na API (`apps/api`), a funcionalidade de **atribuir/alterar a role de um membro de um workspace**. A conversa começou com a verificação de que **não existe nenhuma rota nem use case para isso** hoje — apenas CRUD de roles e leitura de membros. Esta sessão foi de investigação/levantamento; nada foi implementado ainda.
+O backend e o frontend de **atribuir/alterar a role de um membro** já foram concluídos e commitados. A próxima tarefa é **refatorar a página de Settings**: hoje General/Members/Roles são alternados por `useState` dentro de um único arquivo; o objetivo é transformá-los em **rotas separadas** (file-based routing do TanStack Router), cada uma com **seu próprio skeleton de página**.
 
-## ✅ O que foi feito
+## ✅ O que foi feito (tarefas anteriores — já commitado)
 
-- Mapeados todos os controllers existentes em `apps/api/src/infra/http/controllers`. **Não há** `assign-role`, `update-member-role` ou equivalente. Relacionados a role/member que existem: `create-role`, `delete-role`, `get-roles`, `get-role-permissions`, `set-role-permissions`, `get-workspace-members`.
-- Mapeados os use cases em `apps/api/src/domain/root/application/use-cases`. **Não há** use case de atribuição/alteração de role a membro.
-- Confirmado que a entidade `WorkspaceMember` (`apps/api/src/domain/root/enterprise/entities/workspace-member.ts`) **já suporta a alteração**: possui `get roleId()` e um **setter `set roleId(value: string)` que chama `touch()`** (atualiza `updatedAt`).
-- Confirmado que o **`WorkspaceMemberRepository`** (interface em `apps/api/src/domain/root/application/repositories/workspace-member-repository.ts`) **NÃO tem método `save`/`update`** — só `findById`, `findByUserId`, `findByUserIdAndWorkspaceId`, `findByRoleId`, `findManyByWorkspaceId`, `create`, `delete`.
-- Confirmado que a impl Drizzle (`apps/api/src/infra/db/drizzle/repositories/workspace-member-repository.ts`) também **não tem `save`/`update`**.
-- Lido o template de controller `set-role-permissions.controller.ts` (rota `PUT /workspaces/:workspaceId/roles/:roleId/permissions`) — bom modelo para a nova rota (verifyJwt, params, switch de erros).
-- Lido `routes.ts` — registro central dos controllers; a nova rota precisa ser registrada aqui.
-- Lido `get-workspace-members.ts` use case — mostra o padrão de validar workspace via `workspaceRepository.findById(userId, workspaceId)` e resolver role via `workspaceRoleRepository.findById(roleId)`.
+- **Feature "assign role to member" — API + Web — completa e commitada.** 4 commits em `main` (ainda não pushados; branch 8+4 commits à frente de origin):
+  - `99e90f2` feat(api): add assign role to member endpoint
+  - `93537a3` chore: regenerate openapi spec and web http clients
+  - `b0885ff` feat(web): allow changing a member's role from settings
+  - `3efd6fc` docs: add session handoff notes for role assignment
+- API: rota `PATCH /workspaces/:workspaceId/members/:memberId/role`, use case `assign-role-to-member.ts` (+spec, 7 testes passando), controller, factory, e2e, método `save` no `WorkspaceMemberRepository` (interface + Drizzle + in-memory). 400 testes unitários passando.
+- Web: hook orval `useAssignRoleToMember` gerado; criado `apps/web/src/components/ui/dropdown-menu.tsx` (wrapper radix estilizado no padrão brutalista); `members-section.tsx` agora transforma o badge de role num dropdown picker, gated por `can('member','update')`, com spinner por linha e invalidação da query de members.
 
 ## 🔄 Estado atual
 
-Somente investigação concluída. **Nenhum código novo escrito.** A conclusão é: a feature precisa ser construída do zero (use case + método de repositório + controller + rota + factory + testes), aproveitando o setter `roleId` já existente na entidade.
+Working tree limpo, tudo commitado. **A nova tarefa ainda não foi iniciada.** A página de settings está em `apps/web/src/pages/_authenticated/$workspaceId/settings.tsx` e usa estado local:
+
+- `const [activeSection, setActiveSection] = useState<SettingsSection>('roles')` (default `'roles'`).
+- `NAV_ITEMS` = `general` (SettingsIcon), `members` (UsersIcon), `roles` "Roles & Permissions" (ShieldIcon).
+- Nav são `<button>` que chamam `setActiveSection`; conteúdo renderizado condicionalmente: `<GeneralSection/>`, `<MembersSection workspaceId/>`, `<RolesSection workspaceId/>`.
+- Layout: breadcrumb (InlineCode*), título "SETTINGS", `<nav>` de 52 (w-52) + `<Separator orientation='vertical'/>` + `<div className='flex-1 min-w-0'>` com o conteúdo.
 
 ## ⏭️ Próximos passos
 
-1. **Adicionar método de persistência ao repositório.** Incluir `abstract save(member: WorkspaceMember): Promise<void>` (ou `update`) na interface `WorkspaceMemberRepository` e implementar no `DrizzleWorkspaceMemberRepository` com `db.update(schema.workspaceMembers).set(...).where(eq(id, ...))` via o mapper `DrizzleWorkspaceMemberMapper.toDrizzle`. Atualizar também o in-memory repo em `apps/api/test/repositories/`.
-2. **Criar o use case** `assign-role-to-member.ts` (ou `update-member-role.ts`) em `apps/api/src/domain/root/application/use-cases`. Request sugerido: `{ userId, workspaceId, memberId (ou targetUserId), roleId }`. Validar: workspace existe (via `workspaceRepository.findById(userId, workspaceId)`), member existe e pertence ao workspace, role existe e pertence ao workspace (`workspaceRoleRepository.findById`). Setar `member.roleId = roleId` e chamar `repository.save(member)`. Retornar `Either<BaseError, {}>`. Considerar permissão `member:update`.
-3. **Criar o `.spec.ts`** do use case (in-memory repos + factories de `test/`), cobrindo happy path + cada erro (workspace/member/role não encontrados).
-4. **Criar o controller** `assign-role-to-member.controller.ts` seguindo o padrão de `set-role-permissions.controller.ts`. Rota sugerida: `PATCH /workspaces/:workspaceId/members/:memberId/role` com body `{ roleId }`, protegida por `verifyJwt`, resposta `204`. Mapear `ResourceNotFoundError → 404` no switch.
-5. **Criar a factory** `make-assign-role-to-member-use-case.ts` em `apps/api/src/infra/http/factories/` (wire dos repos Drizzle + `db`).
-6. **Registrar o controller** em `apps/api/src/infra/http/routes.ts`.
-7. **Criar o teste e2e** `assign-role-to-member.e2e.spec.ts` seguindo os e2e existentes.
-8. **Regenerar OpenAPI + cliente web:** `pnpm --filter api openapi` e depois `pnpm --filter web generate`.
-9. Rodar `pnpm --filter api test` e `pnpm --filter api test:e2e`.
+1. **Transformar `settings.tsx` em rota de layout.** Manter breadcrumb + título + `<nav>` lateral + separator, e trocar a `div` de conteúdo por `<Outlet/>`. O componente da rota passa a só renderizar o shell + Outlet. (TanStack file-based: um arquivo `settings.tsx` que renderiza `<Outlet/>` vira layout das rotas filhas `settings.*`.)
+2. **Criar as rotas filhas** (flat routing, seguindo o padrão do projeto em `src/pages`):
+   - `settings.index.tsx` → redirect para a aba default (ex.: `general` ou `roles`) via `beforeLoad`/`redirect`, OU renderizar General direto.
+   - `settings.general.tsx` → `createFileRoute('/_authenticated/$workspaceId/settings/general')`, renderiza `<GeneralSection/>`.
+   - `settings.members.tsx` → renderiza `<MembersSection workspaceId/>`.
+   - `settings.roles.tsx` → renderiza `<RolesSection workspaceId/>`.
+   - Pegar `workspaceId` via `Route.useParams()` em cada rota.
+3. **Converter os itens de `<nav>` de `<button>` para `<Link>`** (TanStack `Link to='/$workspaceId/settings/members' params={{workspaceId}}`). Estado ativo via `activeProps`/`activeOptions` do `Link` (substituir a lógica `isActive` baseada em `activeSection`). Manter classes: ativo = `bg-primary/10 text-primary border-l-2 border-primary`; inativo = `text-muted-foreground hover:text-foreground hover:bg-muted/30 border-l-2 border-transparent`.
+4. **Skeleton por página.** Cada rota deve exibir um skeleton enquanto carrega. Usar `pendingComponent` na rota OU `<Suspense fallback={<...Skeleton/>}>` na página. Reaproveitar/expor os skeletons já existentes: `MembersSectionSkeleton` (interno em `members-section.tsx`) e `RolesSectionSkeleton` (interno em `roles-section.tsx`) — exportá-los, ou criar skeletons de página dedicados. General provavelmente não tem skeleton (verificar `general-section.tsx`); criar um se necessário.
+5. **Remover** o `useState`/`SettingsSection`/`activeSection` e a renderização condicional do `settings.tsx`.
+6. **Regenerar a route tree** se o projeto usar geração manual (normalmente o plugin Vite do TanStack Router regenera `routeTree.gen.ts` automaticamente no dev/build — confirmar). Rodar `pnpm dev:web` ou `pnpm --filter web build` para validar.
+7. Atualizar quaisquer `<Link to='/$workspaceId/settings'>` existentes para apontar à nova sub-rota default (buscar referências).
 
 ## 📎 Informações importantes para lembrar
 
-- **Monorepo pnpm.** Sempre `pnpm`, nunca npm/yarn. API em `apps/api`. Plataforma Windows/PowerShell.
-- **Arquitetura:** Clean Architecture + DDD, camadas `core → domain → infra`. Use cases dependem de **abstrações** (classes abstratas), nunca de impls concretas; o wiring fica nas factories.
-- **Use cases retornam `Either<L, R>`** (`left`/`right`), nunca lançam. Erros em `use-cases/errors/`, estendem `Error` e implementam `BaseError`. Reutilizar `ResourceNotFoundError` de `@/core/errors/errors/resource-not-found-error.ts`.
-- **Entidades:** props via getters; campos mutáveis têm setter + `touch()`. `WorkspaceMember.roleId` já tem setter pronto. `WorkspaceMember` é `AggregateRoot` e dispara `MemberJoinedEvent` na criação (apenas quando `id` ausente).
-- **`WorkspaceMemberProps`:** `{ userId, workspaceId, roleId, createdAt, updatedAt }`.
-- **Controllers:** Fastify plugin `FastifyPluginCallbackZod`, um arquivo por rota, nome `<action>-<resource>.controller.ts`, export com mesmo nome. Instanciar use case **dentro do handler** via factory. Mapear erros com `switch (error.constructor.name)`, sempre com `default → 500`. Declarar `operationId` (camelCase), `tags`, e schemas de `response`.
-- **Auth:** rotas protegidas leem cookie `accessToken` e chamam `verifyJwt` (retorna `{ userId } | null`) no topo do handler — não há hook global. Incluir `401` no response schema.
-- **Status mapping:** já existe → 409; regra/input inválido → 400; credenciais → 401; não encontrado → 404; desconhecido → 500.
-- **DB:** Drizzle, colunas snake_case / TS camelCase. **NUNCA editar `apps/api/drizzle/`** (gerado). Esta feature **não exige migration** (só usa update de coluna existente `role_id`). Tabela: `schema.workspaceMembers`.
-- **OpenAPI:** após nova rota, rodar `pnpm --filter api openapi` e `pnpm --filter web generate` (orval) para atualizar o cliente do front.
-- **Testes:** variável do alvo sempre `sut`. In-memory repos em `test/repositories/`, factories em `test/factories/`. e2e em `*.e2e.spec.ts` ao lado do controller.
-- **MCP:** preferir Serena (retrieval/edição semântica) e Context7 (docs de libs) quando disponíveis.
-- **Decisão em aberto:** identificar o membro por `memberId` (id da tabela workspace_members) vs `targetUserId` na rota — checar como o front consome `get-workspace-members` (retorna ambos `id` e `userId`). A rota sugerida usa `memberId`.
+- **Roteamento:** TanStack Router **file-based**, diretório de rotas = `apps/web/src/pages` (não `routes`). `routeTree.gen.ts` é gerado pelo plugin Vite (`apps/web/vite.config.ts`) — **não editar manualmente**. Layout pai usa `<Outlet/>` (ver `_authenticated/layout.tsx`).
+- **Padrão de rota:** `export const Route = createFileRoute('<path>')({ component, beforeLoad?, pendingComponent? })`; params via `Route.useParams()`.
+- **Padrão de página com dados:** componentes usam hooks `useXSuspense` (orval) + `Suspense` com fallback skeleton (ver `$workspaceId/index.tsx` — `RouteComponent` envolve `RoutePage` em `<Suspense fallback={<RouteSuspense/>}>`).
+- **Componentes de seção já existem** em `apps/web/src/components/app/settings/`: `general-section.tsx`, `members-section.tsx`, `roles-section.tsx`. `MembersSection`/`RolesSection` recebem `workspaceId`; `GeneralSection` não recebe props. Members e Roles já têm `Suspense` interno + skeletons internos (`MembersSectionSkeleton`, `RolesSectionSkeleton`) — atualmente NÃO exportados.
+- **Aesthetic (manter):** brutalista/industrial — `font-mono`, UPPERCASE, `tracking-wide`, bordas sharp (sem rounded), `bg-card`/`bg-muted/10`, accent `primary`, ícones lucide. Não introduzir aesthetic nova.
+- **Stack web:** React 18 + Vite, TanStack Router/Query/Form, shadcn/ui + Tailwind CSS 4, clientes HTTP via orval (não editar `src/api/**`, são gerados). `radix-ui` (pacote unificado) disponível para primitivos.
+- **Permissões:** hook `useWorkspacePermissions(workspaceId)` → `can(resource, action)`. Roles section usa `can('role','create'|'delete')`; members usa `can('member','update')`.
+- **Comandos:** `pnpm dev:web`; lint `npx biome check --write <files>` em `apps/web`; typecheck `npx tsc --noEmit` em `apps/web`. Sempre `pnpm`.
