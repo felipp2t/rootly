@@ -3,6 +3,7 @@ import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
+import { InvalidPermissionError } from '@/core/errors/errors/invalid-permission-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
 import { RolePermission } from '../../enterprise/entities/role-permission.ts'
 import { WorkspaceRole } from '../../enterprise/entities/workspace-role.ts'
@@ -235,6 +236,66 @@ describe('SetRolePermissions', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should return InvalidPermissionError when a disallowed permission is provided', {
+    tags: ['set-role-permissions'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    const response = await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+      permissions: [{ resource: 'workspace', action: 'create' }],
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(InvalidPermissionError)
+  })
+
+  it('should not persist any permission when one entry is disallowed', {
+    tags: ['set-role-permissions'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    const existing = RolePermission.create({
+      roleId: role.id.toString(),
+      resource: 'folder',
+      action: 'read',
+    })
+    rolePermissionRepository.items.push(existing)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+      permissions: [
+        { resource: 'folder', action: 'create' },
+        { resource: 'workspace', action: 'create' },
+      ],
+    })
+
+    // existing permissions are left untouched; nothing is deleted or inserted
+    expect(rolePermissionRepository.items).toHaveLength(1)
+    expect(rolePermissionRepository.items[0].resource).toBe('folder')
+    expect(rolePermissionRepository.items[0].action).toBe('read')
   })
 
   it('should return ResourceNotFoundError when the role belongs to a different workspace', {
