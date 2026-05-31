@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeCreateTagUseCase } from '../factories/make-create-tag-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const createTagController: FastifyPluginCallbackZod = async (app) => {
   app.post(
     '/tags',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Create Tag',
         description: 'Create a new tag',
@@ -26,18 +27,6 @@ export const createTagController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { name, color, workspaceId } = request.body
 
       const useCase = makeCreateTagUseCase()

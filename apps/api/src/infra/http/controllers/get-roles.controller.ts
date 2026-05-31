@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetRolesUseCase } from '../factories/make-get-roles-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const getRolesController: FastifyPluginCallbackZod = async (app) => {
   app.get(
     '/workspaces/:workspaceId/roles',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Roles',
         description: 'List all roles for a workspace',
@@ -34,22 +35,10 @@ export const getRolesController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId } = request.params
 
       const useCase = makeGetRolesUseCase()
-      const result = await useCase.execute({ userId: payload.userId, workspaceId })
+      const result = await useCase.execute({ userId: request.userId, workspaceId })
 
       if (result.isLeft()) {
         const error = result.value

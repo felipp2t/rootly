@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeDeleteWorkspaceUseCase } from '../factories/make-delete-workspace-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
   app,
@@ -9,6 +9,7 @@ export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
   app.delete(
     '/workspaces/:workspaceId',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Delete Workspace',
         description: 'Delete a workspace. Only the owner can perform this.',
@@ -27,23 +28,11 @@ export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId } = request.params
 
       const useCase = makeDeleteWorkspaceUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
       })
 

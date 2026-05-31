@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeCreateItemUseCase } from '../factories/make-create-item-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const createItemsController: FastifyPluginCallbackZod = async (app) => {
   app.post(
     '/items',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Create Item',
         description: 'Create a new item',
@@ -29,18 +30,6 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { folderId, title, type, content, workspaceId } = request.body
 
       const createItemUseCase = makeCreateItemUseCase()

@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeAssignRoleToMemberUseCase } from '../factories/make-assign-role-to-member-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const assignRoleToMemberController: FastifyPluginCallbackZod = async (
   app,
@@ -9,6 +9,7 @@ export const assignRoleToMemberController: FastifyPluginCallbackZod = async (
   app.patch(
     '/workspaces/:workspaceId/members/:memberId/role',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Assign Role To Member',
         description: "Assign or change a workspace member's role",
@@ -30,24 +31,12 @@ export const assignRoleToMemberController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId, memberId } = request.params
       const { roleId } = request.body
 
       const useCase = makeAssignRoleToMemberUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
         memberId,
         roleId,

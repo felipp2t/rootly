@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeSetRolePermissionsUseCase } from '../factories/make-set-role-permissions-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 const permissionResourceSchema = z.enum(['workspace', 'folder', 'item', 'tag', 'member', 'role'])
 const permissionActionSchema = z.enum(['read', 'create', 'update', 'delete', 'invite', 'all'])
@@ -10,6 +10,7 @@ export const setRolePermissionsController: FastifyPluginCallbackZod = async (app
   app.put(
     '/workspaces/:workspaceId/roles/:roleId/permissions',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Set Role Permissions',
         description: 'Replace all permissions for a role',
@@ -37,24 +38,12 @@ export const setRolePermissionsController: FastifyPluginCallbackZod = async (app
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId, roleId } = request.params
       const { permissions } = request.body
 
       const useCase = makeSetRolePermissionsUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
         roleId,
         permissions,

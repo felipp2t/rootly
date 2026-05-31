@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetWorkspacesUseCase } from '../factories/make-get-workspaces-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const getWorkspacesController: FastifyPluginCallbackZod = async (
   app,
@@ -9,6 +9,7 @@ export const getWorkspacesController: FastifyPluginCallbackZod = async (
   app.get(
     '/workspaces',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Workspaces',
         description: 'Get all workspaces for the authenticated user',
@@ -34,20 +35,8 @@ export const getWorkspacesController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const useCase = makeGetWorkspacesUseCase()
-      const result = await useCase.execute({ userId: payload.userId })
+      const result = await useCase.execute({ userId: request.userId })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })

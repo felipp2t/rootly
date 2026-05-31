@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetItemsUseCase } from '../factories/make-get-items-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const getItemsController: FastifyPluginCallbackZod = async (app) => {
   app.get(
     '/items',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Items',
         description: 'List items. Optionally filter by parentId or workspaceId.',
@@ -38,22 +39,10 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { parentId, workspaceId } = request.query
 
       const useCase = makeGetItemsUseCase()
-      const result = await useCase.execute({ userId: payload.userId, parentId, workspaceId })
+      const result = await useCase.execute({ userId: request.userId, parentId, workspaceId })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })

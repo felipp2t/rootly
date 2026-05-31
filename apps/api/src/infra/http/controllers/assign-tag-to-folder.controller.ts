@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeAssignTagToFolderUseCase } from '../factories/make-assign-tag-to-folder-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const assignTagToFolderController: FastifyPluginCallbackZod = async (
   app,
@@ -9,6 +9,7 @@ export const assignTagToFolderController: FastifyPluginCallbackZod = async (
   app.patch(
     '/folders/:folderId/tags/:tagId',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Assign Tag to Folder',
         description: 'Assign an existing tag to a folder',
@@ -27,18 +28,6 @@ export const assignTagToFolderController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { folderId, tagId } = request.params
 
       const useCase = makeAssignTagToFolderUseCase()

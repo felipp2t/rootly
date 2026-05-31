@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeGetWorkspaceUseCase } from '../factories/make-get-workspace-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const getWorkspaceController: FastifyPluginCallbackZod = async (app) => {
   app.get(
     '/workspaces/:workspaceId',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Workspace',
         description: 'Get a workspace by ID for the authenticated user',
@@ -32,19 +33,11 @@ export const getWorkspaceController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) return reply.status(401).send({ message: 'Unauthorized' })
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) return reply.status(401).send({ message: 'Unauthorized' })
-
       const { workspaceId } = request.params
 
       const useCase = makeGetWorkspaceUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
       })
 

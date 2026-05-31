@@ -1,12 +1,13 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeRemoveMemberUseCase } from '../factories/make-remove-member-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const removeMemberController: FastifyPluginCallbackZod = async (app) => {
   app.delete(
     '/workspaces/:workspaceId/members/:memberId',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Remove Member',
         description: 'Remove a member from a workspace',
@@ -26,23 +27,11 @@ export const removeMemberController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId, memberId } = request.params
 
       const useCase = makeRemoveMemberUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
         memberId,
       })

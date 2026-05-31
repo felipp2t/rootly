@@ -1,7 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeResolveFolderPathUseCase } from '../factories/make-resolve-folder-path-use-case.ts'
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
 export const resolveFolderPathController: FastifyPluginCallbackZod = async (
   app,
@@ -9,6 +9,7 @@ export const resolveFolderPathController: FastifyPluginCallbackZod = async (
   app.get(
     '/folders/resolve-path',
     {
+      onRequest: verifyJwtHook,
       schema: {
         summary: 'Resolve Folder Path',
         description:
@@ -35,25 +36,13 @@ export const resolveFolderPathController: FastifyPluginCallbackZod = async (
       },
     },
     async (request, reply) => {
-      const token = request.cookies.accessToken
-
-      if (!token) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
-      const payload = await verifyJwt(token)
-
-      if (!payload) {
-        return reply.status(401).send({ message: 'Unauthorized' })
-      }
-
       const { workspaceId, path } = request.query
 
       const pathIds = (path ?? '').split('/').filter(Boolean)
 
       const useCase = makeResolveFolderPathUseCase()
       const result = await useCase.execute({
-        userId: payload.userId,
+        userId: request.userId,
         workspaceId,
         pathIds,
       })
