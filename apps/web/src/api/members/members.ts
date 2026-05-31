@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,8 +21,7 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { fetchWithAuth } from '../../lib/fetch'
+
 import type {
   AssignRoleToMember401,
   AssignRoleToMember404,
@@ -32,7 +31,13 @@ import type {
   GetWorkspaceMembers401,
   GetWorkspaceMembers404,
   GetWorkspaceMembers500,
+  RemoveMember401,
+  RemoveMember403,
+  RemoveMember404,
+  RemoveMember500,
 } from '../model'
+
+import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -563,4 +568,148 @@ export const useAssignRoleToMember = <
   TContext
 > => {
   return useMutation(getAssignRoleToMemberMutationOptions(options), queryClient)
+}
+/**
+ * Remove a member from a workspace
+ * @summary Remove Member
+ */
+export type removeMemberResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removeMemberResponse401 = {
+  data: RemoveMember401
+  status: 401
+}
+
+export type removeMemberResponse403 = {
+  data: RemoveMember403
+  status: 403
+}
+
+export type removeMemberResponse404 = {
+  data: RemoveMember404
+  status: 404
+}
+
+export type removeMemberResponse500 = {
+  data: RemoveMember500
+  status: 500
+}
+
+export type removeMemberResponseSuccess = removeMemberResponse204 & {
+  headers: Headers
+}
+export type removeMemberResponseError = (
+  | removeMemberResponse401
+  | removeMemberResponse403
+  | removeMemberResponse404
+  | removeMemberResponse500
+) & {
+  headers: Headers
+}
+
+export type removeMemberResponse =
+  | removeMemberResponseSuccess
+  | removeMemberResponseError
+
+export const getRemoveMemberUrl = (workspaceId: string, memberId: string) => {
+  return `http://localhost:3333/api/workspaces/${workspaceId}/members/${memberId}`
+}
+
+export const removeMember = async (
+  workspaceId: string,
+  memberId: string,
+  options?: RequestInit,
+): Promise<removeMemberResponse> => {
+  return fetchWithAuth<removeMemberResponse>(
+    getRemoveMemberUrl(workspaceId, memberId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
+}
+
+export const getRemoveMemberMutationOptions = <
+  TError =
+    | RemoveMember401
+    | RemoveMember403
+    | RemoveMember404
+    | RemoveMember500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeMember>>,
+    TError,
+    { workspaceId: string; memberId: string },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeMember>>,
+  TError,
+  { workspaceId: string; memberId: string },
+  TContext
+> => {
+  const mutationKey = ['removeMember']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeMember>>,
+    { workspaceId: string; memberId: string }
+  > = (props) => {
+    const { workspaceId, memberId } = props ?? {}
+
+    return removeMember(workspaceId, memberId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type RemoveMemberMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeMember>>
+>
+
+export type RemoveMemberMutationError =
+  | RemoveMember401
+  | RemoveMember403
+  | RemoveMember404
+  | RemoveMember500
+
+/**
+ * @summary Remove Member
+ */
+export const useRemoveMember = <
+  TError =
+    | RemoveMember401
+    | RemoveMember403
+    | RemoveMember404
+    | RemoveMember500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeMember>>,
+      TError,
+      { workspaceId: string; memberId: string },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeMember>>,
+  TError,
+  { workspaceId: string; memberId: string },
+  TContext
+> => {
+  return useMutation(getRemoveMemberMutationOptions(options), queryClient)
 }

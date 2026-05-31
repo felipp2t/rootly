@@ -4,15 +4,14 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-
+import { useMutation } from '@tanstack/react-query'
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
-import { useMutation } from '@tanstack/react-query'
-import { fetchWithAuth } from '../../lib/fetch'
+
 import type {
   CreateTag201,
   CreateTag401,
@@ -20,6 +19,8 @@ import type {
   CreateTag500,
   CreateTagBody,
 } from '../model'
+
+import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
