@@ -1,20 +1,29 @@
 import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
+import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
+import { RoleInUseError } from '@/core/errors/errors/role-in-use-error.ts'
 import { WorkspaceRole } from '../../enterprise/entities/workspace-role.ts'
 import { DeleteRoleUseCase } from './delete-role.ts'
 
 let workspaceRepository: InMemoryWorkspaceRepository
 let workspaceRoleRepository: InMemoryWorkspaceRoleRepository
+let workspaceMemberRepository: InMemoryWorkspaceMemberRepository
 let sut: DeleteRoleUseCase
 
 describe('DeleteRole', () => {
   beforeEach(() => {
     workspaceRepository = new InMemoryWorkspaceRepository()
     workspaceRoleRepository = new InMemoryWorkspaceRoleRepository()
-    sut = new DeleteRoleUseCase(workspaceRoleRepository, workspaceRepository)
+    workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    sut = new DeleteRoleUseCase(
+      workspaceRoleRepository,
+      workspaceRepository,
+      workspaceMemberRepository,
+    )
   })
 
   it('should be able to delete a role', {
@@ -144,5 +153,36 @@ describe('DeleteRole', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should return RoleInUseError when a member is assigned to the role', {
+    tags: ['delete-role'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    const member = makeWorkspaceMember({
+      userId: makeUser().id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+    })
+    workspaceMemberRepository.items.push(member)
+
+    const response = await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(RoleInUseError)
+    expect(workspaceRoleRepository.items).toHaveLength(1)
   })
 })
