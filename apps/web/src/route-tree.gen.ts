@@ -14,8 +14,12 @@ import { Route as SessionRouteImport } from './pages/session'
 import { Route as AuthenticatedLayoutRouteImport } from './pages/_authenticated/layout'
 import { Route as AuthenticateddashboardIndexRouteImport } from './pages/_authenticated/(dashboard)/index'
 import { Route as AuthenticatedWorkspaceIdIndexRouteImport } from './pages/_authenticated/$workspaceId/index'
-import { Route as AuthenticatedWorkspaceIdSettingsRouteImport } from './pages/_authenticated/$workspaceId/settings'
 import { Route as AuthenticatedWorkspaceIdSplatRouteImport } from './pages/_authenticated/$workspaceId/$'
+import { Route as AuthenticatedWorkspaceIdSettingsLayoutRouteImport } from './pages/_authenticated/$workspaceId/settings/layout'
+import { Route as AuthenticatedWorkspaceIdSettingsIndexRouteImport } from './pages/_authenticated/$workspaceId/settings/index'
+import { Route as AuthenticatedWorkspaceIdSettingsRolesRouteImport } from './pages/_authenticated/$workspaceId/settings/roles'
+import { Route as AuthenticatedWorkspaceIdSettingsMembersRouteImport } from './pages/_authenticated/$workspaceId/settings/members'
+import { Route as AuthenticatedWorkspaceIdSettingsGeneralRouteImport } from './pages/_authenticated/$workspaceId/settings/general'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -43,44 +47,79 @@ const AuthenticatedWorkspaceIdIndexRoute =
     path: '/$workspaceId/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
-const AuthenticatedWorkspaceIdSettingsRoute =
-  AuthenticatedWorkspaceIdSettingsRouteImport.update({
-    id: '/$workspaceId/settings',
-    path: '/$workspaceId/settings',
-    getParentRoute: () => AuthenticatedLayoutRoute,
-  } as any)
 const AuthenticatedWorkspaceIdSplatRoute =
   AuthenticatedWorkspaceIdSplatRouteImport.update({
     id: '/$workspaceId/$',
     path: '/$workspaceId/$',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedWorkspaceIdSettingsLayoutRoute =
+  AuthenticatedWorkspaceIdSettingsLayoutRouteImport.update({
+    id: '/$workspaceId/settings',
+    path: '/$workspaceId/settings',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedWorkspaceIdSettingsIndexRoute =
+  AuthenticatedWorkspaceIdSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
+  } as any)
+const AuthenticatedWorkspaceIdSettingsRolesRoute =
+  AuthenticatedWorkspaceIdSettingsRolesRouteImport.update({
+    id: '/roles',
+    path: '/roles',
+    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
+  } as any)
+const AuthenticatedWorkspaceIdSettingsMembersRoute =
+  AuthenticatedWorkspaceIdSettingsMembersRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
+  } as any)
+const AuthenticatedWorkspaceIdSettingsGeneralRoute =
+  AuthenticatedWorkspaceIdSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticateddashboardIndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
-  '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsRoute
   '/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
+  '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
+  '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
+  '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
+  '/$workspaceId/settings/': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
   '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
-  '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsRoute
   '/$workspaceId': typeof AuthenticatedWorkspaceIdIndexRoute
   '/': typeof AuthenticateddashboardIndexRoute
+  '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
+  '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
+  '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
+  '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedLayoutRouteWithChildren
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   '/_authenticated/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
-  '/_authenticated/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsRoute
   '/_authenticated/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
   '/_authenticated/(dashboard)/': typeof AuthenticateddashboardIndexRoute
+  '/_authenticated/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
+  '/_authenticated/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
+  '/_authenticated/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
+  '/_authenticated/$workspaceId/settings/': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,26 +127,37 @@ export interface FileRouteTypes {
     | '/'
     | '/session'
     | '/signup'
-    | '/$workspaceId/$'
     | '/$workspaceId/settings'
+    | '/$workspaceId/$'
     | '/$workspaceId/'
+    | '/$workspaceId/settings/general'
+    | '/$workspaceId/settings/members'
+    | '/$workspaceId/settings/roles'
+    | '/$workspaceId/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/session'
     | '/signup'
     | '/$workspaceId/$'
-    | '/$workspaceId/settings'
     | '/$workspaceId'
     | '/'
+    | '/$workspaceId/settings/general'
+    | '/$workspaceId/settings/members'
+    | '/$workspaceId/settings/roles'
+    | '/$workspaceId/settings'
   id:
     | '__root__'
     | '/_authenticated'
     | '/session'
     | '/signup'
-    | '/_authenticated/$workspaceId/$'
     | '/_authenticated/$workspaceId/settings'
+    | '/_authenticated/$workspaceId/$'
     | '/_authenticated/$workspaceId/'
     | '/_authenticated/(dashboard)/'
+    | '/_authenticated/$workspaceId/settings/general'
+    | '/_authenticated/$workspaceId/settings/members'
+    | '/_authenticated/$workspaceId/settings/roles'
+    | '/_authenticated/$workspaceId/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,13 +203,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIdIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
-    '/_authenticated/$workspaceId/settings': {
-      id: '/_authenticated/$workspaceId/settings'
-      path: '/$workspaceId/settings'
-      fullPath: '/$workspaceId/settings'
-      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsRouteImport
-      parentRoute: typeof AuthenticatedLayoutRoute
-    }
     '/_authenticated/$workspaceId/$': {
       id: '/_authenticated/$workspaceId/$'
       path: '/$workspaceId/$'
@@ -167,19 +210,79 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIdSplatRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticated/$workspaceId/settings': {
+      id: '/_authenticated/$workspaceId/settings'
+      path: '/$workspaceId/settings'
+      fullPath: '/$workspaceId/settings'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
+    '/_authenticated/$workspaceId/settings/': {
+      id: '/_authenticated/$workspaceId/settings/'
+      path: '/'
+      fullPath: '/$workspaceId/settings/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
+    }
+    '/_authenticated/$workspaceId/settings/roles': {
+      id: '/_authenticated/$workspaceId/settings/roles'
+      path: '/roles'
+      fullPath: '/$workspaceId/settings/roles'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsRolesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
+    }
+    '/_authenticated/$workspaceId/settings/members': {
+      id: '/_authenticated/$workspaceId/settings/members'
+      path: '/members'
+      fullPath: '/$workspaceId/settings/members'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsMembersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
+    }
+    '/_authenticated/$workspaceId/settings/general': {
+      id: '/_authenticated/$workspaceId/settings/general'
+      path: '/general'
+      fullPath: '/$workspaceId/settings/general'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsGeneralRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
+    }
   }
 }
 
+interface AuthenticatedWorkspaceIdSettingsLayoutRouteChildren {
+  AuthenticatedWorkspaceIdSettingsGeneralRoute: typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
+  AuthenticatedWorkspaceIdSettingsMembersRoute: typeof AuthenticatedWorkspaceIdSettingsMembersRoute
+  AuthenticatedWorkspaceIdSettingsRolesRoute: typeof AuthenticatedWorkspaceIdSettingsRolesRoute
+  AuthenticatedWorkspaceIdSettingsIndexRoute: typeof AuthenticatedWorkspaceIdSettingsIndexRoute
+}
+
+const AuthenticatedWorkspaceIdSettingsLayoutRouteChildren: AuthenticatedWorkspaceIdSettingsLayoutRouteChildren =
+  {
+    AuthenticatedWorkspaceIdSettingsGeneralRoute:
+      AuthenticatedWorkspaceIdSettingsGeneralRoute,
+    AuthenticatedWorkspaceIdSettingsMembersRoute:
+      AuthenticatedWorkspaceIdSettingsMembersRoute,
+    AuthenticatedWorkspaceIdSettingsRolesRoute:
+      AuthenticatedWorkspaceIdSettingsRolesRoute,
+    AuthenticatedWorkspaceIdSettingsIndexRoute:
+      AuthenticatedWorkspaceIdSettingsIndexRoute,
+  }
+
+const AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren =
+  AuthenticatedWorkspaceIdSettingsLayoutRoute._addFileChildren(
+    AuthenticatedWorkspaceIdSettingsLayoutRouteChildren,
+  )
+
 interface AuthenticatedLayoutRouteChildren {
+  AuthenticatedWorkspaceIdSettingsLayoutRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   AuthenticatedWorkspaceIdSplatRoute: typeof AuthenticatedWorkspaceIdSplatRoute
-  AuthenticatedWorkspaceIdSettingsRoute: typeof AuthenticatedWorkspaceIdSettingsRoute
   AuthenticatedWorkspaceIdIndexRoute: typeof AuthenticatedWorkspaceIdIndexRoute
   AuthenticateddashboardIndexRoute: typeof AuthenticateddashboardIndexRoute
 }
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticatedWorkspaceIdSettingsLayoutRoute:
+    AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren,
   AuthenticatedWorkspaceIdSplatRoute: AuthenticatedWorkspaceIdSplatRoute,
-  AuthenticatedWorkspaceIdSettingsRoute: AuthenticatedWorkspaceIdSettingsRoute,
   AuthenticatedWorkspaceIdIndexRoute: AuthenticatedWorkspaceIdIndexRoute,
   AuthenticateddashboardIndexRoute: AuthenticateddashboardIndexRoute,
 }

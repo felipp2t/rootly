@@ -176,7 +176,7 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
   )
 }
 
-function MembersSectionSkeleton() {
+export function MembersSectionSkeleton() {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between'>

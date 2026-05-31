@@ -83,7 +83,7 @@ function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
       </Link>
 
       <Link
-        to='/$workspaceId/settings'
+        to='/$workspaceId/settings/general'
         params={{ workspaceId: workspace.id }}
         className='absolute top-4 right-4'
       >

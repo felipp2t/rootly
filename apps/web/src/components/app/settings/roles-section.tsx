@@ -212,7 +212,7 @@ function RolesListSkeleton({ count = 3 }: { count?: number }) {
   )
 }
 
-function RolesSectionSkeleton() {
+export function RolesSectionSkeleton() {
   return (
     <div className='flex gap-6'>
       <div className='w-52 shrink-0 flex flex-col gap-2'>
