@@ -3,6 +3,6 @@ export function formatFileSize(bytes: number): string {
     notation: 'compact',
     style: 'unit',
     unit: 'byte',
-    unitDisplay: 'narrow'
+    unitDisplay: 'narrow',
   }).format(bytes)
 }

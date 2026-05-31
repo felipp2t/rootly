@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "format": "biome format --write",
     "preview": "vite preview",
     "generate": "pnpm --filter @rootly/api openapi && orval",
     "postgenerate": "biome format --write src/api"

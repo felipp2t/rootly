@@ -14,7 +14,6 @@ export default defineConfig({
       routesDirectory: './src/pages',
       routeToken: 'layout',
       quoteStyle: 'single',
-      
     }),
     react({
       babel: {

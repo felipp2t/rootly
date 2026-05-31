@@ -18,11 +18,7 @@ import {
   InlineCodeSeparator,
   InlineCodeText,
 } from '@/components/inline-code'
-import {
-  ItemCard,
-  ItemCardSkeleton,
-  NewItemCard,
-} from '@/components/item-card'
+import { ItemCard, ItemCardSkeleton, NewItemCard } from '@/components/item-card'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/_authenticated/$workspaceId/$')({
@@ -99,11 +95,7 @@ function RoutePage() {
       <div className='flex flex-col gap-6'>
         <InlineCodeRoot>
           <InlineCodeContent>
-            <Link
-              to='/$workspaceId'
-              params={{ workspaceId }}
-              className='group'
-            >
+            <Link to='/$workspaceId' params={{ workspaceId }} className='group'>
               <InlineCodeText className='max-w-[16ch] truncate text-primary transition-colors group-hover:text-foreground'>
                 {workspace ? workspace.name : 'Workspace'}
               </InlineCodeText>
