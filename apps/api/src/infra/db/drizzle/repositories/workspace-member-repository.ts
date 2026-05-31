@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { WorkspaceMemberRepository } from '@/domain/root/application/repositories/workspace-member-repository.ts'
 import type { WorkspaceMember } from '@/domain/root/enterprise/entities/workspace-member.ts'
@@ -29,6 +29,25 @@ export class DrizzleWorkspaceMemberRepository
       .where(eq(schema.workspaceMembers.userId, userId))
 
     return rows.map(DrizzleWorkspaceMemberMapper.toDomain)
+  }
+
+  async findByUserIdAndWorkspaceId(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMember | null> {
+    const rows = await this.db
+      .select()
+      .from(schema.workspaceMembers)
+      .where(
+        and(
+          eq(schema.workspaceMembers.userId, userId),
+          eq(schema.workspaceMembers.workspaceId, workspaceId),
+        ),
+      )
+
+    if (rows.length === 0) return null
+
+    return DrizzleWorkspaceMemberMapper.toDomain(rows[0])
   }
 
   async create(member: WorkspaceMember): Promise<void> {

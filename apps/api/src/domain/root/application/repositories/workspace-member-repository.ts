@@ -3,6 +3,10 @@ import type { WorkspaceMember } from '../../enterprise/entities/workspace-member
 export abstract class WorkspaceMemberRepository {
   abstract findById(id: string): Promise<WorkspaceMember | null>
   abstract findByUserId(userId: string): Promise<WorkspaceMember[]>
+  abstract findByUserIdAndWorkspaceId(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMember | null>
   abstract create(member: WorkspaceMember): Promise<void>
   abstract delete(id: string): Promise<void>
 }

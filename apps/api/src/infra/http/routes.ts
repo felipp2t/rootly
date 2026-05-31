@@ -12,6 +12,7 @@ import { deleteRoleController } from './controllers/delete-role.controller.ts'
 import { getFoldersController } from './controllers/get-folders.controller.ts'
 import { getItemsController } from './controllers/get-items.controller.ts'
 import { getMeController } from './controllers/get-me.controller.ts'
+import { getMyWorkspacePermissionsController } from './controllers/get-my-workspace-permissions.controller.ts'
 import { getRolePermissionsController } from './controllers/get-role-permissions.controller.ts'
 import { getRolesController } from './controllers/get-roles.controller.ts'
 import { getWorkspaceController } from './controllers/get-workspace.controller.ts'
@@ -25,6 +26,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(authenticateUserController)
   app.register(refreshAccessTokenController)
   app.register(getMeController)
+  app.register(getMyWorkspacePermissionsController)
   app.register(createAccountController)
   app.register(createFolderController)
   app.register(createItemsController)
