@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,12 +21,17 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   CreateWorkspace201,
   CreateWorkspace401,
   CreateWorkspace500,
   CreateWorkspaceBody,
+  DeleteWorkspace401,
+  DeleteWorkspace403,
+  DeleteWorkspace404,
+  DeleteWorkspace500,
   GetWorkspace200,
   GetWorkspace401,
   GetWorkspace404,
@@ -35,8 +40,6 @@ import type {
   GetWorkspaces401,
   GetWorkspaces500,
 } from '../model'
-
-import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -448,6 +451,149 @@ export function useGetWorkspacesSuspense<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
+/**
+ * Delete a workspace. Only the owner can perform this.
+ * @summary Delete Workspace
+ */
+export type deleteWorkspaceResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkspaceResponse401 = {
+  data: DeleteWorkspace401
+  status: 401
+}
+
+export type deleteWorkspaceResponse403 = {
+  data: DeleteWorkspace403
+  status: 403
+}
+
+export type deleteWorkspaceResponse404 = {
+  data: DeleteWorkspace404
+  status: 404
+}
+
+export type deleteWorkspaceResponse500 = {
+  data: DeleteWorkspace500
+  status: 500
+}
+
+export type deleteWorkspaceResponseSuccess = deleteWorkspaceResponse204 & {
+  headers: Headers
+}
+export type deleteWorkspaceResponseError = (
+  | deleteWorkspaceResponse401
+  | deleteWorkspaceResponse403
+  | deleteWorkspaceResponse404
+  | deleteWorkspaceResponse500
+) & {
+  headers: Headers
+}
+
+export type deleteWorkspaceResponse =
+  | deleteWorkspaceResponseSuccess
+  | deleteWorkspaceResponseError
+
+export const getDeleteWorkspaceUrl = (workspaceId: string) => {
+  return `http://localhost:3333/api/workspaces/${workspaceId}`
+}
+
+export const deleteWorkspace = async (
+  workspaceId: string,
+  options?: RequestInit,
+): Promise<deleteWorkspaceResponse> => {
+  return fetchWithAuth<deleteWorkspaceResponse>(
+    getDeleteWorkspaceUrl(workspaceId),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
+}
+
+export const getDeleteWorkspaceMutationOptions = <
+  TError =
+    | DeleteWorkspace401
+    | DeleteWorkspace403
+    | DeleteWorkspace404
+    | DeleteWorkspace500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteWorkspace>>,
+    TError,
+    { workspaceId: string },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteWorkspace>>,
+  TError,
+  { workspaceId: string },
+  TContext
+> => {
+  const mutationKey = ['deleteWorkspace']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteWorkspace>>,
+    { workspaceId: string }
+  > = (props) => {
+    const { workspaceId } = props ?? {}
+
+    return deleteWorkspace(workspaceId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteWorkspaceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteWorkspace>>
+>
+
+export type DeleteWorkspaceMutationError =
+  | DeleteWorkspace401
+  | DeleteWorkspace403
+  | DeleteWorkspace404
+  | DeleteWorkspace500
+
+/**
+ * @summary Delete Workspace
+ */
+export const useDeleteWorkspace = <
+  TError =
+    | DeleteWorkspace401
+    | DeleteWorkspace403
+    | DeleteWorkspace404
+    | DeleteWorkspace500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteWorkspace>>,
+      TError,
+      { workspaceId: string },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteWorkspace>>,
+  TError,
+  { workspaceId: string },
+  TContext
+> => {
+  return useMutation(getDeleteWorkspaceMutationOptions(options), queryClient)
+}
 /**
  * Get a workspace by ID for the authenticated user
  * @summary Get Workspace
