@@ -5,7 +5,11 @@ import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-worksp
 import { InMemoryWorkspaceRoleRepository } from '@test/repositories/in-memory-workspace-role-repository.ts'
 import { InvalidPermissionError } from '@/core/errors/errors/invalid-permission-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
-import { RolePermission } from '../../enterprise/entities/role-permission.ts'
+import {
+  type PermissionAction,
+  type PermissionResource,
+  RolePermission,
+} from '../../enterprise/entities/role-permission.ts'
 import { WorkspaceRole } from '../../enterprise/entities/workspace-role.ts'
 import { SetRolePermissionsUseCase } from './set-role-permissions.ts'
 
@@ -321,5 +325,150 @@ describe('SetRolePermissions', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  describe('all super-action normalization', () => {
+    function seed() {
+      const user = makeUser()
+      const workspace = makeWorkspace({ userId: user.id.toString() })
+      workspaceRepository.items.push(workspace)
+
+      const role = WorkspaceRole.create({
+        name: 'Developer',
+        workspaceId: workspace.id.toString(),
+      })
+      workspaceRoleRepository.items.push(role)
+
+      return { user, workspace, role }
+    }
+
+    function seedPermissions(
+      roleId: string,
+      permissions: { resource: PermissionResource; action: PermissionAction }[],
+    ) {
+      for (const { resource, action } of permissions) {
+        rolePermissionRepository.items.push(
+          RolePermission.create({ roleId, resource, action }),
+        )
+      }
+    }
+
+    function actionsFor(roleId: string, resource: PermissionResource) {
+      return rolePermissionRepository.items
+        .filter((p) => p.roleId === roleId && p.resource === resource)
+        .map((p) => p.action)
+        .sort()
+    }
+
+    it('should keep only all when the user checks all on a resource without it', {
+      tags: ['set-role-permissions'],
+    }, async () => {
+      const { user, workspace, role } = seed()
+      seedPermissions(role.id.toString(), [
+        { resource: 'folder', action: 'read' },
+      ])
+
+      await sut.execute({
+        userId: user.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+        permissions: [
+          { resource: 'folder', action: 'read' },
+          { resource: 'folder', action: 'all' },
+        ],
+      })
+
+      expect(actionsFor(role.id.toString(), 'folder')).toEqual(['all'])
+    })
+
+    it('should drop all and keep the granular action when added to a resource that already had all', {
+      tags: ['set-role-permissions'],
+    }, async () => {
+      const { user, workspace, role } = seed()
+      seedPermissions(role.id.toString(), [
+        { resource: 'folder', action: 'all' },
+      ])
+
+      await sut.execute({
+        userId: user.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+        permissions: [
+          { resource: 'folder', action: 'all' },
+          { resource: 'folder', action: 'read' },
+        ],
+      })
+
+      expect(actionsFor(role.id.toString(), 'folder')).toEqual(['read'])
+    })
+
+    it('should collapse to all when every granular action is selected', {
+      tags: ['set-role-permissions'],
+    }, async () => {
+      const { user, workspace, role } = seed()
+      seedPermissions(role.id.toString(), [
+        { resource: 'folder', action: 'read' },
+      ])
+
+      await sut.execute({
+        userId: user.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+        permissions: [
+          { resource: 'folder', action: 'read' },
+          { resource: 'folder', action: 'create' },
+          { resource: 'folder', action: 'update' },
+          { resource: 'folder', action: 'delete' },
+          { resource: 'folder', action: 'invite' },
+        ],
+      })
+
+      expect(actionsFor(role.id.toString(), 'folder')).toEqual(['all'])
+    })
+
+    it('should let rule 2 win: collapse to all even when granular were added to an existing all', {
+      tags: ['set-role-permissions'],
+    }, async () => {
+      const { user, workspace, role } = seed()
+      seedPermissions(role.id.toString(), [
+        { resource: 'folder', action: 'all' },
+      ])
+
+      await sut.execute({
+        userId: user.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+        permissions: [
+          { resource: 'folder', action: 'all' },
+          { resource: 'folder', action: 'read' },
+          { resource: 'folder', action: 'create' },
+          { resource: 'folder', action: 'update' },
+          { resource: 'folder', action: 'delete' },
+          { resource: 'folder', action: 'invite' },
+        ],
+      })
+
+      expect(actionsFor(role.id.toString(), 'folder')).toEqual(['all'])
+    })
+
+    it('should collapse workspace to all without requiring the disallowed create action', {
+      tags: ['set-role-permissions'],
+    }, async () => {
+      const { user, workspace, role } = seed()
+
+      await sut.execute({
+        userId: user.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+        permissions: [
+          { resource: 'workspace', action: 'read' },
+          { resource: 'workspace', action: 'update' },
+          { resource: 'workspace', action: 'delete' },
+          { resource: 'workspace', action: 'invite' },
+        ],
+      })
+
+      expect(actionsFor(role.id.toString(), 'workspace')).toEqual(['all'])
+    })
   })
 })
