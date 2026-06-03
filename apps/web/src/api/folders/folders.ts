@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,7 +21,8 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   AssignTagToFolder401,
   AssignTagToFolder404,
@@ -42,8 +43,6 @@ import type {
   ResolveFolderPath500,
   ResolveFolderPathParams,
 } from '../model'
-
-import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 

@@ -39,6 +39,10 @@ import type {
   GetWorkspaces200,
   GetWorkspaces401,
   GetWorkspaces500,
+  UpdateWorkspace401,
+  UpdateWorkspace404,
+  UpdateWorkspace500,
+  UpdateWorkspaceBody,
 } from '../model'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -451,6 +455,137 @@ export function useGetWorkspacesSuspense<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
+/**
+ * Update a workspace's name.
+ * @summary Update Workspace
+ */
+export type updateWorkspaceResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updateWorkspaceResponse401 = {
+  data: UpdateWorkspace401
+  status: 401
+}
+
+export type updateWorkspaceResponse404 = {
+  data: UpdateWorkspace404
+  status: 404
+}
+
+export type updateWorkspaceResponse500 = {
+  data: UpdateWorkspace500
+  status: 500
+}
+
+export type updateWorkspaceResponseSuccess = updateWorkspaceResponse204 & {
+  headers: Headers
+}
+export type updateWorkspaceResponseError = (
+  | updateWorkspaceResponse401
+  | updateWorkspaceResponse404
+  | updateWorkspaceResponse500
+) & {
+  headers: Headers
+}
+
+export type updateWorkspaceResponse =
+  | updateWorkspaceResponseSuccess
+  | updateWorkspaceResponseError
+
+export const getUpdateWorkspaceUrl = (workspaceId: string) => {
+  return `http://localhost:3333/api/workspaces/${workspaceId}`
+}
+
+export const updateWorkspace = async (
+  workspaceId: string,
+  updateWorkspaceBody: UpdateWorkspaceBody,
+  options?: RequestInit,
+): Promise<updateWorkspaceResponse> => {
+  return fetchWithAuth<updateWorkspaceResponse>(
+    getUpdateWorkspaceUrl(workspaceId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(updateWorkspaceBody),
+    },
+  )
+}
+
+export const getUpdateWorkspaceMutationOptions = <
+  TError = UpdateWorkspace401 | UpdateWorkspace404 | UpdateWorkspace500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorkspace>>,
+    TError,
+    { workspaceId: string; data: UpdateWorkspaceBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateWorkspace>>,
+  TError,
+  { workspaceId: string; data: UpdateWorkspaceBody },
+  TContext
+> => {
+  const mutationKey = ['updateWorkspace']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateWorkspace>>,
+    { workspaceId: string; data: UpdateWorkspaceBody }
+  > = (props) => {
+    const { workspaceId, data } = props ?? {}
+
+    return updateWorkspace(workspaceId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type UpdateWorkspaceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateWorkspace>>
+>
+export type UpdateWorkspaceMutationBody = UpdateWorkspaceBody
+export type UpdateWorkspaceMutationError =
+  | UpdateWorkspace401
+  | UpdateWorkspace404
+  | UpdateWorkspace500
+
+/**
+ * @summary Update Workspace
+ */
+export const useUpdateWorkspace = <
+  TError = UpdateWorkspace401 | UpdateWorkspace404 | UpdateWorkspace500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateWorkspace>>,
+      TError,
+      { workspaceId: string; data: UpdateWorkspaceBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateWorkspace>>,
+  TError,
+  { workspaceId: string; data: UpdateWorkspaceBody },
+  TContext
+> => {
+  return useMutation(getUpdateWorkspaceMutationOptions(options), queryClient)
+}
 /**
  * Delete a workspace. Only the owner can perform this.
  * @summary Delete Workspace

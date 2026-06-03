@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,6 +18,7 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { fetchWithAuth } from '../../lib/fetch'
 
