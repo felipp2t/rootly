@@ -24,6 +24,7 @@ import { refreshAccessTokenController } from './controllers/refresh-access-token
 import { removeMemberController } from './controllers/remove-member.controller.ts'
 import { resolveFolderPathController } from './controllers/resolve-folder-path.controller.ts'
 import { setRolePermissionsController } from './controllers/set-role-permissions.controller.ts'
+import { updateWorkspaceController } from './controllers/update-workspace.controller.ts'
 import { uploadItemController } from './controllers/upload-item.controller.ts'
 
 export const routes: FastifyPluginCallbackZod = async (app) => {
@@ -37,6 +38,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(uploadItemController)
   app.register(createTagController)
   app.register(createWorkspaceController)
+  app.register(updateWorkspaceController)
   app.register(deleteWorkspaceController)
   app.register(assignTagToFolderController)
   app.register(assignTagToItemController)

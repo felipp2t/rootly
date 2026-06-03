@@ -6,5 +6,6 @@ export abstract class WorkspaceRepository {
   abstract findManyByIds(ids: string[]): Promise<Workspace[]>
   abstract findMany(userId?: string): Promise<Workspace[]>
   abstract create(workspace: Workspace): Promise<void>
+  abstract save(workspace: Workspace): Promise<void>
   abstract delete(id: string): Promise<void>
 }

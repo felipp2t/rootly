@@ -33,6 +33,16 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     this.items.push(workspace)
   }
 
+  async save(workspace: Workspace): Promise<void> {
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === workspace.id.toString(),
+    )
+
+    if (index !== -1) {
+      this.items[index] = workspace
+    }
+  }
+
   async delete(id: string): Promise<void> {
     const workspaceIndex = this.items.findIndex(
       (workspace) => workspace.id.toString() === id,

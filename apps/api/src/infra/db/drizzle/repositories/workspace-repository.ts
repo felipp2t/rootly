@@ -68,6 +68,13 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
       .values(DrizzleWorkspaceMapper.toDrizzle(workspace))
   }
 
+  async save(workspace: Workspace): Promise<void> {
+    await this.db
+      .update(schema.workspaces)
+      .set(DrizzleWorkspaceMapper.toDrizzle(workspace))
+      .where(eq(schema.workspaces.id, workspace.id.toString()))
+  }
+
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.workspaces).where(eq(schema.workspaces.id, id))
   }
