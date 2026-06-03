@@ -8,5 +8,6 @@ export const Route = createFileRoute(
 })
 
 function RouteComponent() {
-  return <GeneralSection />
+  const { workspaceId } = Route.useParams()
+  return <GeneralSection workspaceId={workspaceId} />
 }
