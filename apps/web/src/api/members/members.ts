@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,7 +21,8 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   AssignRoleToMember401,
   AssignRoleToMember404,
@@ -31,13 +32,17 @@ import type {
   GetWorkspaceMembers401,
   GetWorkspaceMembers404,
   GetWorkspaceMembers500,
+  InviteUser201,
+  InviteUser401,
+  InviteUser403,
+  InviteUser404,
+  InviteUser500,
+  InviteUserBody,
   RemoveMember401,
   RemoveMember403,
   RemoveMember404,
   RemoveMember500,
 } from '../model'
-
-import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -712,4 +717,139 @@ export const useRemoveMember = <
   TContext
 > => {
   return useMutation(getRemoveMemberMutationOptions(options), queryClient)
+}
+/**
+ * Invite a user to a workspace by email
+ * @summary Invite User
+ */
+export type inviteUserResponse201 = {
+  data: InviteUser201
+  status: 201
+}
+
+export type inviteUserResponse401 = {
+  data: InviteUser401
+  status: 401
+}
+
+export type inviteUserResponse403 = {
+  data: InviteUser403
+  status: 403
+}
+
+export type inviteUserResponse404 = {
+  data: InviteUser404
+  status: 404
+}
+
+export type inviteUserResponse500 = {
+  data: InviteUser500
+  status: 500
+}
+
+export type inviteUserResponseSuccess = inviteUserResponse201 & {
+  headers: Headers
+}
+export type inviteUserResponseError = (
+  | inviteUserResponse401
+  | inviteUserResponse403
+  | inviteUserResponse404
+  | inviteUserResponse500
+) & {
+  headers: Headers
+}
+
+export type inviteUserResponse =
+  | inviteUserResponseSuccess
+  | inviteUserResponseError
+
+export const getInviteUserUrl = (workspaceId: string) => {
+  return `http://localhost:3333/api/workspaces/${workspaceId}/invites`
+}
+
+export const inviteUser = async (
+  workspaceId: string,
+  inviteUserBody: InviteUserBody,
+  options?: RequestInit,
+): Promise<inviteUserResponse> => {
+  return fetchWithAuth<inviteUserResponse>(getInviteUserUrl(workspaceId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(inviteUserBody),
+  })
+}
+
+export const getInviteUserMutationOptions = <
+  TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof inviteUser>>,
+    TError,
+    { workspaceId: string; data: InviteUserBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof inviteUser>>,
+  TError,
+  { workspaceId: string; data: InviteUserBody },
+  TContext
+> => {
+  const mutationKey = ['inviteUser']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof inviteUser>>,
+    { workspaceId: string; data: InviteUserBody }
+  > = (props) => {
+    const { workspaceId, data } = props ?? {}
+
+    return inviteUser(workspaceId, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type InviteUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof inviteUser>>
+>
+export type InviteUserMutationBody = InviteUserBody
+export type InviteUserMutationError =
+  | InviteUser401
+  | InviteUser403
+  | InviteUser404
+  | InviteUser500
+
+/**
+ * @summary Invite User
+ */
+export const useInviteUser = <
+  TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof inviteUser>>,
+      TError,
+      { workspaceId: string; data: InviteUserBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof inviteUser>>,
+  TError,
+  { workspaceId: string; data: InviteUserBody },
+  TContext
+> => {
+  return useMutation(getInviteUserMutationOptions(options), queryClient)
 }

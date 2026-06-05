@@ -4,16 +4,28 @@ import {
   Loader2Icon,
   ShieldIcon,
   Trash2Icon,
+  UserPlusIcon,
 } from 'lucide-react'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { toast } from 'sonner'
 import {
   getGetWorkspaceMembersQueryKey,
   useAssignRoleToMember,
   useGetWorkspaceMembersSuspense,
+  useInviteUser,
   useRemoveMember,
 } from '@/api/members/members'
 import { useGetRolesSuspense } from '@/api/roles/roles'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -22,10 +34,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Field } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspacePermissions } from '@/hooks/use-workspace-permissions'
 import { cn } from '@/lib/utils'
+
+type Role = { id: string; name: string }
 
 export function MembersSection({ workspaceId }: { workspaceId: string }) {
   return (
@@ -46,6 +63,7 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
   const { can } = useWorkspacePermissions(workspaceId)
   const canUpdate = can('member', 'update')
   const canDelete = can('member', 'delete')
+  const canInvite = can('member', 'invite')
 
   const assignRoleMutation = useAssignRoleToMember()
   const removeMemberMutation = useRemoveMember()
@@ -100,9 +118,14 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
         <span className='font-mono text-sm font-bold uppercase tracking-wide'>
           Members
         </span>
-        <span className='font-mono text-xs text-muted-foreground'>
-          {members.length} {members.length === 1 ? 'member' : 'members'}
-        </span>
+        <div className='flex items-center gap-3'>
+          <span className='font-mono text-xs text-muted-foreground'>
+            {members.length} {members.length === 1 ? 'member' : 'members'}
+          </span>
+          {canInvite && (
+            <InviteMemberDialog workspaceId={workspaceId} roles={roles} />
+          )}
+        </div>
       </div>
 
       {members.length === 0 ? (
@@ -224,6 +247,156 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
         </ScrollArea>
       )}
     </div>
+  )
+}
+
+function InviteMemberDialog({
+  workspaceId,
+  roles,
+}: {
+  workspaceId: string
+  roles: Role[]
+}) {
+  const queryClient = useQueryClient()
+  const inviteMutation = useInviteUser()
+
+  const [open, setOpen] = useState(false)
+  const [email, setEmail] = useState('')
+  const [roleId, setRoleId] = useState('')
+
+  const selectedRole = roles.find((role) => role.id === roleId)
+  const canSubmit = email.trim().length > 0 && roleId.length > 0
+
+  function reset() {
+    setEmail('')
+    setRoleId('')
+  }
+
+  async function handleInvite() {
+    if (!canSubmit) return
+
+    const response = await inviteMutation.mutateAsync({
+      workspaceId,
+      data: { email: email.trim(), roleId },
+    })
+
+    if (response.status === 201) {
+      queryClient.invalidateQueries({
+        queryKey: getGetWorkspaceMembersQueryKey(workspaceId),
+      })
+      toast.success(`Invite sent to "${email.trim()}"`)
+      setOpen(false)
+      reset()
+    } else if (response.status === 404) {
+      toast.error('No user found with this email')
+    } else if (response.status === 403) {
+      toast.error('You are not allowed to invite members')
+    } else {
+      toast.error('Failed to send invite. Please try again later.')
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        if (!next) reset()
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button size='sm' className='cursor-pointer'>
+          <UserPlusIcon className='size-3.5' />
+          INVITE
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite member</DialogTitle>
+          <DialogDescription>
+            Invite an existing user to this workspace by email.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          className='flex flex-col gap-4 pt-2'
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleInvite()
+          }}
+        >
+          <Field>
+            <Label htmlFor='invite-email' className='text-xs'>
+              Email
+            </Label>
+            <Input
+              id='invite-email'
+              type='email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete='off'
+              placeholder='member@example.com'
+              className={cn(
+                'border border-border rounded-none focus-visible:outline-none focus-visible:ring-0',
+              )}
+            />
+          </Field>
+
+          <Field>
+            <Label className='text-xs'>Role</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                type='button'
+                className='flex items-center justify-between gap-1.5 px-2.5 py-2 border border-border bg-card outline-none transition-colors cursor-pointer hover:bg-muted/30 data-[state=open]:bg-muted/30'
+              >
+                <span className='font-mono text-xs uppercase tracking-wide'>
+                  {selectedRole?.name ?? 'Select a role'}
+                </span>
+                <ChevronDownIcon className='size-3 shrink-0' />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='start' className='min-w-44'>
+                <DropdownMenuLabel>Assign role</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <ScrollArea type='always'>
+                  <div className='max-h-120'>
+                    {roles.map((role) => (
+                      <DropdownMenuCheckboxItem
+                        key={role.id}
+                        checked={role.id === roleId}
+                        onSelect={() => setRoleId(role.id)}
+                      >
+                        {role.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </div>
+                </ScrollArea>
+                {roles.length === 0 && (
+                  <p className='px-2.5 py-2 font-mono text-xs text-muted-foreground'>
+                    No roles available
+                  </p>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Field>
+
+          <DialogFooter showCloseButton>
+            <Button
+              type='submit'
+              disabled={!canSubmit || inviteMutation.isPending}
+              className='cursor-pointer'
+            >
+              {inviteMutation.isPending ? (
+                <Loader2Icon className='size-4 animate-spin' />
+              ) : (
+                <UserPlusIcon className='size-4' />
+              )}
+              SEND INVITE
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
