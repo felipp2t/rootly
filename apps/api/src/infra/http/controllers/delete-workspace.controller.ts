@@ -6,17 +6,21 @@ import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
   app,
 ) => {
-  app.delete(
-    '/workspaces/:workspaceId',
+  app.post(
+    '/workspaces/:workspaceId/delete',
     {
       onRequest: verifyJwtHook,
       schema: {
         summary: 'Delete Workspace',
-        description: 'Delete a workspace. Only the owner can perform this.',
+        description:
+          'Delete a workspace. Only the owner can perform this, and must confirm with their password.',
         operationId: 'deleteWorkspace',
         tags: ['Workspaces'],
         params: z.object({
           workspaceId: z.string(),
+        }),
+        body: z.object({
+          password: z.string().min(1),
         }),
         response: {
           204: z.undefined(),
@@ -29,11 +33,13 @@ export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
     },
     async (request, reply) => {
       const { workspaceId } = request.params
+      const { password } = request.body
 
       const useCase = makeDeleteWorkspaceUseCase()
       const result = await useCase.execute({
         userId: request.userId,
         workspaceId,
+        password,
       })
 
       if (result.isLeft()) {
@@ -43,6 +49,8 @@ export const deleteWorkspaceController: FastifyPluginCallbackZod = async (
             return reply.status(404).send({ message: error.message })
           case 'NotAllowedError':
             return reply.status(403).send({ message: error.message })
+          case 'WrongCredentialsError':
+            return reply.status(401).send({ message: error.message })
           default:
             return reply.status(500).send({ message: 'Internal Server Error' })
         }

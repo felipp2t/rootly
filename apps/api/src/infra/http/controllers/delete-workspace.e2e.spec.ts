@@ -3,7 +3,7 @@ import { app } from '@/app.ts'
 import { db } from '@/infra/db/drizzle/index.ts'
 import { schema } from '@/infra/db/drizzle/schema/index.ts'
 
-describe('DELETE /workspaces/:workspaceId', () => {
+describe('POST /workspaces/:workspaceId/delete', () => {
   beforeAll(async () => {
     await app.ready()
   })
@@ -65,9 +65,10 @@ describe('DELETE /workspaces/:workspaceId', () => {
     const workspaceId = await createWorkspace(cookieHeader)
 
     const response = await app.inject({
-      method: 'DELETE',
-      url: `/api/workspaces/${workspaceId}`,
+      method: 'POST',
+      url: `/api/workspaces/${workspaceId}/delete`,
       headers: { cookie: cookieHeader },
+      payload: { password: '123456' },
     })
 
     expect(response.statusCode).toBe(204)
@@ -85,9 +86,10 @@ describe('DELETE /workspaces/:workspaceId', () => {
     const workspaceId = await createWorkspace(cookieHeader)
 
     await app.inject({
-      method: 'DELETE',
-      url: `/api/workspaces/${workspaceId}`,
+      method: 'POST',
+      url: `/api/workspaces/${workspaceId}/delete`,
       headers: { cookie: cookieHeader },
+      payload: { password: '123456' },
     })
 
     const roles = await db
@@ -120,9 +122,10 @@ describe('DELETE /workspaces/:workspaceId', () => {
       .values({ userId: memberUserId, workspaceId, roleId: role.id })
 
     const response = await app.inject({
-      method: 'DELETE',
-      url: `/api/workspaces/${workspaceId}`,
+      method: 'POST',
+      url: `/api/workspaces/${workspaceId}/delete`,
       headers: { cookie: memberCookie },
+      payload: { password: '123456' },
     })
 
     expect(response.statusCode).toBe(403)
@@ -140,9 +143,10 @@ describe('DELETE /workspaces/:workspaceId', () => {
     const { cookieHeader } = await createUserAndAuthenticate()
 
     const response = await app.inject({
-      method: 'DELETE',
-      url: '/api/workspaces/non-existent-workspace-id',
+      method: 'POST',
+      url: '/api/workspaces/non-existent-workspace-id/delete',
       headers: { cookie: cookieHeader },
+      payload: { password: '123456' },
     })
 
     expect(response.statusCode).toBe(404)
@@ -151,8 +155,9 @@ describe('DELETE /workspaces/:workspaceId', () => {
 
   it('should return 401 when no access token cookie is present', async () => {
     const response = await app.inject({
-      method: 'DELETE',
-      url: '/api/workspaces/any-workspace-id',
+      method: 'POST',
+      url: '/api/workspaces/any-workspace-id/delete',
+      payload: { password: '123456' },
     })
 
     expect(response.statusCode).toBe(401)
