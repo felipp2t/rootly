@@ -10,6 +10,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
+import { registerSubscribers } from './infra/events/register-subscribers.ts'
 import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -69,6 +70,8 @@ app.setSerializerCompiler(serializerCompiler)
 app.get('/health', async () => {
   return { status: 'ok' }
 })
+
+registerSubscribers()
 
 app.register(routes, { prefix: '/api' })
 
