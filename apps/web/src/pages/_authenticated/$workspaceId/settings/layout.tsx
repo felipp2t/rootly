@@ -48,12 +48,6 @@ function RouteComponent() {
               </InlineCodeText>
             </Link>
             <InlineCodeSeparator />
-            <Link to='/$workspaceId' params={{ workspaceId }} className='group'>
-              <InlineCodeText className='transition-colors group-hover:text-foreground'>
-                {workspaceId}
-              </InlineCodeText>
-            </Link>
-            <InlineCodeSeparator />
             <InlineCodeText className='text-primary'>Settings</InlineCodeText>
             <InlineCodeSeparator />
           </InlineCodeContent>
