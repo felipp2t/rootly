@@ -419,7 +419,6 @@ describe('SetRolePermissions', () => {
           { resource: 'folder', action: 'create' },
           { resource: 'folder', action: 'update' },
           { resource: 'folder', action: 'delete' },
-          { resource: 'folder', action: 'invite' },
         ],
       })
 
@@ -444,7 +443,6 @@ describe('SetRolePermissions', () => {
           { resource: 'folder', action: 'create' },
           { resource: 'folder', action: 'update' },
           { resource: 'folder', action: 'delete' },
-          { resource: 'folder', action: 'invite' },
         ],
       })
 
@@ -464,7 +462,6 @@ describe('SetRolePermissions', () => {
           { resource: 'workspace', action: 'read' },
           { resource: 'workspace', action: 'update' },
           { resource: 'workspace', action: 'delete' },
-          { resource: 'workspace', action: 'invite' },
         ],
       })
 

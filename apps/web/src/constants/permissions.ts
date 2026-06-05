@@ -25,10 +25,17 @@ export const ACTIONS = [
   'all',
 ] as const
 
-// Combinations that are not meaningful in the domain. Workspaces are created
-// freely by any user, so `workspace:create` cannot be gated by a role.
+// Combinations that are not meaningful in the domain.
+// - Workspaces are created freely by any user, so `workspace:create` cannot be
+//   gated by a role.
+// - `invite` only applies to members, so it is disallowed for every other
+//   resource.
 const DISALLOWED_PERMISSIONS: { resource: Resource; action: Action }[] = [
   { resource: 'workspace', action: 'create' },
+  ...RESOURCES.filter((resource) => resource !== 'member').map((resource) => ({
+    resource,
+    action: 'invite' as const,
+  })),
 ]
 
 export function isPermissionAllowed(

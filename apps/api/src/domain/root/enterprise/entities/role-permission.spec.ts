@@ -1,5 +1,10 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
-import { permissionAction, permissionResource, RolePermission } from './role-permission.ts'
+import {
+  isPermissionAllowed,
+  permissionAction,
+  permissionResource,
+  RolePermission,
+} from './role-permission.ts'
 
 describe('RolePermission', () => {
   it('should create a role permission with default timestamps', () => {
@@ -14,9 +19,13 @@ describe('RolePermission', () => {
     expect(permission.roleId).toBe('role-1')
     expect(permission.resource).toBe('workspace')
     expect(permission.action).toBe('all')
-    expect(permission.createdAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
+    expect(permission.createdAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
     expect(permission.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
-    expect(permission.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
+    expect(permission.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
     expect(permission.updatedAt.getTime()).toBeLessThanOrEqual(after.getTime())
   })
 
@@ -66,10 +75,27 @@ describe('RolePermission', () => {
     expect(permissionAction).toHaveLength(6)
   })
 
+  it('should disallow workspace:create', () => {
+    expect(isPermissionAllowed('workspace', 'create')).toBe(false)
+  })
+
+  it('should allow member:invite but disallow invite for every other resource', () => {
+    expect(isPermissionAllowed('member', 'invite')).toBe(true)
+
+    for (const resource of permissionResource) {
+      if (resource === 'member') continue
+      expect(isPermissionAllowed(resource, 'invite')).toBe(false)
+    }
+  })
+
   it('should support all resource and action combinations', () => {
     for (const resource of permissionResource) {
       for (const action of permissionAction) {
-        const permission = RolePermission.create({ roleId: 'role-1', resource, action })
+        const permission = RolePermission.create({
+          roleId: 'role-1',
+          resource,
+          action,
+        })
         expect(permission.resource).toBe(resource)
         expect(permission.action).toBe(action)
       }

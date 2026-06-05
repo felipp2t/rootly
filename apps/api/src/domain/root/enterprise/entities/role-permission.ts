@@ -26,14 +26,22 @@ export type PermissionAction = (typeof permissionAction)[number]
 
 /**
  * Permission combinations that are not meaningful in the domain.
- * Workspaces are created freely by any user (a workspace models a company,
- * and a user may belong to many), so `workspace:create` cannot be gated by
- * a role and is disallowed.
+ *
+ * - Workspaces are created freely by any user (a workspace models a company,
+ *   and a user may belong to many), so `workspace:create` cannot be gated by
+ *   a role and is disallowed.
+ * - `invite` only applies to members (you invite people into a workspace),
+ *   so it is disallowed for every resource other than `member`.
  */
 export const disallowedPermissions: {
   resource: PermissionResource
   action: PermissionAction
-}[] = [{ resource: 'workspace', action: 'create' }]
+}[] = [
+  { resource: 'workspace', action: 'create' },
+  ...permissionResource
+    .filter((resource) => resource !== 'member')
+    .map((resource) => ({ resource, action: 'invite' as const })),
+]
 
 export function isPermissionAllowed(
   resource: PermissionResource,
@@ -74,9 +82,7 @@ function normalizeResourceActions(
 ): Set<PermissionAction> {
   const hadAll = current.has('all')
   const hasAll = incoming.has('all')
-  const granular = new Set(
-    [...incoming].filter((action) => action !== 'all'),
-  )
+  const granular = new Set([...incoming].filter((action) => action !== 'all'))
 
   // Rule 3: the user just checked `all` → keep only `all`.
   if (hasAll && !hadAll) {
