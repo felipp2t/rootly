@@ -1,4 +1,5 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
+import { acceptInviteController } from './controllers/accept-invite.controller.ts'
 import { assignRoleToMemberController } from './controllers/assign-role-to-member.controller.ts'
 import { assignTagToFolderController } from './controllers/assign-tag-to-folder.controller.ts'
 import { assignTagToItemController } from './controllers/assign-tag-to-item.controller.ts'
@@ -10,6 +11,7 @@ import { createRoleController } from './controllers/create-role.controller.ts'
 import { createTagController } from './controllers/create-tag.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
 import { createWsTicketController } from './controllers/create-ws-ticket.controller.ts'
+import { declineInviteController } from './controllers/decline-invite.controller.ts'
 import { deleteRoleController } from './controllers/delete-role.controller.ts'
 import { deleteWorkspaceController } from './controllers/delete-workspace.controller.ts'
 import { getFoldersController } from './controllers/get-folders.controller.ts'
@@ -56,6 +58,8 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(assignRoleToMemberController)
   app.register(removeMemberController)
   app.register(inviteUserController)
+  app.register(acceptInviteController)
+  app.register(declineInviteController)
   app.register(getNotificationsController)
   app.register(readNotificationController)
   app.register(createWsTicketController)
