@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { FoldersIcon } from 'lucide-react'
+import { NotificationBell } from '@/components/notification-bell'
 
 export function Header() {
   return (
@@ -13,6 +14,8 @@ export function Header() {
         </Link>
 
         <div className='flex-1' />
+
+        <NotificationBell />
 
         <div className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300'>
           U
