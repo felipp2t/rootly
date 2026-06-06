@@ -8,6 +8,10 @@ export abstract class WorkspaceInviteRepository {
   abstract findMany(
     status?: WorkspaceInviteStatus[],
   ): Promise<WorkspaceInvite[]>
+  abstract findManyByWorkspaceId(
+    workspaceId: string,
+    status?: WorkspaceInviteStatus[],
+  ): Promise<WorkspaceInvite[]>
   abstract create(workspace: WorkspaceInvite): Promise<void>
   abstract save(workspace: WorkspaceInvite): Promise<void>
   abstract revoke(id: string): Promise<void>

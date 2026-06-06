@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { WorkspaceInviteRepository } from '@/domain/root/application/repositories/workspace-invite-repository.ts'
 import type {
@@ -37,6 +37,25 @@ export class DrizzleWorkspaceInviteRepository
         statuses && statuses.length > 0
           ? inArray(schema.workspaceInvites.status, statuses)
           : undefined,
+      )
+
+    return workspaceInvites.map(DrizzleWorkspaceInviteMapper.toDomain)
+  }
+
+  async findManyByWorkspaceId(
+    workspaceId: string,
+    statuses?: WorkspaceInviteStatus[],
+  ): Promise<WorkspaceInvite[]> {
+    const workspaceInvites = await this.db
+      .select()
+      .from(schema.workspaceInvites)
+      .where(
+        statuses && statuses.length > 0
+          ? and(
+              eq(schema.workspaceInvites.workspaceId, workspaceId),
+              inArray(schema.workspaceInvites.status, statuses),
+            )
+          : eq(schema.workspaceInvites.workspaceId, workspaceId),
       )
 
     return workspaceInvites.map(DrizzleWorkspaceInviteMapper.toDomain)

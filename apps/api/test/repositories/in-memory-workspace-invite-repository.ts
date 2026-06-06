@@ -21,6 +21,17 @@ export class InMemoryWorkspaceInviteRepository
     return this.items.filter((workspace) => status.includes(workspace.status))
   }
 
+  async findManyByWorkspaceId(
+    workspaceId: string,
+    status?: WorkspaceInviteStatus[],
+  ): Promise<WorkspaceInvite[]> {
+    return this.items.filter(
+      (invite) =>
+        invite.workspaceId === workspaceId &&
+        (status === undefined || status.includes(invite.status)),
+    )
+  }
+
   async create(workspace: WorkspaceInvite): Promise<void> {
     this.items.push(workspace)
   }
