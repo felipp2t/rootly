@@ -20,8 +20,12 @@ describe('Notification', () => {
     expect(notification.metadata).toEqual({ type: 'info' })
     expect(notification.recipientId).toBe(recipientId)
     expect(notification.readAt).toBeUndefined()
-    expect(notification.createdAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
-    expect(notification.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
+    expect(notification.createdAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
+    expect(notification.createdAt.getTime()).toBeLessThanOrEqual(
+      after.getTime(),
+    )
   })
 
   it('should create a notification with explicit createdAt', () => {
@@ -95,7 +99,9 @@ describe('Notification', () => {
     const after = new Date()
 
     expect(notification.readAt).toBeDefined()
-    expect(notification.readAt!.getTime()).toBeGreaterThanOrEqual(before.getTime())
+    expect(notification.readAt!.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
     expect(notification.readAt!.getTime()).toBeLessThanOrEqual(after.getTime())
   })
 
@@ -113,6 +119,8 @@ describe('Notification', () => {
     notification.read()
 
     expect(notification.readAt).toBeDefined()
-    expect(notification.readAt!.getTime()).toBeGreaterThanOrEqual(firstReadAt!.getTime())
+    expect(notification.readAt!.getTime()).toBeGreaterThanOrEqual(
+      firstReadAt!.getTime(),
+    )
   })
 })

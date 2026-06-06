@@ -9,18 +9,22 @@ import { createItemsController } from './controllers/create-item.controller.ts'
 import { createRoleController } from './controllers/create-role.controller.ts'
 import { createTagController } from './controllers/create-tag.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
+import { createWsTicketController } from './controllers/create-ws-ticket.controller.ts'
 import { deleteRoleController } from './controllers/delete-role.controller.ts'
 import { deleteWorkspaceController } from './controllers/delete-workspace.controller.ts'
 import { getFoldersController } from './controllers/get-folders.controller.ts'
 import { getItemsController } from './controllers/get-items.controller.ts'
 import { getMeController } from './controllers/get-me.controller.ts'
 import { getMyWorkspacePermissionsController } from './controllers/get-my-workspace-permissions.controller.ts'
+import { getNotificationsController } from './controllers/get-notifications.controller.ts'
 import { getRolePermissionsController } from './controllers/get-role-permissions.controller.ts'
 import { getRolesController } from './controllers/get-roles.controller.ts'
 import { getWorkspaceController } from './controllers/get-workspace.controller.ts'
 import { getWorkspaceMembersController } from './controllers/get-workspace-members.controller.ts'
 import { getWorkspacesController } from './controllers/get-workspaces.controller.ts'
 import { inviteUserController } from './controllers/invite-user.controller.ts'
+import { notificationsWebSocketController } from './controllers/notifications-websocket.controller.ts'
+import { readNotificationController } from './controllers/read-notification.controller.ts'
 import { refreshAccessTokenController } from './controllers/refresh-access-token.controller.ts'
 import { removeMemberController } from './controllers/remove-member.controller.ts'
 import { resolveFolderPathController } from './controllers/resolve-folder-path.controller.ts'
@@ -52,6 +56,10 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(assignRoleToMemberController)
   app.register(removeMemberController)
   app.register(inviteUserController)
+  app.register(getNotificationsController)
+  app.register(readNotificationController)
+  app.register(createWsTicketController)
+  app.register(notificationsWebSocketController)
   app.register(getRolesController)
   app.register(createRoleController)
   app.register(deleteRoleController)

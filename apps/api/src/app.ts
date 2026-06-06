@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 import multipart from '@fastify/multipart'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
+import websocket from '@fastify/websocket'
 import { fastify } from 'fastify'
 import {
   jsonSchemaTransform,
@@ -19,6 +20,7 @@ app.decorateRequest('userId', '')
 
 await app.register(cookie)
 await app.register(multipart)
+await app.register(websocket)
 
 await app.register(cors, {
   origin: 'http://localhost:5173',

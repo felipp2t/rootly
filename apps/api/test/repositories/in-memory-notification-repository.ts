@@ -14,6 +14,12 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     return notification
   }
 
+  async findManyByRecipientId(recipientId: string) {
+    return this.items
+      .filter((item) => item.recipientId.toString() === recipientId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+
   async create(notification: Notification) {
     this.items.push(notification)
   }

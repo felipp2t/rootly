@@ -14,6 +14,7 @@ export function makeNotification(
       recipientId: new UniqueEntityID(),
       title: faker.lorem.sentence(4),
       content: faker.lorem.sentence(10),
+      metadata: { type: 'info' },
       ...override,
     },
     id,

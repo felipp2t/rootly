@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import type { NotificationRepository } from '@/domain/notification/application/repositories/notification-repository.ts'
 import type { Notification } from '@/domain/notification/enterprise/entities/notification.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -19,6 +19,16 @@ export class DrizzleNotificationRepository implements NotificationRepository {
     }
 
     return DrizzleNotificationMapper.toDomain(notifications[0])
+  }
+
+  async findManyByRecipientId(recipientId: string): Promise<Notification[]> {
+    const notifications = await this.db
+      .select()
+      .from(schema.notifications)
+      .where(eq(schema.notifications.recipientId, recipientId))
+      .orderBy(desc(schema.notifications.createdAt))
+
+    return notifications.map(DrizzleNotificationMapper.toDomain)
   }
 
   async create(notification: Notification): Promise<void> {

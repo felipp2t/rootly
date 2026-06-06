@@ -4,6 +4,7 @@ import {
   Notification,
   type NotificationMetadata,
 } from '../../enterprise/entities/notification.ts'
+import type { NotificationGateway } from '../gateways/notification-gateway.ts'
 import type { NotificationRepository } from '../repositories/notification-repository.ts'
 
 export interface SendNotificationUseCaseRequest {
@@ -21,7 +22,10 @@ export type SendNotificationUseCaseResponse = Either<
 >
 
 export class SendNotificationUseCase {
-  constructor(private notificationsRepository: NotificationRepository) {}
+  constructor(
+    private notificationsRepository: NotificationRepository,
+    private notificationGateway: NotificationGateway,
+  ) {}
 
   async execute({
     recipientId,
@@ -37,6 +41,8 @@ export class SendNotificationUseCase {
     })
 
     await this.notificationsRepository.create(notification)
+
+    this.notificationGateway.send(recipientId, notification)
 
     return right({
       notification,
