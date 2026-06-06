@@ -1,5 +1,6 @@
 import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
 import { InMemoryWorkspaceInviteRepository } from '@test/repositories/in-memory-workspace-invite-repository.ts'
+import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
@@ -9,12 +10,17 @@ import { WorkspaceInviteAlreadyAcceptedError } from './errors/workspace-invite-a
 import { WorkspaceInviteExpiredError } from './errors/workspace-invite-expired-error.ts'
 
 let workspaceInviteRepository: InMemoryWorkspaceInviteRepository
+let workspaceMemberRepository: InMemoryWorkspaceMemberRepository
 let sut: AcceptInviteUseCase
 
 describe('AcceptInvite', () => {
   beforeEach(() => {
     workspaceInviteRepository = new InMemoryWorkspaceInviteRepository()
-    sut = new AcceptInviteUseCase(workspaceInviteRepository)
+    workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    sut = new AcceptInviteUseCase(
+      workspaceInviteRepository,
+      workspaceMemberRepository,
+    )
   })
 
   it('should be able to accept an invite', {
@@ -98,6 +104,34 @@ describe('AcceptInvite', () => {
 
     expect(response.isRight()).toBe(true)
     expect(response.value).toEqual({ workspaceId })
+  })
+
+  it('should create a workspace member for the accepted invite', {
+    tags: ['accept-invite'],
+  }, async () => {
+    const inviteId = new UniqueEntityID()
+    const userId = new UniqueEntityID().toString()
+    const workspaceId = new UniqueEntityID().toString()
+    const roleId = new UniqueEntityID().toString()
+
+    const invite = makeWorkspaceInvite(
+      {
+        workspaceId,
+        invitedUserId: userId,
+        invitedByUserId: new UniqueEntityID().toString(),
+        roleId,
+      },
+      inviteId,
+    )
+
+    workspaceInviteRepository.items.push(invite)
+
+    await sut.execute({ inviteId: inviteId.toString(), userId })
+
+    expect(workspaceMemberRepository.items).toHaveLength(1)
+    expect(workspaceMemberRepository.items[0]).toMatchObject({
+      props: { userId, workspaceId, roleId },
+    })
   })
 
   it('should return ResourceNotFoundError when the invite does not exist', {

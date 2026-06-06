@@ -11,6 +11,7 @@ describe('POST /invites/:inviteId/accept', () => {
     await db.delete(schema.notifications)
     await db.delete(schema.refreshTokens)
     await db.delete(schema.workspaceInvites)
+    await db.delete(schema.workspaceMembers)
     await db.delete(schema.workspaceRoles)
     await db.delete(schema.workspaces)
     await db.delete(schema.users)
