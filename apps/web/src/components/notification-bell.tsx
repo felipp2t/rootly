@@ -1,10 +1,22 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { BellIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { useAcceptInvite, useDeclineInvite } from '@/api/invites/invites'
+import type { GetNotifications200NotificationsItem } from '@/api/model'
 import {
   getGetNotificationsQueryKey,
   useGetNotifications,
   useReadNotification,
 } from '@/api/notifications/notifications'
+import {
+  NotificationAction,
+  NotificationActions,
+  NotificationContent,
+  NotificationHeader,
+  NotificationIndicator,
+  NotificationRoot,
+  NotificationTitle,
+} from '@/components/notification'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,36 +27,18 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useNotificationSocket } from '@/hooks/use-notification-socket'
 import { useAuth } from '@/lib/auth'
-import { cn } from '@/lib/utils'
 
 export function NotificationBell() {
   const { isAuthenticated } = useAuth()
 
   useNotificationSocket(isAuthenticated)
 
-  const queryClient = useQueryClient()
   const { data } = useGetNotifications({
     query: { enabled: isAuthenticated },
   })
-  const readMutation = useReadNotification()
 
   const notifications = data?.status === 200 ? data.data.notifications : []
   const unreadCount = notifications.filter((n) => n.readAt === null).length
-
-  function handleRead(notificationId: string, alreadyRead: boolean) {
-    if (alreadyRead) return
-
-    readMutation.mutate(
-      { notificationId },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: getGetNotificationsQueryKey(),
-          })
-        },
-      },
-    )
-  }
 
   if (!isAuthenticated) return null
 
@@ -75,36 +69,134 @@ export function NotificationBell() {
         ) : (
           <ScrollArea type='always'>
             <div className='max-h-96'>
-              {notifications.map((notification) => {
-                const isRead = notification.readAt !== null
-                return (
-                  <button
-                    key={notification.id}
-                    type='button'
-                    onClick={() => handleRead(notification.id, isRead)}
-                    className={cn(
-                      'flex w-full flex-col gap-1 border-b border-border px-3 py-2.5 text-left outline-none transition-colors last:border-b-0 hover:bg-muted/30',
-                      !isRead && 'bg-primary/5',
-                    )}
-                  >
-                    <div className='flex items-center gap-2'>
-                      {!isRead && (
-                        <span className='size-1.5 shrink-0 rounded-full bg-primary' />
-                      )}
-                      <span className='font-mono text-xs font-semibold uppercase tracking-wide truncate'>
-                        {notification.title}
-                      </span>
-                    </div>
-                    <span className='font-mono text-xs text-muted-foreground'>
-                      {notification.content}
-                    </span>
-                  </button>
-                )
-              })}
+              {notifications.map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                />
+              ))}
             </div>
           </ScrollArea>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+function NotificationItem({
+  notification,
+}: {
+  notification: GetNotifications200NotificationsItem
+}) {
+  const queryClient = useQueryClient()
+  const readMutation = useReadNotification()
+  const acceptMutation = useAcceptInvite()
+  const declineMutation = useDeclineInvite()
+
+  const isRead = notification.readAt !== null
+  const inviteId =
+    notification.metadata.type === 'workspace_invite'
+      ? notification.metadata.inviteId
+      : null
+  const isInvite = inviteId !== null
+
+  function invalidate() {
+    queryClient.invalidateQueries({
+      queryKey: getGetNotificationsQueryKey(),
+    })
+  }
+
+  function handleMarkRead() {
+    if (isRead) return
+    readMutation.mutate(
+      { notificationId: notification.id },
+      { onSuccess: invalidate },
+    )
+  }
+
+  function handleAccept() {
+    if (!inviteId) return
+    acceptMutation.mutate(
+      { inviteId },
+      {
+        onSuccess: (res) => {
+          if (res.status === 200) {
+            toast.success('Invite accepted')
+            if (!isRead) {
+              readMutation.mutate({ notificationId: notification.id })
+            }
+            invalidate()
+          } else if (res.status === 409) {
+            toast.error('This invite is no longer valid')
+            invalidate()
+          } else {
+            toast.error('Failed to accept invite')
+          }
+        },
+        onError: () => toast.error('Failed to accept invite'),
+      },
+    )
+  }
+
+  function handleDecline() {
+    if (!inviteId) return
+    declineMutation.mutate(
+      { inviteId },
+      {
+        onSuccess: (res) => {
+          if (res.status === 204) {
+            toast.success('Invite declined')
+            if (!isRead) {
+              readMutation.mutate({ notificationId: notification.id })
+            }
+            invalidate()
+          } else if (res.status === 409) {
+            toast.error('This invite is no longer valid')
+            invalidate()
+          } else {
+            toast.error('Failed to decline invite')
+          }
+        },
+        onError: () => toast.error('Failed to decline invite'),
+      },
+    )
+  }
+
+  return (
+    <NotificationRoot unread={!isRead}>
+      <NotificationHeader>
+        <NotificationIndicator show={!isRead} />
+        <NotificationTitle>{notification.title}</NotificationTitle>
+      </NotificationHeader>
+      <NotificationContent>{notification.content}</NotificationContent>
+      <NotificationActions>
+        {isInvite && (
+          <>
+            <NotificationAction
+              variant='default'
+              pending={acceptMutation.isPending}
+              onClick={handleAccept}
+            >
+              Accept
+            </NotificationAction>
+            <NotificationAction
+              pending={declineMutation.isPending}
+              onClick={handleDecline}
+            >
+              Decline
+            </NotificationAction>
+          </>
+        )}
+        {!isRead && (
+          <NotificationAction
+            variant='ghost'
+            pending={readMutation.isPending}
+            onClick={handleMarkRead}
+          >
+            Mark read
+          </NotificationAction>
+        )}
+      </NotificationActions>
+    </NotificationRoot>
   )
 }
