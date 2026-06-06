@@ -2,6 +2,14 @@ packages:
   - packages/**
   - apps/**
 
+allowBuilds:
+  argon2: true
+  cpu-features: true
+  esbuild: true
+  msw: true
+  protobufjs: true
+  ssh2: true
+
 catalog:
   '@biomejs/biome': 2.4.10
   '@types/node': ^24.10.1
@@ -14,5 +22,10 @@ catalog:
   vite: ^7.3.1
 
 onlyBuiltDependencies:
+  - argon2
+  - cpu-features
   - esbuild
+  - msw
+  - protobufjs
   - sharp
+  - ssh2
