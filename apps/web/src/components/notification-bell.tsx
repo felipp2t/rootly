@@ -8,6 +8,7 @@ import {
   useGetNotifications,
   useReadNotification,
 } from '@/api/notifications/notifications'
+import { getGetWorkspacesQueryKey } from '@/api/workspaces/workspaces'
 import {
   NotificationAction,
   NotificationActions,
@@ -126,6 +127,9 @@ function NotificationItem({
               readMutation.mutate({ notificationId: notification.id })
             }
             invalidate()
+            queryClient.invalidateQueries({
+              queryKey: getGetWorkspacesQueryKey(),
+            })
           } else if (res.status === 409) {
             toast.error('This invite is no longer valid')
             invalidate()
@@ -169,34 +173,42 @@ function NotificationItem({
         <NotificationTitle>{notification.title}</NotificationTitle>
       </NotificationHeader>
       <NotificationContent>{notification.content}</NotificationContent>
-      <NotificationActions>
-        {isInvite && (
-          <>
+      {acceptMutation.isSuccess ? (
+        <NotificationContent className='text-primary'>
+          Convite aceito
+        </NotificationContent>
+      ) : declineMutation.isSuccess ? (
+        <NotificationContent>Convite recusado</NotificationContent>
+      ) : (
+        <NotificationActions>
+          {isInvite && (
+            <>
+              <NotificationAction
+                variant='default'
+                pending={acceptMutation.isPending}
+                onClick={handleAccept}
+              >
+                Accept
+              </NotificationAction>
+              <NotificationAction
+                pending={declineMutation.isPending}
+                onClick={handleDecline}
+              >
+                Decline
+              </NotificationAction>
+            </>
+          )}
+          {!isRead && (
             <NotificationAction
-              variant='default'
-              pending={acceptMutation.isPending}
-              onClick={handleAccept}
+              variant='ghost'
+              pending={readMutation.isPending}
+              onClick={handleMarkRead}
             >
-              Accept
+              Mark read
             </NotificationAction>
-            <NotificationAction
-              pending={declineMutation.isPending}
-              onClick={handleDecline}
-            >
-              Decline
-            </NotificationAction>
-          </>
-        )}
-        {!isRead && (
-          <NotificationAction
-            variant='ghost'
-            pending={readMutation.isPending}
-            onClick={handleMarkRead}
-          >
-            Mark read
-          </NotificationAction>
-        )}
-      </NotificationActions>
+          )}
+        </NotificationActions>
+      )}
     </NotificationRoot>
   )
 }
