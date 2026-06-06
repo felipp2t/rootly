@@ -9,6 +9,11 @@ import {
 import { Suspense, useState } from 'react'
 import { toast } from 'sonner'
 import {
+  getGetWorkspaceInvitesQueryKey,
+  useGetWorkspaceInvitesSuspense,
+  useRevokeInvite,
+} from '@/api/invites/invites'
+import {
   getGetWorkspaceMembersQueryKey,
   useAssignRoleToMember,
   useGetWorkspaceMembersSuspense,
@@ -246,6 +251,92 @@ function MembersSectionLoader({ workspaceId }: { workspaceId: string }) {
           </div>
         </ScrollArea>
       )}
+
+      {canInvite && (
+        <Suspense fallback={null}>
+          <PendingInvitesSection workspaceId={workspaceId} />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+
+function PendingInvitesSection({ workspaceId }: { workspaceId: string }) {
+  const queryClient = useQueryClient()
+  const { data: invitesRes } = useGetWorkspaceInvitesSuspense(workspaceId)
+  const invites = invitesRes.status === 200 ? invitesRes.data.invites : []
+
+  const revokeMutation = useRevokeInvite()
+
+  function handleRevoke(inviteId: string, email: string) {
+    revokeMutation.mutate(
+      { inviteId },
+      {
+        onSuccess: (res) => {
+          if (res.status === 204) {
+            queryClient.invalidateQueries({
+              queryKey: getGetWorkspaceInvitesQueryKey(workspaceId),
+            })
+            toast.success(`Invite to "${email}" revoked`)
+          } else {
+            toast.error('Failed to revoke invite')
+          }
+        },
+        onError: () => toast.error('Failed to revoke invite'),
+      },
+    )
+  }
+
+  if (invites.length === 0) return null
+
+  return (
+    <div className='flex flex-col gap-3'>
+      <div className='flex items-center justify-between'>
+        <span className='font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground'>
+          Pending invites
+        </span>
+        <span className='font-mono text-xs text-muted-foreground'>
+          {invites.length}
+        </span>
+      </div>
+
+      <div className='border border-border divide-y divide-border'>
+        {invites.map((invite) => {
+          const isRevoking =
+            revokeMutation.isPending &&
+            revokeMutation.variables?.inviteId === invite.id
+
+          return (
+            <div
+              key={invite.id}
+              className='flex items-center gap-3 px-4 py-3 bg-card'
+            >
+              <div className='flex flex-col min-w-0 flex-1'>
+                <span className='font-mono text-xs font-semibold tracking-wide truncate'>
+                  {invite.email}
+                </span>
+                <span className='font-mono text-xs text-muted-foreground truncate'>
+                  {invite.roleName}
+                </span>
+              </div>
+
+              <button
+                type='button'
+                aria-label={`Revoke invite to ${invite.email}`}
+                disabled={isRevoking}
+                onClick={() => handleRevoke(invite.id, invite.email)}
+                className='flex items-center justify-center shrink-0 size-7 border border-destructive/40 text-destructive outline-none transition-colors cursor-pointer hover:bg-destructive/10 disabled:opacity-60 disabled:cursor-not-allowed'
+              >
+                {isRevoking ? (
+                  <Loader2Icon className='size-3.5 animate-spin' />
+                ) : (
+                  <Trash2Icon className='size-3.5' />
+                )}
+              </button>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -283,6 +374,9 @@ function InviteMemberDialog({
     if (response.status === 201) {
       queryClient.invalidateQueries({
         queryKey: getGetWorkspaceMembersQueryKey(workspaceId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getGetWorkspaceInvitesQueryKey(workspaceId),
       })
       toast.success(`Invite sent to "${email.trim()}"`)
       setOpen(false)
