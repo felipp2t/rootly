@@ -76,7 +76,6 @@ async function seed() {
   // ── Cleanup (ordem inversa das FKs) ──────────────────────────────────────
   // workspace_members tem ON DELETE RESTRICT no roleId, então membros
   // precisam ser deletados antes das roles. O restante cascateia via users/workspaces.
-  await db.delete(schema.itemTags)
   await db.delete(schema.folderTags)
   await db.delete(schema.items)
   await db.delete(schema.folders)
@@ -205,12 +204,16 @@ async function seed() {
       faker.hacker.adjective,
       faker.number.int({ min: 3, max: 5 }),
     )
-    return names.map((name) => ({
-      id: nanoid(),
-      workspaceId: ws.id,
-      name: name.toLowerCase(),
-      color: faker.helpers.arrayElement(TAG_COLORS),
-    }))
+    return names.map((name) => {
+      const normalized = name.toLowerCase()
+      return {
+        id: nanoid(),
+        workspaceId: ws.id,
+        name: normalized,
+        slug: normalized.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        color: faker.helpers.arrayElement(TAG_COLORS),
+      }
+    })
   })
 
   const tags = await db.insert(schema.tags).values(tagRows).returning()
@@ -274,19 +277,18 @@ async function seed() {
   const items = await db.insert(schema.items).values(itemRows).returning()
   console.log(`  ✓ ${items.length} items`)
 
-  // ── Item tags ────────────────────────────────────────────────────────────
-  const itemTagRows = items.flatMap((item) => {
-    const wsTags = tags.filter((t) => t.workspaceId === item.workspaceId)
+  // ── Folder tags ──────────────────────────────────────────────────────────
+  const folderTagRows = folders.flatMap((folder) => {
+    const wsTags = tags.filter((t) => t.workspaceId === folder.workspaceId)
     if (wsTags.length === 0) return []
-    return faker.helpers
-      .arrayElements(wsTags, faker.number.int({ min: 0, max: 2 }))
-      .map((tag) => ({ id: nanoid(), itemId: item.id, tagId: tag.id }))
+    const picked = faker.helpers.arrayElements(wsTags, faker.number.int({ min: 0, max: 3 }))
+    return picked.map((tag) => ({ folderId: folder.id, tagId: tag.id }))
   })
 
-  if (itemTagRows.length > 0) {
-    await db.insert(schema.itemTags).values(itemTagRows)
+  if (folderTagRows.length > 0) {
+    await db.insert(schema.folderTags).values(folderTagRows)
   }
-  console.log(`  ✓ ${itemTagRows.length} item tags`)
+  console.log(`  ✓ ${folderTagRows.length} folder tags`)
 
   console.log('\n✅ Seed complete!')
   console.log('\n📧 Login credentials (password: password123):')
