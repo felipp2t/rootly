@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   AssignRoleToMember401,
@@ -40,12 +44,15 @@ import type {
   RemoveMember401,
   RemoveMember403,
   RemoveMember404,
-  RemoveMember500,
-} from '../model'
+  RemoveMember500
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * List all members of a workspace with their user and role
@@ -71,367 +78,162 @@ export type getWorkspaceMembersResponse500 = {
   status: 500
 }
 
-export type getWorkspaceMembersResponseSuccess =
-  getWorkspaceMembersResponse200 & {
-    headers: Headers
-  }
-export type getWorkspaceMembersResponseError = (
-  | getWorkspaceMembersResponse401
-  | getWorkspaceMembersResponse404
-  | getWorkspaceMembersResponse500
-) & {
-  headers: Headers
-}
+export type getWorkspaceMembersResponseSuccess = (getWorkspaceMembersResponse200) & {
+  headers: Headers;
+};
+export type getWorkspaceMembersResponseError = (getWorkspaceMembersResponse401 | getWorkspaceMembersResponse404 | getWorkspaceMembersResponse500) & {
+  headers: Headers;
+};
 
-export type getWorkspaceMembersResponse =
-  | getWorkspaceMembersResponseSuccess
-  | getWorkspaceMembersResponseError
+export type getWorkspaceMembersResponse = (getWorkspaceMembersResponseSuccess | getWorkspaceMembersResponseError)
 
-export const getGetWorkspaceMembersUrl = (workspaceId: string) => {
+export const getGetWorkspaceMembersUrl = (workspaceId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/members`
 }
 
-export const getWorkspaceMembers = async (
-  workspaceId: string,
-  options?: RequestInit,
-): Promise<getWorkspaceMembersResponse> => {
-  return fetchWithAuth<getWorkspaceMembersResponse>(
-    getGetWorkspaceMembersUrl(workspaceId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
-}
+export const getWorkspaceMembers = async (workspaceId: string, options?: RequestInit): Promise<getWorkspaceMembersResponse> => {
+  
+  return fetchWithAuth<getWorkspaceMembersResponse>(getGetWorkspaceMembersUrl(workspaceId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getGetWorkspaceMembersQueryKey = (workspaceId: string) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'workspaces',
-    workspaceId,
-    'members',
-  ] as const
-}
 
-export const getGetWorkspaceMembersQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+export const getGetWorkspaceMembersQueryKey = (workspaceId: string,) => {
+    return [
+    'http:','localhost:3333','api','workspaces',workspaceId,'members'
+    ] as const;
+    }
+
+    
+export const getGetWorkspaceMembersQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetWorkspaceMembersQueryKey(workspaceId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getWorkspaceMembers>>
-  > = ({ signal }) =>
-    getWorkspaceMembers(workspaceId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspaceMembersQueryKey(workspaceId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!workspaceId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getWorkspaceMembers>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaceMembers>>> = ({ signal }) => getWorkspaceMembers(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetWorkspaceMembersQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkspaceMembers>>
->
-export type GetWorkspaceMembersQueryError =
-  | GetWorkspaceMembers401
-  | GetWorkspaceMembers404
-  | GetWorkspaceMembers500
+export type GetWorkspaceMembersQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaceMembers>>>
+export type GetWorkspaceMembersQueryError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500
 
-export function useGetWorkspaceMembers<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+
+export function useGetWorkspaceMembers<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaceMembers>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaceMembers>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceMembers<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceMembers<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaceMembers>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaceMembers>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceMembers<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceMembers<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Workspace Members
  */
 
-export function useGetWorkspaceMembers<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetWorkspaceMembersQueryOptions(workspaceId, options)
+export function useGetWorkspaceMembers<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetWorkspaceMembersQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetWorkspaceMembersSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetWorkspaceMembersSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetWorkspaceMembersQueryKey(workspaceId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getWorkspaceMembers>>
-  > = ({ signal }) =>
-    getWorkspaceMembers(workspaceId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspaceMembersQueryKey(workspaceId);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getWorkspaceMembers>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaceMembers>>> = ({ signal }) => getWorkspaceMembers(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetWorkspaceMembersSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkspaceMembers>>
->
-export type GetWorkspaceMembersSuspenseQueryError =
-  | GetWorkspaceMembers401
-  | GetWorkspaceMembers404
-  | GetWorkspaceMembers500
+export type GetWorkspaceMembersSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaceMembers>>>
+export type GetWorkspaceMembersSuspenseQueryError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500
 
-export function useGetWorkspaceMembersSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceMembersSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceMembersSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetWorkspaceMembersSuspense<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceMembersSuspense<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceMembersSuspense<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Workspace Members
  */
 
-export function useGetWorkspaceMembersSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceMembers>>,
-  TError =
-    | GetWorkspaceMembers401
-    | GetWorkspaceMembers404
-    | GetWorkspaceMembers500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceMembers>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetWorkspaceMembersSuspenseQueryOptions(
-    workspaceId,
-    options,
-  )
+export function useGetWorkspaceMembersSuspense<TData = Awaited<ReturnType<typeof getWorkspaceMembers>>, TError = GetWorkspaceMembers401 | GetWorkspaceMembers404 | GetWorkspaceMembers500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceMembers>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetWorkspaceMembersSuspenseQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Assign or change a workspace member's role
@@ -457,125 +259,86 @@ export type assignRoleToMemberResponse500 = {
   status: 500
 }
 
-export type assignRoleToMemberResponseSuccess =
-  assignRoleToMemberResponse204 & {
-    headers: Headers
-  }
-export type assignRoleToMemberResponseError = (
-  | assignRoleToMemberResponse401
-  | assignRoleToMemberResponse404
-  | assignRoleToMemberResponse500
-) & {
-  headers: Headers
-}
+export type assignRoleToMemberResponseSuccess = (assignRoleToMemberResponse204) & {
+  headers: Headers;
+};
+export type assignRoleToMemberResponseError = (assignRoleToMemberResponse401 | assignRoleToMemberResponse404 | assignRoleToMemberResponse500) & {
+  headers: Headers;
+};
 
-export type assignRoleToMemberResponse =
-  | assignRoleToMemberResponseSuccess
-  | assignRoleToMemberResponseError
+export type assignRoleToMemberResponse = (assignRoleToMemberResponseSuccess | assignRoleToMemberResponseError)
 
-export const getAssignRoleToMemberUrl = (
-  workspaceId: string,
-  memberId: string,
-) => {
+export const getAssignRoleToMemberUrl = (workspaceId: string,
+    memberId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/members/${memberId}/role`
 }
 
-export const assignRoleToMember = async (
-  workspaceId: string,
-  memberId: string,
-  assignRoleToMemberBody: AssignRoleToMemberBody,
-  options?: RequestInit,
-): Promise<assignRoleToMemberResponse> => {
-  return fetchWithAuth<assignRoleToMemberResponse>(
-    getAssignRoleToMemberUrl(workspaceId, memberId),
-    {
-      ...options,
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(assignRoleToMemberBody),
-    },
-  )
-}
-
-export const getAssignRoleToMemberMutationOptions = <
-  TError =
-    | AssignRoleToMember401
-    | AssignRoleToMember404
-    | AssignRoleToMember500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof assignRoleToMember>>,
-    TError,
-    { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof assignRoleToMember>>,
-  TError,
-  { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
-  TContext
-> => {
-  const mutationKey = ['assignRoleToMember']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof assignRoleToMember>>,
-    { workspaceId: string; memberId: string; data: AssignRoleToMemberBody }
-  > = (props) => {
-    const { workspaceId, memberId, data } = props ?? {}
-
-    return assignRoleToMember(workspaceId, memberId, data, requestOptions)
+export const assignRoleToMember = async (workspaceId: string,
+    memberId: string,
+    assignRoleToMemberBody: AssignRoleToMemberBody, options?: RequestInit): Promise<assignRoleToMemberResponse> => {
+  
+  return fetchWithAuth<assignRoleToMemberResponse>(getAssignRoleToMemberUrl(workspaceId,memberId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      assignRoleToMemberBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type AssignRoleToMemberMutationResult = NonNullable<
-  Awaited<ReturnType<typeof assignRoleToMember>>
->
-export type AssignRoleToMemberMutationBody = AssignRoleToMemberBody
-export type AssignRoleToMemberMutationError =
-  | AssignRoleToMember401
-  | AssignRoleToMember404
-  | AssignRoleToMember500
 
-/**
+export const getAssignRoleToMemberMutationOptions = <TError = AssignRoleToMember401 | AssignRoleToMember404 | AssignRoleToMember500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignRoleToMember>>, TError,{workspaceId: string;memberId: string;data: AssignRoleToMemberBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignRoleToMember>>, TError,{workspaceId: string;memberId: string;data: AssignRoleToMemberBody}, TContext> => {
+
+const mutationKey = ['assignRoleToMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignRoleToMember>>, {workspaceId: string;memberId: string;data: AssignRoleToMemberBody}> = (props) => {
+          const {workspaceId,memberId,data} = props ?? {};
+
+          return  assignRoleToMember(workspaceId,memberId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignRoleToMemberMutationResult = NonNullable<Awaited<ReturnType<typeof assignRoleToMember>>>
+    export type AssignRoleToMemberMutationBody = AssignRoleToMemberBody
+    export type AssignRoleToMemberMutationError = AssignRoleToMember401 | AssignRoleToMember404 | AssignRoleToMember500
+
+    /**
  * @summary Assign Role To Member
  */
-export const useAssignRoleToMember = <
-  TError =
-    | AssignRoleToMember401
-    | AssignRoleToMember404
-    | AssignRoleToMember500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof assignRoleToMember>>,
-      TError,
-      { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof assignRoleToMember>>,
-  TError,
-  { workspaceId: string; memberId: string; data: AssignRoleToMemberBody },
-  TContext
-> => {
-  return useMutation(getAssignRoleToMemberMutationOptions(options), queryClient)
-}
-/**
+export const useAssignRoleToMember = <TError = AssignRoleToMember401 | AssignRoleToMember404 | AssignRoleToMember500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignRoleToMember>>, TError,{workspaceId: string;memberId: string;data: AssignRoleToMemberBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignRoleToMember>>,
+        TError,
+        {workspaceId: string;memberId: string;data: AssignRoleToMemberBody},
+        TContext
+      > => {
+      return useMutation(getAssignRoleToMemberMutationOptions(options), queryClient);
+    }
+    /**
  * Remove a member from a workspace
  * @summary Remove Member
  */
@@ -604,122 +367,84 @@ export type removeMemberResponse500 = {
   status: 500
 }
 
-export type removeMemberResponseSuccess = removeMemberResponse204 & {
-  headers: Headers
-}
-export type removeMemberResponseError = (
-  | removeMemberResponse401
-  | removeMemberResponse403
-  | removeMemberResponse404
-  | removeMemberResponse500
-) & {
-  headers: Headers
-}
+export type removeMemberResponseSuccess = (removeMemberResponse204) & {
+  headers: Headers;
+};
+export type removeMemberResponseError = (removeMemberResponse401 | removeMemberResponse403 | removeMemberResponse404 | removeMemberResponse500) & {
+  headers: Headers;
+};
 
-export type removeMemberResponse =
-  | removeMemberResponseSuccess
-  | removeMemberResponseError
+export type removeMemberResponse = (removeMemberResponseSuccess | removeMemberResponseError)
 
-export const getRemoveMemberUrl = (workspaceId: string, memberId: string) => {
+export const getRemoveMemberUrl = (workspaceId: string,
+    memberId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/members/${memberId}`
 }
 
-export const removeMember = async (
-  workspaceId: string,
-  memberId: string,
-  options?: RequestInit,
-): Promise<removeMemberResponse> => {
-  return fetchWithAuth<removeMemberResponse>(
-    getRemoveMemberUrl(workspaceId, memberId),
-    {
-      ...options,
-      method: 'DELETE',
-    },
-  )
-}
-
-export const getRemoveMemberMutationOptions = <
-  TError =
-    | RemoveMember401
-    | RemoveMember403
-    | RemoveMember404
-    | RemoveMember500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof removeMember>>,
-    TError,
-    { workspaceId: string; memberId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof removeMember>>,
-  TError,
-  { workspaceId: string; memberId: string },
-  TContext
-> => {
-  const mutationKey = ['removeMember']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof removeMember>>,
-    { workspaceId: string; memberId: string }
-  > = (props) => {
-    const { workspaceId, memberId } = props ?? {}
-
-    return removeMember(workspaceId, memberId, requestOptions)
+export const removeMember = async (workspaceId: string,
+    memberId: string, options?: RequestInit): Promise<removeMemberResponse> => {
+  
+  return fetchWithAuth<removeMemberResponse>(getRemoveMemberUrl(workspaceId,memberId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type RemoveMemberMutationResult = NonNullable<
-  Awaited<ReturnType<typeof removeMember>>
->
 
-export type RemoveMemberMutationError =
-  | RemoveMember401
-  | RemoveMember403
-  | RemoveMember404
-  | RemoveMember500
+export const getRemoveMemberMutationOptions = <TError = RemoveMember401 | RemoveMember403 | RemoveMember404 | RemoveMember500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{workspaceId: string;memberId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{workspaceId: string;memberId: string}, TContext> => {
 
-/**
+const mutationKey = ['removeMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeMember>>, {workspaceId: string;memberId: string}> = (props) => {
+          const {workspaceId,memberId} = props ?? {};
+
+          return  removeMember(workspaceId,memberId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveMemberMutationResult = NonNullable<Awaited<ReturnType<typeof removeMember>>>
+    
+    export type RemoveMemberMutationError = RemoveMember401 | RemoveMember403 | RemoveMember404 | RemoveMember500
+
+    /**
  * @summary Remove Member
  */
-export const useRemoveMember = <
-  TError =
-    | RemoveMember401
-    | RemoveMember403
-    | RemoveMember404
-    | RemoveMember500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof removeMember>>,
-      TError,
-      { workspaceId: string; memberId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof removeMember>>,
-  TError,
-  { workspaceId: string; memberId: string },
-  TContext
-> => {
-  return useMutation(getRemoveMemberMutationOptions(options), queryClient)
-}
-/**
+export const useRemoveMember = <TError = RemoveMember401 | RemoveMember403 | RemoveMember404 | RemoveMember500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{workspaceId: string;memberId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeMember>>,
+        TError,
+        {workspaceId: string;memberId: string},
+        TContext
+      > => {
+      return useMutation(getRemoveMemberMutationOptions(options), queryClient);
+    }
+    /**
  * Invite a user to a workspace by email
  * @summary Invite User
  */
@@ -748,109 +473,81 @@ export type inviteUserResponse500 = {
   status: 500
 }
 
-export type inviteUserResponseSuccess = inviteUserResponse201 & {
-  headers: Headers
-}
-export type inviteUserResponseError = (
-  | inviteUserResponse401
-  | inviteUserResponse403
-  | inviteUserResponse404
-  | inviteUserResponse500
-) & {
-  headers: Headers
-}
+export type inviteUserResponseSuccess = (inviteUserResponse201) & {
+  headers: Headers;
+};
+export type inviteUserResponseError = (inviteUserResponse401 | inviteUserResponse403 | inviteUserResponse404 | inviteUserResponse500) & {
+  headers: Headers;
+};
 
-export type inviteUserResponse =
-  | inviteUserResponseSuccess
-  | inviteUserResponseError
+export type inviteUserResponse = (inviteUserResponseSuccess | inviteUserResponseError)
 
-export const getInviteUserUrl = (workspaceId: string) => {
+export const getInviteUserUrl = (workspaceId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/invites`
 }
 
-export const inviteUser = async (
-  workspaceId: string,
-  inviteUserBody: InviteUserBody,
-  options?: RequestInit,
-): Promise<inviteUserResponse> => {
-  return fetchWithAuth<inviteUserResponse>(getInviteUserUrl(workspaceId), {
+export const inviteUser = async (workspaceId: string,
+    inviteUserBody: InviteUserBody, options?: RequestInit): Promise<inviteUserResponse> => {
+  
+  return fetchWithAuth<inviteUserResponse>(getInviteUserUrl(workspaceId),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(inviteUserBody),
-  })
-}
-
-export const getInviteUserMutationOptions = <
-  TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof inviteUser>>,
-    TError,
-    { workspaceId: string; data: InviteUserBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof inviteUser>>,
-  TError,
-  { workspaceId: string; data: InviteUserBody },
-  TContext
-> => {
-  const mutationKey = ['inviteUser']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof inviteUser>>,
-    { workspaceId: string; data: InviteUserBody }
-  > = (props) => {
-    const { workspaceId, data } = props ?? {}
-
-    return inviteUser(workspaceId, data, requestOptions)
+    body: JSON.stringify(
+      inviteUserBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type InviteUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof inviteUser>>
->
-export type InviteUserMutationBody = InviteUserBody
-export type InviteUserMutationError =
-  | InviteUser401
-  | InviteUser403
-  | InviteUser404
-  | InviteUser500
 
-/**
+export const getInviteUserMutationOptions = <TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteUser>>, TError,{workspaceId: string;data: InviteUserBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof inviteUser>>, TError,{workspaceId: string;data: InviteUserBody}, TContext> => {
+
+const mutationKey = ['inviteUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteUser>>, {workspaceId: string;data: InviteUserBody}> = (props) => {
+          const {workspaceId,data} = props ?? {};
+
+          return  inviteUser(workspaceId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InviteUserMutationResult = NonNullable<Awaited<ReturnType<typeof inviteUser>>>
+    export type InviteUserMutationBody = InviteUserBody
+    export type InviteUserMutationError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500
+
+    /**
  * @summary Invite User
  */
-export const useInviteUser = <
-  TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof inviteUser>>,
-      TError,
-      { workspaceId: string; data: InviteUserBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof inviteUser>>,
-  TError,
-  { workspaceId: string; data: InviteUserBody },
-  TContext
-> => {
-  return useMutation(getInviteUserMutationOptions(options), queryClient)
-}
+export const useInviteUser = <TError = InviteUser401 | InviteUser403 | InviteUser404 | InviteUser500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteUser>>, TError,{workspaceId: string;data: InviteUserBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof inviteUser>>,
+        TError,
+        {workspaceId: string;data: InviteUserBody},
+        TContext
+      > => {
+      return useMutation(getInviteUserMutationOptions(options), queryClient);
+    }
+    

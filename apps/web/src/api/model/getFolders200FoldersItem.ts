@@ -6,14 +6,14 @@
  */
 
 export type GetFolders200FoldersItem = {
-  id: string
-  name: string
-  workspaceId: string
+  id: string;
+  name: string;
+  workspaceId: string;
   /** @nullable */
-  parentId: string | null
-  tagIds: string[]
-  itemCount: number
-  subfolderCount: number
-  createdAt: string
-  updatedAt: string
-}
+  parentId: string | null;
+  tagIds: string[];
+  itemCount: number;
+  subfolderCount: number;
+  createdAt: string;
+  updatedAt: string;
+};

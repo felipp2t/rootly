@@ -6,5 +6,5 @@
  */
 
 export type GetMyWorkspacePermissions500 = {
-  message: string
-}
+  message: string;
+};

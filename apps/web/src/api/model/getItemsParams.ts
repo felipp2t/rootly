@@ -6,6 +6,6 @@
  */
 
 export type GetItemsParams = {
-  parentId?: string
-  workspaceId?: string
-}
+parentId?: string;
+workspaceId?: string;
+};

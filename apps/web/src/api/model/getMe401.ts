@@ -6,5 +6,5 @@
  */
 
 export type GetMe401 = {
-  message: string
-}
+  message: string;
+};

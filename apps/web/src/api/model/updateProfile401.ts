@@ -6,5 +6,5 @@
  */
 
 export type UpdateProfile401 = {
-  message: string
-}
+  message: string;
+};

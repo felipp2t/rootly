@@ -6,5 +6,5 @@
  */
 
 export type RefreshAccessToken500 = {
-  message: string
-}
+  message: string;
+};

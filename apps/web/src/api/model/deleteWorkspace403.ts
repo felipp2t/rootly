@@ -6,5 +6,5 @@
  */
 
 export type DeleteWorkspace403 = {
-  message: string
-}
+  message: string;
+};

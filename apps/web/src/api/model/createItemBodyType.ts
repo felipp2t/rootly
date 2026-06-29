@@ -5,12 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type CreateItemBodyType =
-  (typeof CreateItemBodyType)[keyof typeof CreateItemBodyType]
+export type CreateItemBodyType = typeof CreateItemBodyType[keyof typeof CreateItemBodyType];
+
 
 export const CreateItemBodyType = {
   link: 'link',
   document: 'document',
   text: 'text',
   secret: 'secret',
-} as const
+} as const;

@@ -6,5 +6,5 @@
  */
 
 export type CreateTag201 = {
-  tagId: string
-}
+  tagId: string;
+};

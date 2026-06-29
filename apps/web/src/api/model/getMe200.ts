@@ -6,7 +6,7 @@
  */
 
 export type GetMe200 = {
-  id: string
-  name: string
-  email: string
-}
+  id: string;
+  name: string;
+  email: string;
+};

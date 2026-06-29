@@ -6,5 +6,5 @@
  */
 
 export type CreateFolder400 = {
-  message: string
-}
+  message: string;
+};

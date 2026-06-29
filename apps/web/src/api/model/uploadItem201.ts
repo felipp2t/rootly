@@ -6,5 +6,5 @@
  */
 
 export type UploadItem201 = {
-  itemId: string
-}
+  itemId: string;
+};

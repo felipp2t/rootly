@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateWsTicket201,
@@ -32,12 +36,15 @@ import type {
   ReadNotification401,
   ReadNotification403,
   ReadNotification404,
-  ReadNotification500,
-} from '../model'
+  ReadNotification500
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * List the authenticated user notifications
@@ -58,292 +65,162 @@ export type getNotificationsResponse500 = {
   status: 500
 }
 
-export type getNotificationsResponseSuccess = getNotificationsResponse200 & {
-  headers: Headers
-}
-export type getNotificationsResponseError = (
-  | getNotificationsResponse401
-  | getNotificationsResponse500
-) & {
-  headers: Headers
-}
+export type getNotificationsResponseSuccess = (getNotificationsResponse200) & {
+  headers: Headers;
+};
+export type getNotificationsResponseError = (getNotificationsResponse401 | getNotificationsResponse500) & {
+  headers: Headers;
+};
 
-export type getNotificationsResponse =
-  | getNotificationsResponseSuccess
-  | getNotificationsResponseError
+export type getNotificationsResponse = (getNotificationsResponseSuccess | getNotificationsResponseError)
 
 export const getGetNotificationsUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/notifications`
 }
 
-export const getNotifications = async (
-  options?: RequestInit,
-): Promise<getNotificationsResponse> => {
-  return fetchWithAuth<getNotificationsResponse>(getGetNotificationsUrl(), {
+export const getNotifications = async ( options?: RequestInit): Promise<getNotificationsResponse> => {
+  
+  return fetchWithAuth<getNotificationsResponse>(getGetNotificationsUrl(),
+  {      
     ...options,
-    method: 'GET',
-  })
-}
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
 
 export const getGetNotificationsQueryKey = () => {
-  return ['http:', 'localhost:3333', 'api', 'notifications'] as const
+    return [
+    'http:','localhost:3333','api','notifications'
+    ] as const;
+    }
+
+    
+export const getGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetNotificationsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNotifications>>> = ({ signal }) => getNotifications({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export const getGetNotificationsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
+export type GetNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getNotifications>>>
+export type GetNotificationsQueryError = GetNotifications401 | GetNotifications500
 
-  const queryKey = queryOptions?.queryKey ?? getGetNotificationsQueryKey()
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getNotifications>>
-  > = ({ signal }) => getNotifications({ signal, ...requestOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getNotifications>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetNotificationsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getNotifications>>
->
-export type GetNotificationsQueryError =
-  | GetNotifications401
-  | GetNotifications500
-
-export function useGetNotifications<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getNotifications>>,
           TError,
           Awaited<ReturnType<typeof getNotifications>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetNotifications<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getNotifications>>,
           TError,
           Awaited<ReturnType<typeof getNotifications>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetNotifications<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Notifications
  */
 
-export function useGetNotifications<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
+export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
   const queryOptions = getGetNotificationsQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetNotificationsSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(options?: {
-  query?: Partial<
-    UseSuspenseQueryOptions<
-      Awaited<ReturnType<typeof getNotifications>>,
-      TError,
-      TData
-    >
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetNotificationsQueryKey()
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getNotifications>>
-  > = ({ signal }) => getNotifications({ signal, ...requestOptions })
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getNotifications>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+export const getGetNotificationsSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>( options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetNotificationsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNotifications>>> = ({ signal }) => getNotifications({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetNotificationsSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getNotifications>>
->
-export type GetNotificationsSuspenseQueryError =
-  | GetNotifications401
-  | GetNotifications500
+export type GetNotificationsSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getNotifications>>>
+export type GetNotificationsSuspenseQueryError = GetNotifications401 | GetNotifications500
 
-export function useGetNotificationsSuspense<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetNotificationsSuspense<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetNotificationsSuspense<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetNotificationsSuspense<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetNotificationsSuspense<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetNotificationsSuspense<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Notifications
  */
 
-export function useGetNotificationsSuspense<
-  TData = Awaited<ReturnType<typeof getNotifications>>,
-  TError = GetNotifications401 | GetNotifications500,
->(
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getNotifications>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
+export function useGetNotificationsSuspense<TData = Awaited<ReturnType<typeof getNotifications>>, TError = GetNotifications401 | GetNotifications500>(
+  options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
   const queryOptions = getGetNotificationsSuspenseQueryOptions(options)
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Mark a notification as read
@@ -374,121 +251,82 @@ export type readNotificationResponse500 = {
   status: 500
 }
 
-export type readNotificationResponseSuccess = readNotificationResponse204 & {
-  headers: Headers
-}
-export type readNotificationResponseError = (
-  | readNotificationResponse401
-  | readNotificationResponse403
-  | readNotificationResponse404
-  | readNotificationResponse500
-) & {
-  headers: Headers
-}
+export type readNotificationResponseSuccess = (readNotificationResponse204) & {
+  headers: Headers;
+};
+export type readNotificationResponseError = (readNotificationResponse401 | readNotificationResponse403 | readNotificationResponse404 | readNotificationResponse500) & {
+  headers: Headers;
+};
 
-export type readNotificationResponse =
-  | readNotificationResponseSuccess
-  | readNotificationResponseError
+export type readNotificationResponse = (readNotificationResponseSuccess | readNotificationResponseError)
 
-export const getReadNotificationUrl = (notificationId: string) => {
+export const getReadNotificationUrl = (notificationId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/notifications/${notificationId}/read`
 }
 
-export const readNotification = async (
-  notificationId: string,
-  options?: RequestInit,
-): Promise<readNotificationResponse> => {
-  return fetchWithAuth<readNotificationResponse>(
-    getReadNotificationUrl(notificationId),
-    {
-      ...options,
-      method: 'PATCH',
-    },
-  )
-}
-
-export const getReadNotificationMutationOptions = <
-  TError =
-    | ReadNotification401
-    | ReadNotification403
-    | ReadNotification404
-    | ReadNotification500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof readNotification>>,
-    TError,
-    { notificationId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof readNotification>>,
-  TError,
-  { notificationId: string },
-  TContext
-> => {
-  const mutationKey = ['readNotification']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof readNotification>>,
-    { notificationId: string }
-  > = (props) => {
-    const { notificationId } = props ?? {}
-
-    return readNotification(notificationId, requestOptions)
+export const readNotification = async (notificationId: string, options?: RequestInit): Promise<readNotificationResponse> => {
+  
+  return fetchWithAuth<readNotificationResponse>(getReadNotificationUrl(notificationId),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type ReadNotificationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof readNotification>>
->
 
-export type ReadNotificationMutationError =
-  | ReadNotification401
-  | ReadNotification403
-  | ReadNotification404
-  | ReadNotification500
+export const getReadNotificationMutationOptions = <TError = ReadNotification401 | ReadNotification403 | ReadNotification404 | ReadNotification500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readNotification>>, TError,{notificationId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof readNotification>>, TError,{notificationId: string}, TContext> => {
 
-/**
+const mutationKey = ['readNotification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof readNotification>>, {notificationId: string}> = (props) => {
+          const {notificationId} = props ?? {};
+
+          return  readNotification(notificationId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReadNotificationMutationResult = NonNullable<Awaited<ReturnType<typeof readNotification>>>
+    
+    export type ReadNotificationMutationError = ReadNotification401 | ReadNotification403 | ReadNotification404 | ReadNotification500
+
+    /**
  * @summary Read Notification
  */
-export const useReadNotification = <
-  TError =
-    | ReadNotification401
-    | ReadNotification403
-    | ReadNotification404
-    | ReadNotification500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof readNotification>>,
-      TError,
-      { notificationId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof readNotification>>,
-  TError,
-  { notificationId: string },
-  TContext
-> => {
-  return useMutation(getReadNotificationMutationOptions(options), queryClient)
-}
-/**
+export const useReadNotification = <TError = ReadNotification401 | ReadNotification403 | ReadNotification404 | ReadNotification500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof readNotification>>, TError,{notificationId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof readNotification>>,
+        TError,
+        {notificationId: string},
+        TContext
+      > => {
+      return useMutation(getReadNotificationMutationOptions(options), queryClient);
+    }
+    /**
  * Issue a short-lived ticket used to authenticate a WebSocket connection
  * @summary Create WebSocket Ticket
  */
@@ -507,97 +345,79 @@ export type createWsTicketResponse500 = {
   status: 500
 }
 
-export type createWsTicketResponseSuccess = createWsTicketResponse201 & {
-  headers: Headers
-}
-export type createWsTicketResponseError = (
-  | createWsTicketResponse401
-  | createWsTicketResponse500
-) & {
-  headers: Headers
-}
+export type createWsTicketResponseSuccess = (createWsTicketResponse201) & {
+  headers: Headers;
+};
+export type createWsTicketResponseError = (createWsTicketResponse401 | createWsTicketResponse500) & {
+  headers: Headers;
+};
 
-export type createWsTicketResponse =
-  | createWsTicketResponseSuccess
-  | createWsTicketResponseError
+export type createWsTicketResponse = (createWsTicketResponseSuccess | createWsTicketResponseError)
 
 export const getCreateWsTicketUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/ws-ticket`
 }
 
-export const createWsTicket = async (
-  options?: RequestInit,
-): Promise<createWsTicketResponse> => {
-  return fetchWithAuth<createWsTicketResponse>(getCreateWsTicketUrl(), {
+export const createWsTicket = async ( options?: RequestInit): Promise<createWsTicketResponse> => {
+  
+  return fetchWithAuth<createWsTicketResponse>(getCreateWsTicketUrl(),
+  {      
     ...options,
-    method: 'POST',
-  })
-}
-
-export const getCreateWsTicketMutationOptions = <
-  TError = CreateWsTicket401 | CreateWsTicket500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createWsTicket>>,
-    TError,
-    void,
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createWsTicket>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ['createWsTicket']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createWsTicket>>,
-    void
-  > = () => {
-    return createWsTicket(requestOptions)
+    method: 'POST'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateWsTicketMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createWsTicket>>
->
 
-export type CreateWsTicketMutationError = CreateWsTicket401 | CreateWsTicket500
+export const getCreateWsTicketMutationOptions = <TError = CreateWsTicket401 | CreateWsTicket500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWsTicket>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWsTicket>>, TError,void, TContext> => {
 
-/**
+const mutationKey = ['createWsTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWsTicket>>, void> = () => {
+          
+
+          return  createWsTicket(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWsTicketMutationResult = NonNullable<Awaited<ReturnType<typeof createWsTicket>>>
+    
+    export type CreateWsTicketMutationError = CreateWsTicket401 | CreateWsTicket500
+
+    /**
  * @summary Create WebSocket Ticket
  */
-export const useCreateWsTicket = <
-  TError = CreateWsTicket401 | CreateWsTicket500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createWsTicket>>,
-      TError,
-      void,
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createWsTicket>>,
-  TError,
-  void,
-  TContext
-> => {
-  return useMutation(getCreateWsTicketMutationOptions(options), queryClient)
-}
+export const useCreateWsTicket = <TError = CreateWsTicket401 | CreateWsTicket500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWsTicket>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createWsTicket>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCreateWsTicketMutationOptions(options), queryClient);
+    }
+    

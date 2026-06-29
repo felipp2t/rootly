@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetMyWorkspacePermissions200PermissionsItemResource =
-  (typeof GetMyWorkspacePermissions200PermissionsItemResource)[keyof typeof GetMyWorkspacePermissions200PermissionsItemResource]
+export type GetMyWorkspacePermissions200PermissionsItemResource = typeof GetMyWorkspacePermissions200PermissionsItemResource[keyof typeof GetMyWorkspacePermissions200PermissionsItemResource];
+
 
 export const GetMyWorkspacePermissions200PermissionsItemResource = {
   workspace: 'workspace',
@@ -15,4 +15,4 @@ export const GetMyWorkspacePermissions200PermissionsItemResource = {
   tag: 'tag',
   member: 'member',
   role: 'role',
-} as const
+} as const;

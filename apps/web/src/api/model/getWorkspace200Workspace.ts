@@ -6,9 +6,9 @@
  */
 
 export type GetWorkspace200Workspace = {
-  id: string
-  name: string
-  userId: string
-  createdAt: string
-  updatedAt: string
-}
+  id: string;
+  name: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};

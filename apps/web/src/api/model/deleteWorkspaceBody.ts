@@ -7,5 +7,5 @@
 
 export type DeleteWorkspaceBody = {
   /** @minLength 1 */
-  password: string
-}
+  password: string;
+};

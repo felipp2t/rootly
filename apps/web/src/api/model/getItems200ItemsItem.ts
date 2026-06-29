@@ -4,18 +4,18 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetItems200ItemsItemType } from './getItems200ItemsItemType'
+import type { GetItems200ItemsItemType } from './getItems200ItemsItemType';
 
 export type GetItems200ItemsItem = {
-  id: string
-  title: string
-  type: GetItems200ItemsItemType
+  id: string;
+  title: string;
+  type: GetItems200ItemsItemType;
   /** @nullable */
-  content: string | null
-  workspaceId: string
+  content: string | null;
+  workspaceId: string;
   /** @nullable */
-  folderId: string | null
-  tagIds: string[]
-  createdAt: string
-  updatedAt: string
-}
+  folderId: string | null;
+  tagIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};

@@ -7,9 +7,9 @@
 
 export type ChangePasswordBody = {
   /** @minLength 1 */
-  currentPassword: string
+  currentPassword: string;
   /** @minLength 8 */
-  newPassword: string
+  newPassword: string;
   /** @minLength 8 */
-  confirmPassword: string
-}
+  confirmPassword: string;
+};

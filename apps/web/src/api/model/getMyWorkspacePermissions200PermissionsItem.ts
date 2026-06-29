@@ -4,10 +4,10 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetMyWorkspacePermissions200PermissionsItemAction } from './getMyWorkspacePermissions200PermissionsItemAction'
-import type { GetMyWorkspacePermissions200PermissionsItemResource } from './getMyWorkspacePermissions200PermissionsItemResource'
+import type { GetMyWorkspacePermissions200PermissionsItemAction } from './getMyWorkspacePermissions200PermissionsItemAction';
+import type { GetMyWorkspacePermissions200PermissionsItemResource } from './getMyWorkspacePermissions200PermissionsItemResource';
 
 export type GetMyWorkspacePermissions200PermissionsItem = {
-  resource: GetMyWorkspacePermissions200PermissionsItemResource
-  action: GetMyWorkspacePermissions200PermissionsItemAction
-}
+  resource: GetMyWorkspacePermissions200PermissionsItemResource;
+  action: GetMyWorkspacePermissions200PermissionsItemAction;
+};

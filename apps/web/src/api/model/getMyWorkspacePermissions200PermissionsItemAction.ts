@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetMyWorkspacePermissions200PermissionsItemAction =
-  (typeof GetMyWorkspacePermissions200PermissionsItemAction)[keyof typeof GetMyWorkspacePermissions200PermissionsItemAction]
+export type GetMyWorkspacePermissions200PermissionsItemAction = typeof GetMyWorkspacePermissions200PermissionsItemAction[keyof typeof GetMyWorkspacePermissions200PermissionsItemAction];
+
 
 export const GetMyWorkspacePermissions200PermissionsItemAction = {
   create: 'create',
@@ -15,4 +15,4 @@ export const GetMyWorkspacePermissions200PermissionsItemAction = {
   delete: 'delete',
   invite: 'invite',
   all: 'all',
-} as const
+} as const;

@@ -6,5 +6,5 @@
  */
 
 export type AcceptInvite200 = {
-  workspaceId: string
-}
+  workspaceId: string;
+};

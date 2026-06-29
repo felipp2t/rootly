@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   AcceptInvite200,
@@ -42,12 +46,15 @@ import type {
   RevokeInvite401,
   RevokeInvite403,
   RevokeInvite404,
-  RevokeInvite500,
-} from '../model'
+  RevokeInvite500
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * List pending invites of a workspace
@@ -78,380 +85,162 @@ export type getWorkspaceInvitesResponse500 = {
   status: 500
 }
 
-export type getWorkspaceInvitesResponseSuccess =
-  getWorkspaceInvitesResponse200 & {
-    headers: Headers
-  }
-export type getWorkspaceInvitesResponseError = (
-  | getWorkspaceInvitesResponse401
-  | getWorkspaceInvitesResponse403
-  | getWorkspaceInvitesResponse404
-  | getWorkspaceInvitesResponse500
-) & {
-  headers: Headers
-}
+export type getWorkspaceInvitesResponseSuccess = (getWorkspaceInvitesResponse200) & {
+  headers: Headers;
+};
+export type getWorkspaceInvitesResponseError = (getWorkspaceInvitesResponse401 | getWorkspaceInvitesResponse403 | getWorkspaceInvitesResponse404 | getWorkspaceInvitesResponse500) & {
+  headers: Headers;
+};
 
-export type getWorkspaceInvitesResponse =
-  | getWorkspaceInvitesResponseSuccess
-  | getWorkspaceInvitesResponseError
+export type getWorkspaceInvitesResponse = (getWorkspaceInvitesResponseSuccess | getWorkspaceInvitesResponseError)
 
-export const getGetWorkspaceInvitesUrl = (workspaceId: string) => {
+export const getGetWorkspaceInvitesUrl = (workspaceId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/invites`
 }
 
-export const getWorkspaceInvites = async (
-  workspaceId: string,
-  options?: RequestInit,
-): Promise<getWorkspaceInvitesResponse> => {
-  return fetchWithAuth<getWorkspaceInvitesResponse>(
-    getGetWorkspaceInvitesUrl(workspaceId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
-}
+export const getWorkspaceInvites = async (workspaceId: string, options?: RequestInit): Promise<getWorkspaceInvitesResponse> => {
+  
+  return fetchWithAuth<getWorkspaceInvitesResponse>(getGetWorkspaceInvitesUrl(workspaceId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getGetWorkspaceInvitesQueryKey = (workspaceId: string) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'workspaces',
-    workspaceId,
-    'invites',
-  ] as const
-}
 
-export const getGetWorkspaceInvitesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+export const getGetWorkspaceInvitesQueryKey = (workspaceId: string,) => {
+    return [
+    'http:','localhost:3333','api','workspaces',workspaceId,'invites'
+    ] as const;
+    }
+
+    
+export const getGetWorkspaceInvitesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetWorkspaceInvitesQueryKey(workspaceId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getWorkspaceInvites>>
-  > = ({ signal }) =>
-    getWorkspaceInvites(workspaceId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspaceInvitesQueryKey(workspaceId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!workspaceId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getWorkspaceInvites>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaceInvites>>> = ({ signal }) => getWorkspaceInvites(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetWorkspaceInvitesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkspaceInvites>>
->
-export type GetWorkspaceInvitesQueryError =
-  | GetWorkspaceInvites401
-  | GetWorkspaceInvites403
-  | GetWorkspaceInvites404
-  | GetWorkspaceInvites500
+export type GetWorkspaceInvitesQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaceInvites>>>
+export type GetWorkspaceInvitesQueryError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500
 
-export function useGetWorkspaceInvites<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+
+export function useGetWorkspaceInvites<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaceInvites>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaceInvites>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceInvites<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceInvites<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaceInvites>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaceInvites>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceInvites<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceInvites<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Workspace Invites
  */
 
-export function useGetWorkspaceInvites<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetWorkspaceInvitesQueryOptions(workspaceId, options)
+export function useGetWorkspaceInvites<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetWorkspaceInvitesQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetWorkspaceInvitesSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetWorkspaceInvitesSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetWorkspaceInvitesQueryKey(workspaceId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getWorkspaceInvites>>
-  > = ({ signal }) =>
-    getWorkspaceInvites(workspaceId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspaceInvitesQueryKey(workspaceId);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getWorkspaceInvites>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaceInvites>>> = ({ signal }) => getWorkspaceInvites(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetWorkspaceInvitesSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkspaceInvites>>
->
-export type GetWorkspaceInvitesSuspenseQueryError =
-  | GetWorkspaceInvites401
-  | GetWorkspaceInvites403
-  | GetWorkspaceInvites404
-  | GetWorkspaceInvites500
+export type GetWorkspaceInvitesSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaceInvites>>>
+export type GetWorkspaceInvitesSuspenseQueryError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500
 
-export function useGetWorkspaceInvitesSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceInvitesSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetWorkspaceInvitesSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetWorkspaceInvitesSuspense<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceInvitesSuspense<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspaceInvitesSuspense<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Workspace Invites
  */
 
-export function useGetWorkspaceInvitesSuspense<
-  TData = Awaited<ReturnType<typeof getWorkspaceInvites>>,
-  TError =
-    | GetWorkspaceInvites401
-    | GetWorkspaceInvites403
-    | GetWorkspaceInvites404
-    | GetWorkspaceInvites500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceInvites>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetWorkspaceInvitesSuspenseQueryOptions(
-    workspaceId,
-    options,
-  )
+export function useGetWorkspaceInvitesSuspense<TData = Awaited<ReturnType<typeof getWorkspaceInvites>>, TError = GetWorkspaceInvites401 | GetWorkspaceInvites403 | GetWorkspaceInvites404 | GetWorkspaceInvites500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getWorkspaceInvites>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetWorkspaceInvitesSuspenseQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Accept a workspace invite
@@ -487,122 +276,82 @@ export type acceptInviteResponse500 = {
   status: 500
 }
 
-export type acceptInviteResponseSuccess = acceptInviteResponse200 & {
-  headers: Headers
-}
-export type acceptInviteResponseError = (
-  | acceptInviteResponse401
-  | acceptInviteResponse403
-  | acceptInviteResponse404
-  | acceptInviteResponse409
-  | acceptInviteResponse500
-) & {
-  headers: Headers
-}
+export type acceptInviteResponseSuccess = (acceptInviteResponse200) & {
+  headers: Headers;
+};
+export type acceptInviteResponseError = (acceptInviteResponse401 | acceptInviteResponse403 | acceptInviteResponse404 | acceptInviteResponse409 | acceptInviteResponse500) & {
+  headers: Headers;
+};
 
-export type acceptInviteResponse =
-  | acceptInviteResponseSuccess
-  | acceptInviteResponseError
+export type acceptInviteResponse = (acceptInviteResponseSuccess | acceptInviteResponseError)
 
-export const getAcceptInviteUrl = (inviteId: string) => {
+export const getAcceptInviteUrl = (inviteId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/invites/${inviteId}/accept`
 }
 
-export const acceptInvite = async (
-  inviteId: string,
-  options?: RequestInit,
-): Promise<acceptInviteResponse> => {
-  return fetchWithAuth<acceptInviteResponse>(getAcceptInviteUrl(inviteId), {
+export const acceptInvite = async (inviteId: string, options?: RequestInit): Promise<acceptInviteResponse> => {
+  
+  return fetchWithAuth<acceptInviteResponse>(getAcceptInviteUrl(inviteId),
+  {      
     ...options,
-    method: 'POST',
-  })
-}
-
-export const getAcceptInviteMutationOptions = <
-  TError =
-    | AcceptInvite401
-    | AcceptInvite403
-    | AcceptInvite404
-    | AcceptInvite409
-    | AcceptInvite500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof acceptInvite>>,
-    TError,
-    { inviteId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof acceptInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  const mutationKey = ['acceptInvite']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof acceptInvite>>,
-    { inviteId: string }
-  > = (props) => {
-    const { inviteId } = props ?? {}
-
-    return acceptInvite(inviteId, requestOptions)
+    method: 'POST'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type AcceptInviteMutationResult = NonNullable<
-  Awaited<ReturnType<typeof acceptInvite>>
->
 
-export type AcceptInviteMutationError =
-  | AcceptInvite401
-  | AcceptInvite403
-  | AcceptInvite404
-  | AcceptInvite409
-  | AcceptInvite500
+export const getAcceptInviteMutationOptions = <TError = AcceptInvite401 | AcceptInvite403 | AcceptInvite404 | AcceptInvite409 | AcceptInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof acceptInvite>>, TError,{inviteId: string}, TContext> => {
 
-/**
+const mutationKey = ['acceptInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acceptInvite>>, {inviteId: string}> = (props) => {
+          const {inviteId} = props ?? {};
+
+          return  acceptInvite(inviteId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AcceptInviteMutationResult = NonNullable<Awaited<ReturnType<typeof acceptInvite>>>
+    
+    export type AcceptInviteMutationError = AcceptInvite401 | AcceptInvite403 | AcceptInvite404 | AcceptInvite409 | AcceptInvite500
+
+    /**
  * @summary Accept Invite
  */
-export const useAcceptInvite = <
-  TError =
-    | AcceptInvite401
-    | AcceptInvite403
-    | AcceptInvite404
-    | AcceptInvite409
-    | AcceptInvite500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof acceptInvite>>,
-      TError,
-      { inviteId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof acceptInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  return useMutation(getAcceptInviteMutationOptions(options), queryClient)
-}
-/**
+export const useAcceptInvite = <TError = AcceptInvite401 | AcceptInvite403 | AcceptInvite404 | AcceptInvite409 | AcceptInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof acceptInvite>>,
+        TError,
+        {inviteId: string},
+        TContext
+      > => {
+      return useMutation(getAcceptInviteMutationOptions(options), queryClient);
+    }
+    /**
  * Decline a workspace invite
  * @summary Decline Invite
  */
@@ -636,122 +385,82 @@ export type declineInviteResponse500 = {
   status: 500
 }
 
-export type declineInviteResponseSuccess = declineInviteResponse204 & {
-  headers: Headers
-}
-export type declineInviteResponseError = (
-  | declineInviteResponse401
-  | declineInviteResponse403
-  | declineInviteResponse404
-  | declineInviteResponse409
-  | declineInviteResponse500
-) & {
-  headers: Headers
-}
+export type declineInviteResponseSuccess = (declineInviteResponse204) & {
+  headers: Headers;
+};
+export type declineInviteResponseError = (declineInviteResponse401 | declineInviteResponse403 | declineInviteResponse404 | declineInviteResponse409 | declineInviteResponse500) & {
+  headers: Headers;
+};
 
-export type declineInviteResponse =
-  | declineInviteResponseSuccess
-  | declineInviteResponseError
+export type declineInviteResponse = (declineInviteResponseSuccess | declineInviteResponseError)
 
-export const getDeclineInviteUrl = (inviteId: string) => {
+export const getDeclineInviteUrl = (inviteId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/invites/${inviteId}/decline`
 }
 
-export const declineInvite = async (
-  inviteId: string,
-  options?: RequestInit,
-): Promise<declineInviteResponse> => {
-  return fetchWithAuth<declineInviteResponse>(getDeclineInviteUrl(inviteId), {
+export const declineInvite = async (inviteId: string, options?: RequestInit): Promise<declineInviteResponse> => {
+  
+  return fetchWithAuth<declineInviteResponse>(getDeclineInviteUrl(inviteId),
+  {      
     ...options,
-    method: 'POST',
-  })
-}
-
-export const getDeclineInviteMutationOptions = <
-  TError =
-    | DeclineInvite401
-    | DeclineInvite403
-    | DeclineInvite404
-    | DeclineInvite409
-    | DeclineInvite500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof declineInvite>>,
-    TError,
-    { inviteId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof declineInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  const mutationKey = ['declineInvite']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof declineInvite>>,
-    { inviteId: string }
-  > = (props) => {
-    const { inviteId } = props ?? {}
-
-    return declineInvite(inviteId, requestOptions)
+    method: 'POST'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type DeclineInviteMutationResult = NonNullable<
-  Awaited<ReturnType<typeof declineInvite>>
->
 
-export type DeclineInviteMutationError =
-  | DeclineInvite401
-  | DeclineInvite403
-  | DeclineInvite404
-  | DeclineInvite409
-  | DeclineInvite500
+export const getDeclineInviteMutationOptions = <TError = DeclineInvite401 | DeclineInvite403 | DeclineInvite404 | DeclineInvite409 | DeclineInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof declineInvite>>, TError,{inviteId: string}, TContext> => {
 
-/**
+const mutationKey = ['declineInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof declineInvite>>, {inviteId: string}> = (props) => {
+          const {inviteId} = props ?? {};
+
+          return  declineInvite(inviteId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeclineInviteMutationResult = NonNullable<Awaited<ReturnType<typeof declineInvite>>>
+    
+    export type DeclineInviteMutationError = DeclineInvite401 | DeclineInvite403 | DeclineInvite404 | DeclineInvite409 | DeclineInvite500
+
+    /**
  * @summary Decline Invite
  */
-export const useDeclineInvite = <
-  TError =
-    | DeclineInvite401
-    | DeclineInvite403
-    | DeclineInvite404
-    | DeclineInvite409
-    | DeclineInvite500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof declineInvite>>,
-      TError,
-      { inviteId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof declineInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  return useMutation(getDeclineInviteMutationOptions(options), queryClient)
-}
-/**
+export const useDeclineInvite = <TError = DeclineInvite401 | DeclineInvite403 | DeclineInvite404 | DeclineInvite409 | DeclineInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof declineInvite>>,
+        TError,
+        {inviteId: string},
+        TContext
+      > => {
+      return useMutation(getDeclineInviteMutationOptions(options), queryClient);
+    }
+    /**
  * Revoke a pending workspace invite
  * @summary Revoke Invite
  */
@@ -780,114 +489,79 @@ export type revokeInviteResponse500 = {
   status: 500
 }
 
-export type revokeInviteResponseSuccess = revokeInviteResponse204 & {
-  headers: Headers
-}
-export type revokeInviteResponseError = (
-  | revokeInviteResponse401
-  | revokeInviteResponse403
-  | revokeInviteResponse404
-  | revokeInviteResponse500
-) & {
-  headers: Headers
-}
+export type revokeInviteResponseSuccess = (revokeInviteResponse204) & {
+  headers: Headers;
+};
+export type revokeInviteResponseError = (revokeInviteResponse401 | revokeInviteResponse403 | revokeInviteResponse404 | revokeInviteResponse500) & {
+  headers: Headers;
+};
 
-export type revokeInviteResponse =
-  | revokeInviteResponseSuccess
-  | revokeInviteResponseError
+export type revokeInviteResponse = (revokeInviteResponseSuccess | revokeInviteResponseError)
 
-export const getRevokeInviteUrl = (inviteId: string) => {
+export const getRevokeInviteUrl = (inviteId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/invites/${inviteId}/revoke`
 }
 
-export const revokeInvite = async (
-  inviteId: string,
-  options?: RequestInit,
-): Promise<revokeInviteResponse> => {
-  return fetchWithAuth<revokeInviteResponse>(getRevokeInviteUrl(inviteId), {
+export const revokeInvite = async (inviteId: string, options?: RequestInit): Promise<revokeInviteResponse> => {
+  
+  return fetchWithAuth<revokeInviteResponse>(getRevokeInviteUrl(inviteId),
+  {      
     ...options,
-    method: 'POST',
-  })
-}
-
-export const getRevokeInviteMutationOptions = <
-  TError =
-    | RevokeInvite401
-    | RevokeInvite403
-    | RevokeInvite404
-    | RevokeInvite500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof revokeInvite>>,
-    TError,
-    { inviteId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof revokeInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  const mutationKey = ['revokeInvite']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof revokeInvite>>,
-    { inviteId: string }
-  > = (props) => {
-    const { inviteId } = props ?? {}
-
-    return revokeInvite(inviteId, requestOptions)
+    method: 'POST'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type RevokeInviteMutationResult = NonNullable<
-  Awaited<ReturnType<typeof revokeInvite>>
->
 
-export type RevokeInviteMutationError =
-  | RevokeInvite401
-  | RevokeInvite403
-  | RevokeInvite404
-  | RevokeInvite500
+export const getRevokeInviteMutationOptions = <TError = RevokeInvite401 | RevokeInvite403 | RevokeInvite404 | RevokeInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof revokeInvite>>, TError,{inviteId: string}, TContext> => {
 
-/**
+const mutationKey = ['revokeInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeInvite>>, {inviteId: string}> = (props) => {
+          const {inviteId} = props ?? {};
+
+          return  revokeInvite(inviteId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeInviteMutationResult = NonNullable<Awaited<ReturnType<typeof revokeInvite>>>
+    
+    export type RevokeInviteMutationError = RevokeInvite401 | RevokeInvite403 | RevokeInvite404 | RevokeInvite500
+
+    /**
  * @summary Revoke Invite
  */
-export const useRevokeInvite = <
-  TError =
-    | RevokeInvite401
-    | RevokeInvite403
-    | RevokeInvite404
-    | RevokeInvite500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof revokeInvite>>,
-      TError,
-      { inviteId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof revokeInvite>>,
-  TError,
-  { inviteId: string },
-  TContext
-> => {
-  return useMutation(getRevokeInviteMutationOptions(options), queryClient)
-}
+export const useRevokeInvite = <TError = RevokeInvite401 | RevokeInvite403 | RevokeInvite404 | RevokeInvite500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeInvite>>, TError,{inviteId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeInvite>>,
+        TError,
+        {inviteId: string},
+        TContext
+      > => {
+      return useMutation(getRevokeInviteMutationOptions(options), queryClient);
+    }
+    

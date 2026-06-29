@@ -6,5 +6,5 @@
  */
 
 export type GetWorkspaceMembers500 = {
-  message: string
-}
+  message: string;
+};

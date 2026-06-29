@@ -6,5 +6,5 @@
  */
 
 export type AssignRoleToMemberBody = {
-  roleId: string
-}
+  roleId: string;
+};

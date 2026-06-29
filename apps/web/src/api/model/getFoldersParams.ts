@@ -6,6 +6,6 @@
  */
 
 export type GetFoldersParams = {
-  parentId?: string
-  workspaceId?: string
-}
+parentId?: string;
+workspaceId?: string;
+};

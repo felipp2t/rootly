@@ -6,5 +6,5 @@
  */
 
 export type CreateAccount201 = {
-  userId: string
-}
+  userId: string;
+};

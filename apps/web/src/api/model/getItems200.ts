@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetItems200ItemsItem } from './getItems200ItemsItem'
+import type { GetItems200ItemsItem } from './getItems200ItemsItem';
 
 export type GetItems200 = {
-  items: GetItems200ItemsItem[]
-}
+  items: GetItems200ItemsItem[];
+};

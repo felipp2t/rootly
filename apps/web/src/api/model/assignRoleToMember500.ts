@@ -6,5 +6,5 @@
  */
 
 export type AssignRoleToMember500 = {
-  message: string
-}
+  message: string;
+};

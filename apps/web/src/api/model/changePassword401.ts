@@ -6,5 +6,5 @@
  */
 
 export type ChangePassword401 = {
-  message: string
-}
+  message: string;
+};

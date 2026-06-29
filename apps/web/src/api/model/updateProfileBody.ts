@@ -7,5 +7,5 @@
 
 export type UpdateProfileBody = {
   /** @minLength 3 */
-  name: string
-}
+  name: string;
+};

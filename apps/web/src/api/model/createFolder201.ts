@@ -6,5 +6,5 @@
  */
 
 export type CreateFolder201 = {
-  folderId: string
-}
+  folderId: string;
+};

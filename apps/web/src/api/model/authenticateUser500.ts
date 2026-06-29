@@ -6,5 +6,5 @@
  */
 
 export type AuthenticateUser500 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type GetMyWorkspacePermissions404 = {
-  message: string
-}
+  message: string;
+};

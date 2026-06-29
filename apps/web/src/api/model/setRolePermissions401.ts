@@ -6,5 +6,5 @@
  */
 
 export type SetRolePermissions401 = {
-  message: string
-}
+  message: string;
+};

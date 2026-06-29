@@ -4,13 +4,15 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation } from '@tanstack/react-query'
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from '@tanstack/react-query'
+  UseMutationResult
+} from '@tanstack/react-query';
 
 import type {
   AuthenticateUser201,
@@ -21,14 +23,20 @@ import type {
   CreateAccount409,
   CreateAccount500,
   CreateAccountBody,
+  Logout204,
+  Logout401,
+  Logout500,
   RefreshAccessToken200,
   RefreshAccessToken401,
-  RefreshAccessToken500,
-} from '../model'
+  RefreshAccessToken500
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Authenticate a user and return a JWT token
@@ -49,108 +57,177 @@ export type authenticateUserResponse500 = {
   status: 500
 }
 
-export type authenticateUserResponseSuccess = authenticateUserResponse201 & {
-  headers: Headers
-}
-export type authenticateUserResponseError = (
-  | authenticateUserResponse401
-  | authenticateUserResponse500
-) & {
-  headers: Headers
-}
+export type authenticateUserResponseSuccess = (authenticateUserResponse201) & {
+  headers: Headers;
+};
+export type authenticateUserResponseError = (authenticateUserResponse401 | authenticateUserResponse500) & {
+  headers: Headers;
+};
 
-export type authenticateUserResponse =
-  | authenticateUserResponseSuccess
-  | authenticateUserResponseError
+export type authenticateUserResponse = (authenticateUserResponseSuccess | authenticateUserResponseError)
 
 export const getAuthenticateUserUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/sessions`
 }
 
-export const authenticateUser = async (
-  authenticateUserBody: AuthenticateUserBody,
-  options?: RequestInit,
-): Promise<authenticateUserResponse> => {
-  return fetchWithAuth<authenticateUserResponse>(getAuthenticateUserUrl(), {
+export const authenticateUser = async (authenticateUserBody: AuthenticateUserBody, options?: RequestInit): Promise<authenticateUserResponse> => {
+  
+  return fetchWithAuth<authenticateUserResponse>(getAuthenticateUserUrl(),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(authenticateUserBody),
-  })
-}
-
-export const getAuthenticateUserMutationOptions = <
-  TError = AuthenticateUser401 | AuthenticateUser500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof authenticateUser>>,
-    TError,
-    { data: AuthenticateUserBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof authenticateUser>>,
-  TError,
-  { data: AuthenticateUserBody },
-  TContext
-> => {
-  const mutationKey = ['authenticateUser']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof authenticateUser>>,
-    { data: AuthenticateUserBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return authenticateUser(data, requestOptions)
+    body: JSON.stringify(
+      authenticateUserBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type AuthenticateUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof authenticateUser>>
->
-export type AuthenticateUserMutationBody = AuthenticateUserBody
-export type AuthenticateUserMutationError =
-  | AuthenticateUser401
-  | AuthenticateUser500
 
-/**
+export const getAuthenticateUserMutationOptions = <TError = AuthenticateUser401 | AuthenticateUser500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticateUser>>, TError,{data: AuthenticateUserBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof authenticateUser>>, TError,{data: AuthenticateUserBody}, TContext> => {
+
+const mutationKey = ['authenticateUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authenticateUser>>, {data: AuthenticateUserBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  authenticateUser(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthenticateUserMutationResult = NonNullable<Awaited<ReturnType<typeof authenticateUser>>>
+    export type AuthenticateUserMutationBody = AuthenticateUserBody
+    export type AuthenticateUserMutationError = AuthenticateUser401 | AuthenticateUser500
+
+    /**
  * @summary Authenticate User
  */
-export const useAuthenticateUser = <
-  TError = AuthenticateUser401 | AuthenticateUser500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof authenticateUser>>,
-      TError,
-      { data: AuthenticateUserBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof authenticateUser>>,
-  TError,
-  { data: AuthenticateUserBody },
-  TContext
-> => {
-  return useMutation(getAuthenticateUserMutationOptions(options), queryClient)
+export const useAuthenticateUser = <TError = AuthenticateUser401 | AuthenticateUser500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticateUser>>, TError,{data: AuthenticateUserBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authenticateUser>>,
+        TError,
+        {data: AuthenticateUserBody},
+        TContext
+      > => {
+      return useMutation(getAuthenticateUserMutationOptions(options), queryClient);
+    }
+    /**
+ * Invalidate the current session
+ * @summary Logout
+ */
+export type logoutResponse204 = {
+  data: Logout204
+  status: 204
 }
-/**
+
+export type logoutResponse401 = {
+  data: Logout401
+  status: 401
+}
+
+export type logoutResponse500 = {
+  data: Logout500
+  status: 500
+}
+
+export type logoutResponseSuccess = (logoutResponse204) & {
+  headers: Headers;
+};
+export type logoutResponseError = (logoutResponse401 | logoutResponse500) & {
+  headers: Headers;
+};
+
+export type logoutResponse = (logoutResponseSuccess | logoutResponseError)
+
+export const getLogoutUrl = () => {
+
+
+  
+
+  return `http://localhost:3333/api/sessions`
+}
+
+export const logout = async ( options?: RequestInit): Promise<logoutResponse> => {
+  
+  return fetchWithAuth<logoutResponse>(getLogoutUrl(),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getLogoutMutationOptions = <TError = Logout401 | Logout500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
+
+const mutationKey = ['logout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logout>>, void> = () => {
+          
+
+          return  logout(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
+    
+    export type LogoutMutationError = Logout401 | Logout500
+
+    /**
+ * @summary Logout
+ */
+export const useLogout = <TError = Logout401 | Logout500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof logout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutMutationOptions(options), queryClient);
+    }
+    /**
  * Exchange a valid refresh token for a new access token and refresh token
  * @summary Refresh Access Token
  */
@@ -169,104 +246,82 @@ export type refreshAccessTokenResponse500 = {
   status: 500
 }
 
-export type refreshAccessTokenResponseSuccess =
-  refreshAccessTokenResponse200 & {
-    headers: Headers
-  }
-export type refreshAccessTokenResponseError = (
-  | refreshAccessTokenResponse401
-  | refreshAccessTokenResponse500
-) & {
-  headers: Headers
-}
+export type refreshAccessTokenResponseSuccess = (refreshAccessTokenResponse200) & {
+  headers: Headers;
+};
+export type refreshAccessTokenResponseError = (refreshAccessTokenResponse401 | refreshAccessTokenResponse500) & {
+  headers: Headers;
+};
 
-export type refreshAccessTokenResponse =
-  | refreshAccessTokenResponseSuccess
-  | refreshAccessTokenResponseError
+export type refreshAccessTokenResponse = (refreshAccessTokenResponseSuccess | refreshAccessTokenResponseError)
 
 export const getRefreshAccessTokenUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/sessions/refresh`
 }
 
-export const refreshAccessToken = async (
-  options?: RequestInit,
-): Promise<refreshAccessTokenResponse> => {
-  return fetchWithAuth<refreshAccessTokenResponse>(getRefreshAccessTokenUrl(), {
+export const refreshAccessToken = async ( options?: RequestInit): Promise<refreshAccessTokenResponse> => {
+  
+  return fetchWithAuth<refreshAccessTokenResponse>(getRefreshAccessTokenUrl(),
+  {      
     ...options,
-    method: 'POST',
-  })
-}
-
-export const getRefreshAccessTokenMutationOptions = <
-  TError = RefreshAccessToken401 | RefreshAccessToken500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof refreshAccessToken>>,
-    TError,
-    void,
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof refreshAccessToken>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ['refreshAccessToken']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof refreshAccessToken>>,
-    void
-  > = () => {
-    return refreshAccessToken(requestOptions)
+    method: 'POST'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type RefreshAccessTokenMutationResult = NonNullable<
-  Awaited<ReturnType<typeof refreshAccessToken>>
->
 
-export type RefreshAccessTokenMutationError =
-  | RefreshAccessToken401
-  | RefreshAccessToken500
+export const getRefreshAccessTokenMutationOptions = <TError = RefreshAccessToken401 | RefreshAccessToken500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshAccessToken>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof refreshAccessToken>>, TError,void, TContext> => {
 
-/**
+const mutationKey = ['refreshAccessToken'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshAccessToken>>, void> = () => {
+          
+
+          return  refreshAccessToken(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RefreshAccessTokenMutationResult = NonNullable<Awaited<ReturnType<typeof refreshAccessToken>>>
+    
+    export type RefreshAccessTokenMutationError = RefreshAccessToken401 | RefreshAccessToken500
+
+    /**
  * @summary Refresh Access Token
  */
-export const useRefreshAccessToken = <
-  TError = RefreshAccessToken401 | RefreshAccessToken500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof refreshAccessToken>>,
-      TError,
-      void,
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof refreshAccessToken>>,
-  TError,
-  void,
-  TContext
-> => {
-  return useMutation(getRefreshAccessTokenMutationOptions(options), queryClient)
-}
-/**
+export const useRefreshAccessToken = <TError = RefreshAccessToken401 | RefreshAccessToken500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshAccessToken>>, TError,void, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof refreshAccessToken>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRefreshAccessTokenMutationOptions(options), queryClient);
+    }
+    /**
  * Register a new user
  * @summary Register User
  */
@@ -285,102 +340,80 @@ export type createAccountResponse500 = {
   status: 500
 }
 
-export type createAccountResponseSuccess = createAccountResponse201 & {
-  headers: Headers
-}
-export type createAccountResponseError = (
-  | createAccountResponse409
-  | createAccountResponse500
-) & {
-  headers: Headers
-}
+export type createAccountResponseSuccess = (createAccountResponse201) & {
+  headers: Headers;
+};
+export type createAccountResponseError = (createAccountResponse409 | createAccountResponse500) & {
+  headers: Headers;
+};
 
-export type createAccountResponse =
-  | createAccountResponseSuccess
-  | createAccountResponseError
+export type createAccountResponse = (createAccountResponseSuccess | createAccountResponseError)
 
 export const getCreateAccountUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/accounts`
 }
 
-export const createAccount = async (
-  createAccountBody: CreateAccountBody,
-  options?: RequestInit,
-): Promise<createAccountResponse> => {
-  return fetchWithAuth<createAccountResponse>(getCreateAccountUrl(), {
+export const createAccount = async (createAccountBody: CreateAccountBody, options?: RequestInit): Promise<createAccountResponse> => {
+  
+  return fetchWithAuth<createAccountResponse>(getCreateAccountUrl(),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createAccountBody),
-  })
-}
-
-export const getCreateAccountMutationOptions = <
-  TError = CreateAccount409 | CreateAccount500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createAccount>>,
-    TError,
-    { data: CreateAccountBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createAccount>>,
-  TError,
-  { data: CreateAccountBody },
-  TContext
-> => {
-  const mutationKey = ['createAccount']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createAccount>>,
-    { data: CreateAccountBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return createAccount(data, requestOptions)
+    body: JSON.stringify(
+      createAccountBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateAccountMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createAccount>>
->
-export type CreateAccountMutationBody = CreateAccountBody
-export type CreateAccountMutationError = CreateAccount409 | CreateAccount500
 
-/**
+export const getCreateAccountMutationOptions = <TError = CreateAccount409 | CreateAccount500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAccount>>, TError,{data: CreateAccountBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAccount>>, TError,{data: CreateAccountBody}, TContext> => {
+
+const mutationKey = ['createAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAccount>>, {data: CreateAccountBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAccount(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAccountMutationResult = NonNullable<Awaited<ReturnType<typeof createAccount>>>
+    export type CreateAccountMutationBody = CreateAccountBody
+    export type CreateAccountMutationError = CreateAccount409 | CreateAccount500
+
+    /**
  * @summary Register User
  */
-export const useCreateAccount = <
-  TError = CreateAccount409 | CreateAccount500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createAccount>>,
-      TError,
-      { data: CreateAccountBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createAccount>>,
-  TError,
-  { data: CreateAccountBody },
-  TContext
-> => {
-  return useMutation(getCreateAccountMutationOptions(options), queryClient)
-}
+export const useCreateAccount = <TError = CreateAccount409 | CreateAccount500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAccount>>, TError,{data: CreateAccountBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAccount>>,
+        TError,
+        {data: CreateAccountBody},
+        TContext
+      > => {
+      return useMutation(getCreateAccountMutationOptions(options), queryClient);
+    }
+    

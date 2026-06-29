@@ -6,5 +6,5 @@
  */
 
 export type CreateTag500 = {
-  message: string
-}
+  message: string;
+};

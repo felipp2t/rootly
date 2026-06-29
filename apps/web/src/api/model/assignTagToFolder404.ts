@@ -6,5 +6,5 @@
  */
 
 export type AssignTagToFolder404 = {
-  message: string
-}
+  message: string;
+};

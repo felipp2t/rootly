@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateRole201,
@@ -45,12 +49,15 @@ import type {
   SetRolePermissions401,
   SetRolePermissions404,
   SetRolePermissions500,
-  SetRolePermissionsBody,
-} from '../model'
+  SetRolePermissionsBody
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * List all roles for a workspace
@@ -76,296 +83,162 @@ export type getRolesResponse500 = {
   status: 500
 }
 
-export type getRolesResponseSuccess = getRolesResponse200 & {
-  headers: Headers
-}
-export type getRolesResponseError = (
-  | getRolesResponse401
-  | getRolesResponse404
-  | getRolesResponse500
-) & {
-  headers: Headers
-}
+export type getRolesResponseSuccess = (getRolesResponse200) & {
+  headers: Headers;
+};
+export type getRolesResponseError = (getRolesResponse401 | getRolesResponse404 | getRolesResponse500) & {
+  headers: Headers;
+};
 
-export type getRolesResponse = getRolesResponseSuccess | getRolesResponseError
+export type getRolesResponse = (getRolesResponseSuccess | getRolesResponseError)
 
-export const getGetRolesUrl = (workspaceId: string) => {
+export const getGetRolesUrl = (workspaceId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/roles`
 }
 
-export const getRoles = async (
-  workspaceId: string,
-  options?: RequestInit,
-): Promise<getRolesResponse> => {
-  return fetchWithAuth<getRolesResponse>(getGetRolesUrl(workspaceId), {
+export const getRoles = async (workspaceId: string, options?: RequestInit): Promise<getRolesResponse> => {
+  
+  return fetchWithAuth<getRolesResponse>(getGetRolesUrl(workspaceId),
+  {      
     ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetRolesQueryKey = (workspaceId: string) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'workspaces',
-    workspaceId,
-    'roles',
-  ] as const
-}
-
-export const getGetRolesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
-
-  const queryKey = queryOptions?.queryKey ?? getGetRolesQueryKey(workspaceId)
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoles>>> = ({
-    signal,
-  }) => getRoles(workspaceId, { signal, ...requestOptions })
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!workspaceId,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData, TError>
+    method: 'GET'
+    
+    
   }
+);}
+  
+
+
+
+
+export const getGetRolesQueryKey = (workspaceId: string,) => {
+    return [
+    'http:','localhost:3333','api','workspaces',workspaceId,'roles'
+    ] as const;
+    }
+
+    
+export const getGetRolesQueryOptions = <TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolesQueryKey(workspaceId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoles>>> = ({ signal }) => getRoles(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetRolesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRoles>>
->
+export type GetRolesQueryResult = NonNullable<Awaited<ReturnType<typeof getRoles>>>
 export type GetRolesQueryError = GetRoles401 | GetRoles404 | GetRoles500
 
-export function useGetRoles<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>
-    > &
-      Pick<
+
+export function useGetRoles<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRoles>>,
           TError,
           Awaited<ReturnType<typeof getRoles>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRoles<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRoles<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRoles>>,
           TError,
           Awaited<ReturnType<typeof getRoles>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRoles<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRoles<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Roles
  */
 
-export function useGetRoles<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetRolesQueryOptions(workspaceId, options)
+export function useGetRoles<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetRolesQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetRolesSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRoles>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetRolesSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetRolesQueryKey(workspaceId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoles>>> = ({
-    signal,
-  }) => getRoles(workspaceId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetRolesQueryKey(workspaceId);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getRoles>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoles>>> = ({ signal }) => getRoles(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetRolesSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRoles>>
->
+export type GetRolesSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getRoles>>>
 export type GetRolesSuspenseQueryError = GetRoles401 | GetRoles404 | GetRoles500
 
-export function useGetRolesSuspense<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRoles>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolesSuspense<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRoles>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolesSuspense<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRoles>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetRolesSuspense<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolesSuspense<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolesSuspense<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Roles
  */
 
-export function useGetRolesSuspense<
-  TData = Awaited<ReturnType<typeof getRoles>>,
-  TError = GetRoles401 | GetRoles404 | GetRoles500,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRoles>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetRolesSuspenseQueryOptions(workspaceId, options)
+export function useGetRolesSuspense<TData = Awaited<ReturnType<typeof getRoles>>, TError = GetRoles401 | GetRoles404 | GetRoles500>(
+ workspaceId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRoles>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetRolesSuspenseQueryOptions(workspaceId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Create a new role in a workspace
@@ -396,113 +269,84 @@ export type createRoleResponse500 = {
   status: 500
 }
 
-export type createRoleResponseSuccess = createRoleResponse201 & {
-  headers: Headers
-}
-export type createRoleResponseError = (
-  | createRoleResponse401
-  | createRoleResponse404
-  | createRoleResponse409
-  | createRoleResponse500
-) & {
-  headers: Headers
-}
+export type createRoleResponseSuccess = (createRoleResponse201) & {
+  headers: Headers;
+};
+export type createRoleResponseError = (createRoleResponse401 | createRoleResponse404 | createRoleResponse409 | createRoleResponse500) & {
+  headers: Headers;
+};
 
-export type createRoleResponse =
-  | createRoleResponseSuccess
-  | createRoleResponseError
+export type createRoleResponse = (createRoleResponseSuccess | createRoleResponseError)
 
-export const getCreateRoleUrl = (workspaceId: string) => {
+export const getCreateRoleUrl = (workspaceId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/roles`
 }
 
-export const createRole = async (
-  workspaceId: string,
-  createRoleBody: CreateRoleBody,
-  options?: RequestInit,
-): Promise<createRoleResponse> => {
-  return fetchWithAuth<createRoleResponse>(getCreateRoleUrl(workspaceId), {
+export const createRole = async (workspaceId: string,
+    createRoleBody: CreateRoleBody, options?: RequestInit): Promise<createRoleResponse> => {
+  
+  return fetchWithAuth<createRoleResponse>(getCreateRoleUrl(workspaceId),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createRoleBody),
-  })
-}
-
-export const getCreateRoleMutationOptions = <
-  TError = CreateRole401 | CreateRole404 | CreateRole409 | CreateRole500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createRole>>,
-    TError,
-    { workspaceId: string; data: CreateRoleBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createRole>>,
-  TError,
-  { workspaceId: string; data: CreateRoleBody },
-  TContext
-> => {
-  const mutationKey = ['createRole']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createRole>>,
-    { workspaceId: string; data: CreateRoleBody }
-  > = (props) => {
-    const { workspaceId, data } = props ?? {}
-
-    return createRole(workspaceId, data, requestOptions)
+    body: JSON.stringify(
+      createRoleBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createRole>>
->
-export type CreateRoleMutationBody = CreateRoleBody
-export type CreateRoleMutationError =
-  | CreateRole401
-  | CreateRole404
-  | CreateRole409
-  | CreateRole500
 
-/**
+export const getCreateRoleMutationOptions = <TError = CreateRole401 | CreateRole404 | CreateRole409 | CreateRole500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError,{workspaceId: string;data: CreateRoleBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError,{workspaceId: string;data: CreateRoleBody}, TContext> => {
+
+const mutationKey = ['createRole'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRole>>, {workspaceId: string;data: CreateRoleBody}> = (props) => {
+          const {workspaceId,data} = props ?? {};
+
+          return  createRole(workspaceId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateRoleMutationResult = NonNullable<Awaited<ReturnType<typeof createRole>>>
+    export type CreateRoleMutationBody = CreateRoleBody
+    export type CreateRoleMutationError = CreateRole401 | CreateRole404 | CreateRole409 | CreateRole500
+
+    /**
  * @summary Create Role
  */
-export const useCreateRole = <
-  TError = CreateRole401 | CreateRole404 | CreateRole409 | CreateRole500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createRole>>,
-      TError,
-      { workspaceId: string; data: CreateRoleBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createRole>>,
-  TError,
-  { workspaceId: string; data: CreateRoleBody },
-  TContext
-> => {
-  return useMutation(getCreateRoleMutationOptions(options), queryClient)
-}
-/**
+export const useCreateRole = <TError = CreateRole401 | CreateRole404 | CreateRole409 | CreateRole500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError,{workspaceId: string;data: CreateRoleBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createRole>>,
+        TError,
+        {workspaceId: string;data: CreateRoleBody},
+        TContext
+      > => {
+      return useMutation(getCreateRoleMutationOptions(options), queryClient);
+    }
+    /**
  * Delete a role from a workspace
  * @summary Delete Role
  */
@@ -531,114 +375,84 @@ export type deleteRoleResponse500 = {
   status: 500
 }
 
-export type deleteRoleResponseSuccess = deleteRoleResponse204 & {
-  headers: Headers
-}
-export type deleteRoleResponseError = (
-  | deleteRoleResponse401
-  | deleteRoleResponse404
-  | deleteRoleResponse409
-  | deleteRoleResponse500
-) & {
-  headers: Headers
-}
+export type deleteRoleResponseSuccess = (deleteRoleResponse204) & {
+  headers: Headers;
+};
+export type deleteRoleResponseError = (deleteRoleResponse401 | deleteRoleResponse404 | deleteRoleResponse409 | deleteRoleResponse500) & {
+  headers: Headers;
+};
 
-export type deleteRoleResponse =
-  | deleteRoleResponseSuccess
-  | deleteRoleResponseError
+export type deleteRoleResponse = (deleteRoleResponseSuccess | deleteRoleResponseError)
 
-export const getDeleteRoleUrl = (workspaceId: string, roleId: string) => {
+export const getDeleteRoleUrl = (workspaceId: string,
+    roleId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/roles/${roleId}`
 }
 
-export const deleteRole = async (
-  workspaceId: string,
-  roleId: string,
-  options?: RequestInit,
-): Promise<deleteRoleResponse> => {
-  return fetchWithAuth<deleteRoleResponse>(
-    getDeleteRoleUrl(workspaceId, roleId),
-    {
-      ...options,
-      method: 'DELETE',
-    },
-  )
-}
-
-export const getDeleteRoleMutationOptions = <
-  TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteRole>>,
-    TError,
-    { workspaceId: string; roleId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteRole>>,
-  TError,
-  { workspaceId: string; roleId: string },
-  TContext
-> => {
-  const mutationKey = ['deleteRole']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteRole>>,
-    { workspaceId: string; roleId: string }
-  > = (props) => {
-    const { workspaceId, roleId } = props ?? {}
-
-    return deleteRole(workspaceId, roleId, requestOptions)
+export const deleteRole = async (workspaceId: string,
+    roleId: string, options?: RequestInit): Promise<deleteRoleResponse> => {
+  
+  return fetchWithAuth<deleteRoleResponse>(getDeleteRoleUrl(workspaceId,roleId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type DeleteRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteRole>>
->
 
-export type DeleteRoleMutationError =
-  | DeleteRole401
-  | DeleteRole404
-  | DeleteRole409
-  | DeleteRole500
+export const getDeleteRoleMutationOptions = <TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRole>>, TError,{workspaceId: string;roleId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteRole>>, TError,{workspaceId: string;roleId: string}, TContext> => {
 
-/**
+const mutationKey = ['deleteRole'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRole>>, {workspaceId: string;roleId: string}> = (props) => {
+          const {workspaceId,roleId} = props ?? {};
+
+          return  deleteRole(workspaceId,roleId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteRoleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteRole>>>
+    
+    export type DeleteRoleMutationError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500
+
+    /**
  * @summary Delete Role
  */
-export const useDeleteRole = <
-  TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteRole>>,
-      TError,
-      { workspaceId: string; roleId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteRole>>,
-  TError,
-  { workspaceId: string; roleId: string },
-  TContext
-> => {
-  return useMutation(getDeleteRoleMutationOptions(options), queryClient)
-}
-/**
+export const useDeleteRole = <TError = DeleteRole401 | DeleteRole404 | DeleteRole409 | DeleteRole500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRole>>, TError,{workspaceId: string;roleId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteRole>>,
+        TError,
+        {workspaceId: string;roleId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteRoleMutationOptions(options), queryClient);
+    }
+    /**
  * List all permissions for a role
  * @summary Get Role Permissions
  */
@@ -662,391 +476,175 @@ export type getRolePermissionsResponse500 = {
   status: 500
 }
 
-export type getRolePermissionsResponseSuccess =
-  getRolePermissionsResponse200 & {
-    headers: Headers
-  }
-export type getRolePermissionsResponseError = (
-  | getRolePermissionsResponse401
-  | getRolePermissionsResponse404
-  | getRolePermissionsResponse500
-) & {
-  headers: Headers
-}
+export type getRolePermissionsResponseSuccess = (getRolePermissionsResponse200) & {
+  headers: Headers;
+};
+export type getRolePermissionsResponseError = (getRolePermissionsResponse401 | getRolePermissionsResponse404 | getRolePermissionsResponse500) & {
+  headers: Headers;
+};
 
-export type getRolePermissionsResponse =
-  | getRolePermissionsResponseSuccess
-  | getRolePermissionsResponseError
+export type getRolePermissionsResponse = (getRolePermissionsResponseSuccess | getRolePermissionsResponseError)
 
-export const getGetRolePermissionsUrl = (
-  workspaceId: string,
-  roleId: string,
-) => {
+export const getGetRolePermissionsUrl = (workspaceId: string,
+    roleId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/roles/${roleId}/permissions`
 }
 
-export const getRolePermissions = async (
-  workspaceId: string,
-  roleId: string,
-  options?: RequestInit,
-): Promise<getRolePermissionsResponse> => {
-  return fetchWithAuth<getRolePermissionsResponse>(
-    getGetRolePermissionsUrl(workspaceId, roleId),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
-}
+export const getRolePermissions = async (workspaceId: string,
+    roleId: string, options?: RequestInit): Promise<getRolePermissionsResponse> => {
+  
+  return fetchWithAuth<getRolePermissionsResponse>(getGetRolePermissionsUrl(workspaceId,roleId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getGetRolePermissionsQueryKey = (
-  workspaceId: string,
-  roleId: string,
+
+
+
+export const getGetRolePermissionsQueryKey = (workspaceId: string,
+    roleId: string,) => {
+    return [
+    'http:','localhost:3333','api','workspaces',workspaceId,'roles',roleId,'permissions'
+    ] as const;
+    }
+
+    
+export const getGetRolePermissionsQueryOptions = <TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'workspaces',
-    workspaceId,
-    'roles',
-    roleId,
-    'permissions',
-  ] as const
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRolePermissionsQueryKey(workspaceId,roleId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolePermissions>>> = ({ signal }) => getRolePermissions(workspaceId,roleId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId && roleId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export const getGetRolePermissionsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
+export type GetRolePermissionsQueryResult = NonNullable<Awaited<ReturnType<typeof getRolePermissions>>>
+export type GetRolePermissionsQueryError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetRolePermissionsQueryKey(workspaceId, roleId)
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRolePermissions>>
-  > = ({ signal }) =>
-    getRolePermissions(workspaceId, roleId, { signal, ...requestOptions })
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(workspaceId && roleId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getRolePermissions>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetRolePermissionsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRolePermissions>>
->
-export type GetRolePermissionsQueryError =
-  | GetRolePermissions401
-  | GetRolePermissions404
-  | GetRolePermissions500
-
-export function useGetRolePermissions<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export function useGetRolePermissions<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRolePermissions>>,
           TError,
           Awaited<ReturnType<typeof getRolePermissions>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolePermissions<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolePermissions<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRolePermissions>>,
           TError,
           Awaited<ReturnType<typeof getRolePermissions>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolePermissions<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolePermissions<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Role Permissions
  */
 
-export function useGetRolePermissions<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetRolePermissionsQueryOptions(
-    workspaceId,
-    roleId,
-    options,
-  )
+export function useGetRolePermissions<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetRolePermissionsQueryOptions(workspaceId,roleId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetRolePermissionsSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetRolePermissionsSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetRolePermissionsQueryKey(workspaceId, roleId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getRolePermissions>>
-  > = ({ signal }) =>
-    getRolePermissions(workspaceId, roleId, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetRolePermissionsQueryKey(workspaceId,roleId);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getRolePermissions>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolePermissions>>> = ({ signal }) => getRolePermissions(workspaceId,roleId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetRolePermissionsSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getRolePermissions>>
->
-export type GetRolePermissionsSuspenseQueryError =
-  | GetRolePermissions401
-  | GetRolePermissions404
-  | GetRolePermissions500
+export type GetRolePermissionsSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getRolePermissions>>>
+export type GetRolePermissionsSuspenseQueryError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500
 
-export function useGetRolePermissionsSuspense<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolePermissionsSuspense<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetRolePermissionsSuspense<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetRolePermissionsSuspense<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolePermissionsSuspense<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRolePermissionsSuspense<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Role Permissions
  */
 
-export function useGetRolePermissionsSuspense<
-  TData = Awaited<ReturnType<typeof getRolePermissions>>,
-  TError =
-    | GetRolePermissions401
-    | GetRolePermissions404
-    | GetRolePermissions500,
->(
-  workspaceId: string,
-  roleId: string,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getRolePermissions>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetRolePermissionsSuspenseQueryOptions(
-    workspaceId,
-    roleId,
-    options,
-  )
+export function useGetRolePermissionsSuspense<TData = Awaited<ReturnType<typeof getRolePermissions>>, TError = GetRolePermissions401 | GetRolePermissions404 | GetRolePermissions500>(
+ workspaceId: string,
+    roleId: string, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getRolePermissions>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetRolePermissionsSuspenseQueryOptions(workspaceId,roleId,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Replace all permissions for a role
@@ -1077,125 +675,83 @@ export type setRolePermissionsResponse500 = {
   status: 500
 }
 
-export type setRolePermissionsResponseSuccess =
-  setRolePermissionsResponse204 & {
-    headers: Headers
-  }
-export type setRolePermissionsResponseError = (
-  | setRolePermissionsResponse400
-  | setRolePermissionsResponse401
-  | setRolePermissionsResponse404
-  | setRolePermissionsResponse500
-) & {
-  headers: Headers
-}
+export type setRolePermissionsResponseSuccess = (setRolePermissionsResponse204) & {
+  headers: Headers;
+};
+export type setRolePermissionsResponseError = (setRolePermissionsResponse400 | setRolePermissionsResponse401 | setRolePermissionsResponse404 | setRolePermissionsResponse500) & {
+  headers: Headers;
+};
 
-export type setRolePermissionsResponse =
-  | setRolePermissionsResponseSuccess
-  | setRolePermissionsResponseError
+export type setRolePermissionsResponse = (setRolePermissionsResponseSuccess | setRolePermissionsResponseError)
 
-export const getSetRolePermissionsUrl = (
-  workspaceId: string,
-  roleId: string,
-) => {
+export const getSetRolePermissionsUrl = (workspaceId: string,
+    roleId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/workspaces/${workspaceId}/roles/${roleId}/permissions`
 }
 
-export const setRolePermissions = async (
-  workspaceId: string,
-  roleId: string,
-  setRolePermissionsBody: SetRolePermissionsBody,
-  options?: RequestInit,
-): Promise<setRolePermissionsResponse> => {
-  return fetchWithAuth<setRolePermissionsResponse>(
-    getSetRolePermissionsUrl(workspaceId, roleId),
-    {
-      ...options,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(setRolePermissionsBody),
-    },
-  )
-}
-
-export const getSetRolePermissionsMutationOptions = <
-  TError =
-    | SetRolePermissions400
-    | SetRolePermissions401
-    | SetRolePermissions404
-    | SetRolePermissions500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof setRolePermissions>>,
-    TError,
-    { workspaceId: string; roleId: string; data: SetRolePermissionsBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof setRolePermissions>>,
-  TError,
-  { workspaceId: string; roleId: string; data: SetRolePermissionsBody },
-  TContext
-> => {
-  const mutationKey = ['setRolePermissions']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof setRolePermissions>>,
-    { workspaceId: string; roleId: string; data: SetRolePermissionsBody }
-  > = (props) => {
-    const { workspaceId, roleId, data } = props ?? {}
-
-    return setRolePermissions(workspaceId, roleId, data, requestOptions)
+export const setRolePermissions = async (workspaceId: string,
+    roleId: string,
+    setRolePermissionsBody: SetRolePermissionsBody, options?: RequestInit): Promise<setRolePermissionsResponse> => {
+  
+  return fetchWithAuth<setRolePermissionsResponse>(getSetRolePermissionsUrl(workspaceId,roleId),
+  {      
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      setRolePermissionsBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type SetRolePermissionsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof setRolePermissions>>
->
-export type SetRolePermissionsMutationBody = SetRolePermissionsBody
-export type SetRolePermissionsMutationError =
-  | SetRolePermissions400
-  | SetRolePermissions401
-  | SetRolePermissions404
-  | SetRolePermissions500
 
-/**
+export const getSetRolePermissionsMutationOptions = <TError = SetRolePermissions400 | SetRolePermissions401 | SetRolePermissions404 | SetRolePermissions500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRolePermissions>>, TError,{workspaceId: string;roleId: string;data: SetRolePermissionsBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof setRolePermissions>>, TError,{workspaceId: string;roleId: string;data: SetRolePermissionsBody}, TContext> => {
+
+const mutationKey = ['setRolePermissions'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setRolePermissions>>, {workspaceId: string;roleId: string;data: SetRolePermissionsBody}> = (props) => {
+          const {workspaceId,roleId,data} = props ?? {};
+
+          return  setRolePermissions(workspaceId,roleId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetRolePermissionsMutationResult = NonNullable<Awaited<ReturnType<typeof setRolePermissions>>>
+    export type SetRolePermissionsMutationBody = SetRolePermissionsBody
+    export type SetRolePermissionsMutationError = SetRolePermissions400 | SetRolePermissions401 | SetRolePermissions404 | SetRolePermissions500
+
+    /**
  * @summary Set Role Permissions
  */
-export const useSetRolePermissions = <
-  TError =
-    | SetRolePermissions400
-    | SetRolePermissions401
-    | SetRolePermissions404
-    | SetRolePermissions500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof setRolePermissions>>,
-      TError,
-      { workspaceId: string; roleId: string; data: SetRolePermissionsBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof setRolePermissions>>,
-  TError,
-  { workspaceId: string; roleId: string; data: SetRolePermissionsBody },
-  TContext
-> => {
-  return useMutation(getSetRolePermissionsMutationOptions(options), queryClient)
-}
+export const useSetRolePermissions = <TError = SetRolePermissions400 | SetRolePermissions401 | SetRolePermissions404 | SetRolePermissions500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRolePermissions>>, TError,{workspaceId: string;roleId: string;data: SetRolePermissionsBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setRolePermissions>>,
+        TError,
+        {workspaceId: string;roleId: string;data: SetRolePermissionsBody},
+        TContext
+      > => {
+      return useMutation(getSetRolePermissionsMutationOptions(options), queryClient);
+    }
+    

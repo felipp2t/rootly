@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { ResolveFolderPath200PathItem } from './resolveFolderPath200PathItem'
+import type { ResolveFolderPath200PathItem } from './resolveFolderPath200PathItem';
 
 export type ResolveFolderPath200 = {
-  path: ResolveFolderPath200PathItem[]
-}
+  path: ResolveFolderPath200PathItem[];
+};

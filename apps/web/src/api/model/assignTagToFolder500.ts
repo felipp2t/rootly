@@ -6,5 +6,5 @@
  */
 
 export type AssignTagToFolder500 = {
-  message: string
-}
+  message: string;
+};

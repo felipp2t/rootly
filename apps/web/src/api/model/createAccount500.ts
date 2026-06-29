@@ -6,5 +6,5 @@
  */
 
 export type CreateAccount500 = {
-  message: string
-}
+  message: string;
+};

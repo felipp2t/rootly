@@ -6,5 +6,5 @@
  */
 
 export type ResolveFolderPath500 = {
-  message: string
-}
+  message: string;
+};

@@ -5,12 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetItems200ItemsItemType =
-  (typeof GetItems200ItemsItemType)[keyof typeof GetItems200ItemsItemType]
+export type GetItems200ItemsItemType = typeof GetItems200ItemsItemType[keyof typeof GetItems200ItemsItemType];
+
 
 export const GetItems200ItemsItemType = {
   link: 'link',
   document: 'document',
   text: 'text',
   secret: 'secret',
-} as const
+} as const;

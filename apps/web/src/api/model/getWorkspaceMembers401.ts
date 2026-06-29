@@ -6,5 +6,5 @@
  */
 
 export type GetWorkspaceMembers401 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type AssignTagToItem500 = {
-  message: string
-}
+  message: string;
+};

@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetWorkspace200Workspace } from './getWorkspace200Workspace'
+import type { GetWorkspace200Workspace } from './getWorkspace200Workspace';
 
 export type GetWorkspace200 = {
-  workspace: GetWorkspace200Workspace
-}
+  workspace: GetWorkspace200Workspace;
+};

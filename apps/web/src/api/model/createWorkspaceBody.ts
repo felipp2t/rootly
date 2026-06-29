@@ -6,5 +6,5 @@
  */
 
 export type CreateWorkspaceBody = {
-  name: string
-}
+  name: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type GetFolders401 = {
-  message: string
-}
+  message: string;
+};

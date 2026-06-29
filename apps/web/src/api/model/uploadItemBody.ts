@@ -6,8 +6,8 @@
  */
 
 export type UploadItemBody = {
-  title: string
-  workspaceId: string
-  folderId?: string
-  file: Blob
-}
+  title: string;
+  workspaceId: string;
+  folderId?: string;
+  file: Blob;
+};

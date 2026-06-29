@@ -6,5 +6,5 @@
  */
 
 export type UploadItem500 = {
-  message: string
-}
+  message: string;
+};

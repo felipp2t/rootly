@@ -6,5 +6,5 @@
  */
 
 export type CreateItem401 = {
-  message: string
-}
+  message: string;
+};

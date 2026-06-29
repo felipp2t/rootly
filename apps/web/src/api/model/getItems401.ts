@@ -6,5 +6,5 @@
  */
 
 export type GetItems401 = {
-  message: string
-}
+  message: string;
+};

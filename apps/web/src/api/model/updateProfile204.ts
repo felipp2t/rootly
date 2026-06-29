@@ -8,8 +8,8 @@
 /**
  * @nullable
  */
-export type UpdateProfile204 =
-  | (typeof UpdateProfile204)[keyof typeof UpdateProfile204]
-  | null
+export type UpdateProfile204 = typeof UpdateProfile204[keyof typeof UpdateProfile204] | null;
 
-export const UpdateProfile204 = {} as const
+
+export const UpdateProfile204 = {
+} as const;

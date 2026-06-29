@@ -6,10 +6,10 @@
  */
 
 export type GetWorkspaceMembers200MembersItem = {
-  id: string
-  userId: string
-  name: string
-  email: string
-  roleId: string
-  roleName: string
-}
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  roleId: string;
+  roleName: string;
+};

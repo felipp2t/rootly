@@ -6,5 +6,5 @@
  */
 
 export type UpdateWorkspace500 = {
-  message: string
-}
+  message: string;
+};

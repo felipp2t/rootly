@@ -6,5 +6,5 @@
  */
 
 export type GetWorkspace401 = {
-  message: string
-}
+  message: string;
+};

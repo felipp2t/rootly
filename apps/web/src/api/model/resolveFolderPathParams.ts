@@ -6,6 +6,6 @@
  */
 
 export type ResolveFolderPathParams = {
-  workspaceId: string
-  path?: string
-}
+workspaceId: string;
+path?: string;
+};

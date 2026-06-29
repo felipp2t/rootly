@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   AssignTagToFolder401,
@@ -40,12 +44,15 @@ import type {
   ResolveFolderPath401,
   ResolveFolderPath404,
   ResolveFolderPath500,
-  ResolveFolderPathParams,
-} from '../model'
+  ResolveFolderPathParams
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Create a new folder
@@ -76,120 +83,83 @@ export type createFolderResponse500 = {
   status: 500
 }
 
-export type createFolderResponseSuccess = createFolderResponse201 & {
-  headers: Headers
-}
-export type createFolderResponseError = (
-  | createFolderResponse400
-  | createFolderResponse401
-  | createFolderResponse409
-  | createFolderResponse500
-) & {
-  headers: Headers
-}
+export type createFolderResponseSuccess = (createFolderResponse201) & {
+  headers: Headers;
+};
+export type createFolderResponseError = (createFolderResponse400 | createFolderResponse401 | createFolderResponse409 | createFolderResponse500) & {
+  headers: Headers;
+};
 
-export type createFolderResponse =
-  | createFolderResponseSuccess
-  | createFolderResponseError
+export type createFolderResponse = (createFolderResponseSuccess | createFolderResponseError)
 
 export const getCreateFolderUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/folders`
 }
 
-export const createFolder = async (
-  createFolderBody: CreateFolderBody,
-  options?: RequestInit,
-): Promise<createFolderResponse> => {
-  return fetchWithAuth<createFolderResponse>(getCreateFolderUrl(), {
+export const createFolder = async (createFolderBody: CreateFolderBody, options?: RequestInit): Promise<createFolderResponse> => {
+  
+  return fetchWithAuth<createFolderResponse>(getCreateFolderUrl(),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createFolderBody),
-  })
-}
-
-export const getCreateFolderMutationOptions = <
-  TError =
-    | CreateFolder400
-    | CreateFolder401
-    | CreateFolder409
-    | CreateFolder500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createFolder>>,
-    TError,
-    { data: CreateFolderBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createFolder>>,
-  TError,
-  { data: CreateFolderBody },
-  TContext
-> => {
-  const mutationKey = ['createFolder']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createFolder>>,
-    { data: CreateFolderBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return createFolder(data, requestOptions)
+    body: JSON.stringify(
+      createFolderBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateFolderMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createFolder>>
->
-export type CreateFolderMutationBody = CreateFolderBody
-export type CreateFolderMutationError =
-  | CreateFolder400
-  | CreateFolder401
-  | CreateFolder409
-  | CreateFolder500
 
-/**
+export const getCreateFolderMutationOptions = <TError = CreateFolder400 | CreateFolder401 | CreateFolder409 | CreateFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFolder>>, TError,{data: CreateFolderBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFolder>>, TError,{data: CreateFolderBody}, TContext> => {
+
+const mutationKey = ['createFolder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFolder>>, {data: CreateFolderBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFolder(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFolderMutationResult = NonNullable<Awaited<ReturnType<typeof createFolder>>>
+    export type CreateFolderMutationBody = CreateFolderBody
+    export type CreateFolderMutationError = CreateFolder400 | CreateFolder401 | CreateFolder409 | CreateFolder500
+
+    /**
  * @summary Create Folder
  */
-export const useCreateFolder = <
-  TError =
-    | CreateFolder400
-    | CreateFolder401
-    | CreateFolder409
-    | CreateFolder500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createFolder>>,
-      TError,
-      { data: CreateFolderBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createFolder>>,
-  TError,
-  { data: CreateFolderBody },
-  TContext
-> => {
-  return useMutation(getCreateFolderMutationOptions(options), queryClient)
-}
-/**
+export const useCreateFolder = <TError = CreateFolder400 | CreateFolder401 | CreateFolder409 | CreateFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFolder>>, TError,{data: CreateFolderBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createFolder>>,
+        TError,
+        {data: CreateFolderBody},
+        TContext
+      > => {
+      return useMutation(getCreateFolderMutationOptions(options), queryClient);
+    }
+    /**
  * List folders. Optionally filter by parentId or workspaceId.
  * @summary Get Folders
  */
@@ -208,305 +178,169 @@ export type getFoldersResponse500 = {
   status: 500
 }
 
-export type getFoldersResponseSuccess = getFoldersResponse200 & {
-  headers: Headers
-}
-export type getFoldersResponseError = (
-  | getFoldersResponse401
-  | getFoldersResponse500
-) & {
-  headers: Headers
-}
+export type getFoldersResponseSuccess = (getFoldersResponse200) & {
+  headers: Headers;
+};
+export type getFoldersResponseError = (getFoldersResponse401 | getFoldersResponse500) & {
+  headers: Headers;
+};
 
-export type getFoldersResponse =
-  | getFoldersResponseSuccess
-  | getFoldersResponseError
+export type getFoldersResponse = (getFoldersResponseSuccess | getFoldersResponseError)
 
-export const getGetFoldersUrl = (params?: GetFoldersParams) => {
-  const normalizedParams = new URLSearchParams()
+export const getGetFoldersUrl = (params?: GetFoldersParams,) => {
+  const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  });
 
-  const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `http://localhost:3333/api/folders?${stringifiedParams}`
-    : `http://localhost:3333/api/folders`
+  return stringifiedParams.length > 0 ? `http://localhost:3333/api/folders?${stringifiedParams}` : `http://localhost:3333/api/folders`
 }
 
-export const getFolders = async (
-  params?: GetFoldersParams,
-  options?: RequestInit,
-): Promise<getFoldersResponse> => {
-  return fetchWithAuth<getFoldersResponse>(getGetFoldersUrl(params), {
+export const getFolders = async (params?: GetFoldersParams, options?: RequestInit): Promise<getFoldersResponse> => {
+  
+  return fetchWithAuth<getFoldersResponse>(getGetFoldersUrl(params),
+  {      
     ...options,
-    method: 'GET',
-  })
-}
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getGetFoldersQueryKey = (params?: GetFoldersParams) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'folders',
-    ...(params ? [params] : []),
-  ] as const
-}
 
-export const getGetFoldersQueryOptions = <
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+export const getGetFoldersQueryKey = (params?: GetFoldersParams,) => {
+    return [
+    'http:','localhost:3333','api','folders', ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetFoldersQueryOptions = <TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(params?: GetFoldersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetFoldersQueryKey(params)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({
-    signal,
-  }) => getFolders(params, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetFoldersQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getFolders>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({ signal }) => getFolders(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetFoldersQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getFolders>>
->
+export type GetFoldersQueryResult = NonNullable<Awaited<ReturnType<typeof getFolders>>>
 export type GetFoldersQueryError = GetFolders401 | GetFolders500
 
-export function useGetFolders<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params: undefined | GetFoldersParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
-    > &
-      Pick<
+
+export function useGetFolders<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params: undefined |  GetFoldersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getFolders>>,
           TError,
           Awaited<ReturnType<typeof getFolders>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetFolders<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFolders<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getFolders>>,
           TError,
           Awaited<ReturnType<typeof getFolders>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetFolders<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFolders<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Folders
  */
 
-export function useGetFolders<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetFoldersQueryOptions(params, options)
+export function useGetFolders<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetFoldersQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetFoldersSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getFolders>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetFoldersSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(params?: GetFoldersParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetFoldersQueryKey(params)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({
-    signal,
-  }) => getFolders(params, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetFoldersQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getFolders>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFolders>>> = ({ signal }) => getFolders(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetFoldersSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getFolders>>
->
+export type GetFoldersSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getFolders>>>
 export type GetFoldersSuspenseQueryError = GetFolders401 | GetFolders500
 
-export function useGetFoldersSuspense<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params: undefined | GetFoldersParams,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getFolders>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetFoldersSuspense<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getFolders>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetFoldersSuspense<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getFolders>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetFoldersSuspense<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params: undefined |  GetFoldersParams, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFoldersSuspense<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFoldersSuspense<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Folders
  */
 
-export function useGetFoldersSuspense<
-  TData = Awaited<ReturnType<typeof getFolders>>,
-  TError = GetFolders401 | GetFolders500,
->(
-  params?: GetFoldersParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getFolders>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetFoldersSuspenseQueryOptions(params, options)
+export function useGetFoldersSuspense<TData = Awaited<ReturnType<typeof getFolders>>, TError = GetFolders401 | GetFolders500>(
+ params?: GetFoldersParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getFolders>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetFoldersSuspenseQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Assign an existing tag to a folder
@@ -532,112 +366,84 @@ export type assignTagToFolderResponse500 = {
   status: 500
 }
 
-export type assignTagToFolderResponseSuccess = assignTagToFolderResponse204 & {
-  headers: Headers
-}
-export type assignTagToFolderResponseError = (
-  | assignTagToFolderResponse401
-  | assignTagToFolderResponse404
-  | assignTagToFolderResponse500
-) & {
-  headers: Headers
-}
+export type assignTagToFolderResponseSuccess = (assignTagToFolderResponse204) & {
+  headers: Headers;
+};
+export type assignTagToFolderResponseError = (assignTagToFolderResponse401 | assignTagToFolderResponse404 | assignTagToFolderResponse500) & {
+  headers: Headers;
+};
 
-export type assignTagToFolderResponse =
-  | assignTagToFolderResponseSuccess
-  | assignTagToFolderResponseError
+export type assignTagToFolderResponse = (assignTagToFolderResponseSuccess | assignTagToFolderResponseError)
 
-export const getAssignTagToFolderUrl = (folderId: string, tagId: string) => {
+export const getAssignTagToFolderUrl = (folderId: string,
+    tagId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/folders/${folderId}/tags/${tagId}`
 }
 
-export const assignTagToFolder = async (
-  folderId: string,
-  tagId: string,
-  options?: RequestInit,
-): Promise<assignTagToFolderResponse> => {
-  return fetchWithAuth<assignTagToFolderResponse>(
-    getAssignTagToFolderUrl(folderId, tagId),
-    {
-      ...options,
-      method: 'PATCH',
-    },
-  )
-}
-
-export const getAssignTagToFolderMutationOptions = <
-  TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof assignTagToFolder>>,
-    TError,
-    { folderId: string; tagId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof assignTagToFolder>>,
-  TError,
-  { folderId: string; tagId: string },
-  TContext
-> => {
-  const mutationKey = ['assignTagToFolder']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof assignTagToFolder>>,
-    { folderId: string; tagId: string }
-  > = (props) => {
-    const { folderId, tagId } = props ?? {}
-
-    return assignTagToFolder(folderId, tagId, requestOptions)
+export const assignTagToFolder = async (folderId: string,
+    tagId: string, options?: RequestInit): Promise<assignTagToFolderResponse> => {
+  
+  return fetchWithAuth<assignTagToFolderResponse>(getAssignTagToFolderUrl(folderId,tagId),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type AssignTagToFolderMutationResult = NonNullable<
-  Awaited<ReturnType<typeof assignTagToFolder>>
->
 
-export type AssignTagToFolderMutationError =
-  | AssignTagToFolder401
-  | AssignTagToFolder404
-  | AssignTagToFolder500
+export const getAssignTagToFolderMutationOptions = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext> => {
 
-/**
+const mutationKey = ['assignTagToFolder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTagToFolder>>, {folderId: string;tagId: string}> = (props) => {
+          const {folderId,tagId} = props ?? {};
+
+          return  assignTagToFolder(folderId,tagId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignTagToFolderMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToFolder>>>
+    
+    export type AssignTagToFolderMutationError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500
+
+    /**
  * @summary Assign Tag to Folder
  */
-export const useAssignTagToFolder = <
-  TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof assignTagToFolder>>,
-      TError,
-      { folderId: string; tagId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof assignTagToFolder>>,
-  TError,
-  { folderId: string; tagId: string },
-  TContext
-> => {
-  return useMutation(getAssignTagToFolderMutationOptions(options), queryClient)
-}
-/**
+export const useAssignTagToFolder = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignTagToFolder>>,
+        TError,
+        {folderId: string;tagId: string},
+        TContext
+      > => {
+      return useMutation(getAssignTagToFolderMutationOptions(options), queryClient);
+    }
+    /**
  * Resolve a folder path (list of ids separated by /) into the ordered chain of folder names. Validates that every id belongs to the workspace and that each folder is a child of the previous.
  * @summary Resolve Folder Path
  */
@@ -661,337 +467,167 @@ export type resolveFolderPathResponse500 = {
   status: 500
 }
 
-export type resolveFolderPathResponseSuccess = resolveFolderPathResponse200 & {
-  headers: Headers
-}
-export type resolveFolderPathResponseError = (
-  | resolveFolderPathResponse401
-  | resolveFolderPathResponse404
-  | resolveFolderPathResponse500
-) & {
-  headers: Headers
-}
+export type resolveFolderPathResponseSuccess = (resolveFolderPathResponse200) & {
+  headers: Headers;
+};
+export type resolveFolderPathResponseError = (resolveFolderPathResponse401 | resolveFolderPathResponse404 | resolveFolderPathResponse500) & {
+  headers: Headers;
+};
 
-export type resolveFolderPathResponse =
-  | resolveFolderPathResponseSuccess
-  | resolveFolderPathResponseError
+export type resolveFolderPathResponse = (resolveFolderPathResponseSuccess | resolveFolderPathResponseError)
 
-export const getResolveFolderPathUrl = (params: ResolveFolderPathParams) => {
-  const normalizedParams = new URLSearchParams()
+export const getResolveFolderPathUrl = (params: ResolveFolderPathParams,) => {
+  const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  });
 
-  const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `http://localhost:3333/api/folders/resolve-path?${stringifiedParams}`
-    : `http://localhost:3333/api/folders/resolve-path`
+  return stringifiedParams.length > 0 ? `http://localhost:3333/api/folders/resolve-path?${stringifiedParams}` : `http://localhost:3333/api/folders/resolve-path`
 }
 
-export const resolveFolderPath = async (
-  params: ResolveFolderPathParams,
-  options?: RequestInit,
-): Promise<resolveFolderPathResponse> => {
-  return fetchWithAuth<resolveFolderPathResponse>(
-    getResolveFolderPathUrl(params),
-    {
-      ...options,
-      method: 'GET',
-    },
-  )
-}
+export const resolveFolderPath = async (params: ResolveFolderPathParams, options?: RequestInit): Promise<resolveFolderPathResponse> => {
+  
+  return fetchWithAuth<resolveFolderPathResponse>(getResolveFolderPathUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getResolveFolderPathQueryKey = (
-  params?: ResolveFolderPathParams,
+
+
+
+export const getResolveFolderPathQueryKey = (params?: ResolveFolderPathParams,) => {
+    return [
+    'http:','localhost:3333','api','folders','resolve-path', ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getResolveFolderPathQueryOptions = <TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(params: ResolveFolderPathParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'folders',
-    'resolve-path',
-    ...(params ? [params] : []),
-  ] as const
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveFolderPath>>> = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export const getResolveFolderPathQueryOptions = <
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
+export type ResolveFolderPathQueryResult = NonNullable<Awaited<ReturnType<typeof resolveFolderPath>>>
+export type ResolveFolderPathQueryError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500
 
-  const queryKey =
-    queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params)
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof resolveFolderPath>>
-  > = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions })
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof resolveFolderPath>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ResolveFolderPathQueryResult = NonNullable<
-  Awaited<ReturnType<typeof resolveFolderPath>>
->
-export type ResolveFolderPathQueryError =
-  | ResolveFolderPath401
-  | ResolveFolderPath404
-  | ResolveFolderPath500
-
-export function useResolveFolderPath<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export function useResolveFolderPath<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof resolveFolderPath>>,
           TError,
           Awaited<ReturnType<typeof resolveFolderPath>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useResolveFolderPath<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveFolderPath<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof resolveFolderPath>>,
           TError,
           Awaited<ReturnType<typeof resolveFolderPath>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useResolveFolderPath<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveFolderPath<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Resolve Folder Path
  */
 
-export function useResolveFolderPath<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getResolveFolderPathQueryOptions(params, options)
+export function useResolveFolderPath<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getResolveFolderPathQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getResolveFolderPathSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getResolveFolderPathSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(params: ResolveFolderPathParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey =
-    queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof resolveFolderPath>>
-  > = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getResolveFolderPathQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof resolveFolderPath>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveFolderPath>>> = ({ signal }) => resolveFolderPath(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type ResolveFolderPathSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof resolveFolderPath>>
->
-export type ResolveFolderPathSuspenseQueryError =
-  | ResolveFolderPath401
-  | ResolveFolderPath404
-  | ResolveFolderPath500
+export type ResolveFolderPathSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof resolveFolderPath>>>
+export type ResolveFolderPathSuspenseQueryError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500
 
-export function useResolveFolderPathSuspense<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useResolveFolderPathSuspense<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useResolveFolderPathSuspense<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useResolveFolderPathSuspense<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveFolderPathSuspense<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveFolderPathSuspense<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Resolve Folder Path
  */
 
-export function useResolveFolderPathSuspense<
-  TData = Awaited<ReturnType<typeof resolveFolderPath>>,
-  TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500,
->(
-  params: ResolveFolderPathParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof resolveFolderPath>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getResolveFolderPathSuspenseQueryOptions(params, options)
+export function useResolveFolderPathSuspense<TData = Awaited<ReturnType<typeof resolveFolderPath>>, TError = ResolveFolderPath401 | ResolveFolderPath404 | ResolveFolderPath500>(
+ params: ResolveFolderPathParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof resolveFolderPath>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getResolveFolderPathSuspenseQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+

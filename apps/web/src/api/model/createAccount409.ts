@@ -6,5 +6,5 @@
  */
 
 export type CreateAccount409 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type AcceptInvite500 = {
-  message: string
-}
+  message: string;
+};

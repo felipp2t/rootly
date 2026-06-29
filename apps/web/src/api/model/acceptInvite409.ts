@@ -6,5 +6,5 @@
  */
 
 export type AcceptInvite409 = {
-  message: string
-}
+  message: string;
+};

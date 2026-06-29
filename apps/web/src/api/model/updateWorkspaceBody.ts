@@ -7,5 +7,5 @@
 
 export type UpdateWorkspaceBody = {
   /** @minLength 3 */
-  name: string
-}
+  name: string;
+};

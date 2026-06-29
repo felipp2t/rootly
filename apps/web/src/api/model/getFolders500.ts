@@ -6,5 +6,5 @@
  */
 
 export type GetFolders500 = {
-  message: string
-}
+  message: string;
+};

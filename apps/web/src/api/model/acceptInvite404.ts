@@ -6,5 +6,5 @@
  */
 
 export type AcceptInvite404 = {
-  message: string
-}
+  message: string;
+};

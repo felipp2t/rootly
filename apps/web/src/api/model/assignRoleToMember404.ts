@@ -6,5 +6,5 @@
  */
 
 export type AssignRoleToMember404 = {
-  message: string
-}
+  message: string;
+};

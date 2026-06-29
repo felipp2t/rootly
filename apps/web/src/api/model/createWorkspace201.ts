@@ -6,5 +6,5 @@
  */
 
 export type CreateWorkspace201 = {
-  workspaceId: string
-}
+  workspaceId: string;
+};

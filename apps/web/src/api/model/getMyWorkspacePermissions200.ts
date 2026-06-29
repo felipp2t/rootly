@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetMyWorkspacePermissions200PermissionsItem } from './getMyWorkspacePermissions200PermissionsItem'
+import type { GetMyWorkspacePermissions200PermissionsItem } from './getMyWorkspacePermissions200PermissionsItem';
 
 export type GetMyWorkspacePermissions200 = {
-  permissions: GetMyWorkspacePermissions200PermissionsItem[]
-}
+  permissions: GetMyWorkspacePermissions200PermissionsItem[];
+};

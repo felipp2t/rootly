@@ -6,5 +6,5 @@
  */
 
 export type GetItems500 = {
-  message: string
-}
+  message: string;
+};

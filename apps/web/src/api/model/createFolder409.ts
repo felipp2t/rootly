@@ -6,5 +6,5 @@
  */
 
 export type CreateFolder409 = {
-  message: string
-}
+  message: string;
+};

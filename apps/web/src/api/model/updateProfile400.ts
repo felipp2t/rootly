@@ -6,5 +6,5 @@
  */
 
 export type UpdateProfile400 = {
-  message: string
-}
+  message: string;
+};

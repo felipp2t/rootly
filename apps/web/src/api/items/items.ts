@@ -4,7 +4,11 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,8 +23,8 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
+  UseSuspenseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   AssignTagToItem401,
@@ -41,12 +45,15 @@ import type {
   UploadItem401,
   UploadItem409,
   UploadItem500,
-  UploadItemBody,
-} from '../model'
+  UploadItemBody
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Create a new item
@@ -77,112 +84,83 @@ export type createItemResponse500 = {
   status: 500
 }
 
-export type createItemResponseSuccess = createItemResponse201 & {
-  headers: Headers
-}
-export type createItemResponseError = (
-  | createItemResponse400
-  | createItemResponse401
-  | createItemResponse409
-  | createItemResponse500
-) & {
-  headers: Headers
-}
+export type createItemResponseSuccess = (createItemResponse201) & {
+  headers: Headers;
+};
+export type createItemResponseError = (createItemResponse400 | createItemResponse401 | createItemResponse409 | createItemResponse500) & {
+  headers: Headers;
+};
 
-export type createItemResponse =
-  | createItemResponseSuccess
-  | createItemResponseError
+export type createItemResponse = (createItemResponseSuccess | createItemResponseError)
 
 export const getCreateItemUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/items`
 }
 
-export const createItem = async (
-  createItemBody: CreateItemBody,
-  options?: RequestInit,
-): Promise<createItemResponse> => {
-  return fetchWithAuth<createItemResponse>(getCreateItemUrl(), {
+export const createItem = async (createItemBody: CreateItemBody, options?: RequestInit): Promise<createItemResponse> => {
+  
+  return fetchWithAuth<createItemResponse>(getCreateItemUrl(),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createItemBody),
-  })
-}
-
-export const getCreateItemMutationOptions = <
-  TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createItem>>,
-    TError,
-    { data: CreateItemBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createItem>>,
-  TError,
-  { data: CreateItemBody },
-  TContext
-> => {
-  const mutationKey = ['createItem']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createItem>>,
-    { data: CreateItemBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return createItem(data, requestOptions)
+    body: JSON.stringify(
+      createItemBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateItemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createItem>>
->
-export type CreateItemMutationBody = CreateItemBody
-export type CreateItemMutationError =
-  | CreateItem400
-  | CreateItem401
-  | CreateItem409
-  | CreateItem500
 
-/**
+export const getCreateItemMutationOptions = <TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext> => {
+
+const mutationKey = ['createItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createItem>>, {data: CreateItemBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createItem(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateItemMutationResult = NonNullable<Awaited<ReturnType<typeof createItem>>>
+    export type CreateItemMutationBody = CreateItemBody
+    export type CreateItemMutationError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500
+
+    /**
  * @summary Create Item
  */
-export const useCreateItem = <
-  TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createItem>>,
-      TError,
-      { data: CreateItemBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createItem>>,
-  TError,
-  { data: CreateItemBody },
-  TContext
-> => {
-  return useMutation(getCreateItemMutationOptions(options), queryClient)
-}
-/**
+export const useCreateItem = <TError = CreateItem400 | CreateItem401 | CreateItem409 | CreateItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createItem>>, TError,{data: CreateItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createItem>>,
+        TError,
+        {data: CreateItemBody},
+        TContext
+      > => {
+      return useMutation(getCreateItemMutationOptions(options), queryClient);
+    }
+    /**
  * List items. Optionally filter by parentId or workspaceId.
  * @summary Get Items
  */
@@ -201,303 +179,169 @@ export type getItemsResponse500 = {
   status: 500
 }
 
-export type getItemsResponseSuccess = getItemsResponse200 & {
-  headers: Headers
-}
-export type getItemsResponseError = (
-  | getItemsResponse401
-  | getItemsResponse500
-) & {
-  headers: Headers
-}
+export type getItemsResponseSuccess = (getItemsResponse200) & {
+  headers: Headers;
+};
+export type getItemsResponseError = (getItemsResponse401 | getItemsResponse500) & {
+  headers: Headers;
+};
 
-export type getItemsResponse = getItemsResponseSuccess | getItemsResponseError
+export type getItemsResponse = (getItemsResponseSuccess | getItemsResponseError)
 
-export const getGetItemsUrl = (params?: GetItemsParams) => {
-  const normalizedParams = new URLSearchParams()
+export const getGetItemsUrl = (params?: GetItemsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  })
+  });
 
-  const stringifiedParams = normalizedParams.toString()
+  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `http://localhost:3333/api/items?${stringifiedParams}`
-    : `http://localhost:3333/api/items`
+  return stringifiedParams.length > 0 ? `http://localhost:3333/api/items?${stringifiedParams}` : `http://localhost:3333/api/items`
 }
 
-export const getItems = async (
-  params?: GetItemsParams,
-  options?: RequestInit,
-): Promise<getItemsResponse> => {
-  return fetchWithAuth<getItemsResponse>(getGetItemsUrl(params), {
+export const getItems = async (params?: GetItemsParams, options?: RequestInit): Promise<getItemsResponse> => {
+  
+  return fetchWithAuth<getItemsResponse>(getGetItemsUrl(params),
+  {      
     ...options,
-    method: 'GET',
-  })
-}
+    method: 'GET'
+    
+    
+  }
+);}
+  
 
-export const getGetItemsQueryKey = (params?: GetItemsParams) => {
-  return [
-    'http:',
-    'localhost:3333',
-    'api',
-    'items',
-    ...(params ? [params] : []),
-  ] as const
-}
 
-export const getGetItemsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+export const getGetItemsQueryKey = (params?: GetItemsParams,) => {
+    return [
+    'http:','localhost:3333','api','items', ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetItemsQueryOptions = <TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(params?: GetItemsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetItemsQueryKey(params)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({
-    signal,
-  }) => getItems(params, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetItemsQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getItems>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({ signal }) => getItems(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetItemsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getItems>>
->
+export type GetItemsQueryResult = NonNullable<Awaited<ReturnType<typeof getItems>>>
 export type GetItemsQueryError = GetItems401 | GetItems500
 
-export function useGetItems<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params: undefined | GetItemsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
-    > &
-      Pick<
+
+export function useGetItems<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params: undefined |  GetItemsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getItems>>,
           TError,
           Awaited<ReturnType<typeof getItems>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetItems<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetItems<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getItems>>,
           TError,
           Awaited<ReturnType<typeof getItems>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetItems<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetItems<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Items
  */
 
-export function useGetItems<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetItemsQueryOptions(params, options)
+export function useGetItems<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryOptions = getGetItemsQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const getGetItemsSuspenseQueryOptions = <
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getItems>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
+
+
+
+export const getGetItemsSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(params?: GetItemsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetItemsQueryKey(params)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({
-    signal,
-  }) => getItems(params, { signal, ...requestOptions })
+  const queryKey =  queryOptions?.queryKey ?? getGetItemsQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
-    Awaited<ReturnType<typeof getItems>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getItems>>> = ({ signal }) => getItems(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetItemsSuspenseQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getItems>>
->
+export type GetItemsSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getItems>>>
 export type GetItemsSuspenseQueryError = GetItems401 | GetItems500
 
-export function useGetItemsSuspense<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params: undefined | GetItemsParams,
-  options: {
-    query: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getItems>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetItemsSuspense<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getItems>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
-export function useGetItemsSuspense<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getItems>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-}
+
+export function useGetItemsSuspense<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params: undefined |  GetItemsParams, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetItemsSuspense<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetItemsSuspense<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Items
  */
 
-export function useGetItemsSuspense<
-  TData = Awaited<ReturnType<typeof getItems>>,
-  TError = GetItems401 | GetItems500,
->(
-  params?: GetItemsParams,
-  options?: {
-    query?: Partial<
-      UseSuspenseQueryOptions<
-        Awaited<ReturnType<typeof getItems>>,
-        TError,
-        TData
-      >
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseSuspenseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>
-} {
-  const queryOptions = getGetItemsSuspenseQueryOptions(params, options)
+export function useGetItemsSuspense<TData = Awaited<ReturnType<typeof getItems>>, TError = GetItems401 | GetItems500>(
+ params?: GetItemsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getItems>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useSuspenseQuery(
-    queryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetItemsSuspenseQueryOptions(params,options)
 
-  return { ...query, queryKey: queryOptions.queryKey }
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * Create a document item by uploading a file via multipart/form-data
@@ -528,119 +372,90 @@ export type uploadItemResponse500 = {
   status: 500
 }
 
-export type uploadItemResponseSuccess = uploadItemResponse201 & {
-  headers: Headers
-}
-export type uploadItemResponseError = (
-  | uploadItemResponse400
-  | uploadItemResponse401
-  | uploadItemResponse409
-  | uploadItemResponse500
-) & {
-  headers: Headers
-}
+export type uploadItemResponseSuccess = (uploadItemResponse201) & {
+  headers: Headers;
+};
+export type uploadItemResponseError = (uploadItemResponse400 | uploadItemResponse401 | uploadItemResponse409 | uploadItemResponse500) & {
+  headers: Headers;
+};
 
-export type uploadItemResponse =
-  | uploadItemResponseSuccess
-  | uploadItemResponseError
+export type uploadItemResponse = (uploadItemResponseSuccess | uploadItemResponseError)
 
 export const getUploadItemUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/items/upload`
 }
 
-export const uploadItem = async (
-  uploadItemBody: UploadItemBody,
-  options?: RequestInit,
-): Promise<uploadItemResponse> => {
-  const formData = new FormData()
-  formData.append(`title`, uploadItemBody.title)
-  formData.append(`workspaceId`, uploadItemBody.workspaceId)
-  if (uploadItemBody.folderId !== undefined) {
-    formData.append(`folderId`, uploadItemBody.folderId)
-  }
-  formData.append(`file`, uploadItemBody.file)
+export const uploadItem = async (uploadItemBody: UploadItemBody, options?: RequestInit): Promise<uploadItemResponse> => {
+    const formData = new FormData();
+formData.append(`title`, uploadItemBody.title);
+formData.append(`workspaceId`, uploadItemBody.workspaceId);
+if(uploadItemBody.folderId !== undefined) {
+ formData.append(`folderId`, uploadItemBody.folderId);
+ }
+formData.append(`file`, uploadItemBody.file);
 
-  return fetchWithAuth<uploadItemResponse>(getUploadItemUrl(), {
+  return fetchWithAuth<uploadItemResponse>(getUploadItemUrl(),
+  {      
     ...options,
-    method: 'POST',
-    body: formData,
-  })
-}
-
-export const getUploadItemMutationOptions = <
-  TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof uploadItem>>,
-    TError,
-    { data: UploadItemBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof uploadItem>>,
-  TError,
-  { data: UploadItemBody },
-  TContext
-> => {
-  const mutationKey = ['uploadItem']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof uploadItem>>,
-    { data: UploadItemBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return uploadItem(data, requestOptions)
+    method: 'POST'
+    ,
+    body: 
+      formData,
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type UploadItemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof uploadItem>>
->
-export type UploadItemMutationBody = UploadItemBody
-export type UploadItemMutationError =
-  | UploadItem400
-  | UploadItem401
-  | UploadItem409
-  | UploadItem500
 
-/**
+export const getUploadItemMutationOptions = <TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadItem>>, TError,{data: UploadItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadItem>>, TError,{data: UploadItemBody}, TContext> => {
+
+const mutationKey = ['uploadItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadItem>>, {data: UploadItemBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadItem(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadItemMutationResult = NonNullable<Awaited<ReturnType<typeof uploadItem>>>
+    export type UploadItemMutationBody = UploadItemBody
+    export type UploadItemMutationError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500
+
+    /**
  * @summary Upload Item
  */
-export const useUploadItem = <
-  TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof uploadItem>>,
-      TError,
-      { data: UploadItemBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof uploadItem>>,
-  TError,
-  { data: UploadItemBody },
-  TContext
-> => {
-  return useMutation(getUploadItemMutationOptions(options), queryClient)
-}
-/**
+export const useUploadItem = <TError = UploadItem400 | UploadItem401 | UploadItem409 | UploadItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadItem>>, TError,{data: UploadItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadItem>>,
+        TError,
+        {data: UploadItemBody},
+        TContext
+      > => {
+      return useMutation(getUploadItemMutationOptions(options), queryClient);
+    }
+    /**
  * Assign an existing tag to an item
  * @summary Assign Tag to Item
  */
@@ -664,108 +479,81 @@ export type assignTagToItemResponse500 = {
   status: 500
 }
 
-export type assignTagToItemResponseSuccess = assignTagToItemResponse204 & {
-  headers: Headers
-}
-export type assignTagToItemResponseError = (
-  | assignTagToItemResponse401
-  | assignTagToItemResponse404
-  | assignTagToItemResponse500
-) & {
-  headers: Headers
-}
+export type assignTagToItemResponseSuccess = (assignTagToItemResponse204) & {
+  headers: Headers;
+};
+export type assignTagToItemResponseError = (assignTagToItemResponse401 | assignTagToItemResponse404 | assignTagToItemResponse500) & {
+  headers: Headers;
+};
 
-export type assignTagToItemResponse =
-  | assignTagToItemResponseSuccess
-  | assignTagToItemResponseError
+export type assignTagToItemResponse = (assignTagToItemResponseSuccess | assignTagToItemResponseError)
 
-export const getAssignTagToItemUrl = (itemId: string, tagId: string) => {
+export const getAssignTagToItemUrl = (itemId: string,
+    tagId: string,) => {
+
+
+  
+
   return `http://localhost:3333/api/items/${itemId}/tags/${tagId}`
 }
 
-export const assignTagToItem = async (
-  itemId: string,
-  tagId: string,
-  options?: RequestInit,
-): Promise<assignTagToItemResponse> => {
-  return fetchWithAuth<assignTagToItemResponse>(
-    getAssignTagToItemUrl(itemId, tagId),
-    {
-      ...options,
-      method: 'PATCH',
-    },
-  )
-}
-
-export const getAssignTagToItemMutationOptions = <
-  TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof assignTagToItem>>,
-    TError,
-    { itemId: string; tagId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof assignTagToItem>>,
-  TError,
-  { itemId: string; tagId: string },
-  TContext
-> => {
-  const mutationKey = ['assignTagToItem']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof assignTagToItem>>,
-    { itemId: string; tagId: string }
-  > = (props) => {
-    const { itemId, tagId } = props ?? {}
-
-    return assignTagToItem(itemId, tagId, requestOptions)
+export const assignTagToItem = async (itemId: string,
+    tagId: string, options?: RequestInit): Promise<assignTagToItemResponse> => {
+  
+  return fetchWithAuth<assignTagToItemResponse>(getAssignTagToItemUrl(itemId,tagId),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type AssignTagToItemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof assignTagToItem>>
->
 
-export type AssignTagToItemMutationError =
-  | AssignTagToItem401
-  | AssignTagToItem404
-  | AssignTagToItem500
+export const getAssignTagToItemMutationOptions = <TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext> => {
 
-/**
+const mutationKey = ['assignTagToItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTagToItem>>, {itemId: string;tagId: string}> = (props) => {
+          const {itemId,tagId} = props ?? {};
+
+          return  assignTagToItem(itemId,tagId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignTagToItemMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToItem>>>
+    
+    export type AssignTagToItemMutationError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500
+
+    /**
  * @summary Assign Tag to Item
  */
-export const useAssignTagToItem = <
-  TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof assignTagToItem>>,
-      TError,
-      { itemId: string; tagId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof assignTagToItem>>,
-  TError,
-  { itemId: string; tagId: string },
-  TContext
-> => {
-  return useMutation(getAssignTagToItemMutationOptions(options), queryClient)
-}
+export const useAssignTagToItem = <TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignTagToItem>>,
+        TError,
+        {itemId: string;tagId: string},
+        TContext
+      > => {
+      return useMutation(getAssignTagToItemMutationOptions(options), queryClient);
+    }
+    

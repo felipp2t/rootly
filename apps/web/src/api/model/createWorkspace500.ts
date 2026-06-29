@@ -6,5 +6,5 @@
  */
 
 export type CreateWorkspace500 = {
-  message: string
-}
+  message: string;
+};

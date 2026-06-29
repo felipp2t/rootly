@@ -8,8 +8,8 @@
 /**
  * @nullable
  */
-export type ChangePassword204 = typeof ChangePassword204[keyof typeof ChangePassword204] | null;
+export type Logout204 = typeof Logout204[keyof typeof Logout204] | null;
 
 
-export const ChangePassword204 = {
+export const Logout204 = {
 } as const;

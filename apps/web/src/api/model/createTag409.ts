@@ -6,5 +6,5 @@
  */
 
 export type CreateTag409 = {
-  message: string
-}
+  message: string;
+};

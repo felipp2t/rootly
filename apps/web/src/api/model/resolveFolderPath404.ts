@@ -6,5 +6,5 @@
  */
 
 export type ResolveFolderPath404 = {
-  message: string
-}
+  message: string;
+};

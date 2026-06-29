@@ -5,6 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type UploadItem409 = {
+export type Logout500 = {
   message: string;
 };

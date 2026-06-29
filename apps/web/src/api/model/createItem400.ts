@@ -6,5 +6,5 @@
  */
 
 export type CreateItem400 = {
-  message: string
-}
+  message: string;
+};

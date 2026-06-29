@@ -6,5 +6,5 @@
  */
 
 export type ChangePassword500 = {
-  message: string
-}
+  message: string;
+};

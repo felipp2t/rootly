@@ -6,5 +6,5 @@
  */
 
 export type AssignTagToItem404 = {
-  message: string
-}
+  message: string;
+};

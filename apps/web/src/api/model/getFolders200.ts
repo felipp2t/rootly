@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetFolders200FoldersItem } from './getFolders200FoldersItem'
+import type { GetFolders200FoldersItem } from './getFolders200FoldersItem';
 
 export type GetFolders200 = {
-  folders: GetFolders200FoldersItem[]
-}
+  folders: GetFolders200FoldersItem[];
+};

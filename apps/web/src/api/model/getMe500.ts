@@ -6,5 +6,5 @@
  */
 
 export type GetMe500 = {
-  message: string
-}
+  message: string;
+};
