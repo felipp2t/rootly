@@ -6,6 +6,7 @@ import {
   useResolveFolderPathSuspense,
 } from '@/api/folders/folders'
 import { useGetItemsSuspense } from '@/api/items/items'
+import { useGetTagsSuspense } from '@/api/tags/tags'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
 import {
   FolderCard,
@@ -81,11 +82,13 @@ function RoutePage() {
     workspaceId,
     path: _splat,
   })
+  const { data: tagsResult } = useGetTagsSuspense({ workspaceId })
 
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
   const items = itemsResult.status === 200 ? itemsResult.data.items : []
+  const workspaceTags = tagsResult.status === 200 ? tagsResult.data.tags : []
   const resolvedPath =
     resolvedPathResult.status === 200 ? resolvedPathResult.data.path : []
   const currentFolderName = resolvedPath.at(-1)?.name
@@ -199,7 +202,15 @@ function RoutePage() {
                   _splat: [...folderPath, folder.id].join('/'),
                 }}
               >
-                <FolderCard itemCount={folder.itemCount} subfolderCount={folder.subfolderCount} name={folder.name} />
+                <FolderCard
+                  folderId={folder.id}
+                  name={folder.name}
+                  itemCount={folder.itemCount}
+                  subfolderCount={folder.subfolderCount}
+                  tagIds={folder.tagIds}
+                  workspaceTags={workspaceTags}
+                  workspaceId={workspaceId}
+                />
               </Link>
             ))}
           </div>
