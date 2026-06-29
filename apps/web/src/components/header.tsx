@@ -1,6 +1,13 @@
 import { Link } from '@tanstack/react-router'
-import { FoldersIcon } from 'lucide-react'
+import { FoldersIcon, LogOutIcon, SettingsIcon } from 'lucide-react'
 import { NotificationBell } from '@/components/notification-bell'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export function Header() {
   return (
@@ -17,12 +24,32 @@ export function Header() {
 
         <NotificationBell />
 
-        <Link
-          to='/account'
-          className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-600'
-        >
-          U
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type='button'
+              className='size-8 cursor-pointer rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+            >
+              U
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='w-40'>
+            <DropdownMenuItem asChild>
+              <Link
+                to='/account'
+                className='flex items-center gap-2 cursor-pointer'
+              >
+                <SettingsIcon size={14} />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant='destructive' className='flex items-center gap-2 cursor-pointer'>
+              <LogOutIcon size={14} />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )
