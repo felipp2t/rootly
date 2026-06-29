@@ -1,5 +1,5 @@
 import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
-import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
+import type { FolderRepository, FolderWithCounts } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 
 export class InMemoryFolderRepository implements FolderRepository {
@@ -61,6 +61,19 @@ export class InMemoryFolderRepository implements FolderRepository {
     }
     if (parentId === undefined) return scoped
     return scoped.filter((folder) => folder.parentId === parentId)
+  }
+
+  async findManyWithCounts(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<FolderWithCounts[]> {
+    const folders = await this.findMany(userId, parentId, workspaceId)
+    return folders.map((folder) => ({
+      folder,
+      itemCount: 0,
+      subfolderCount: this.items.filter((f) => f.parentId === folder.id.toString()).length,
+    }))
   }
 
   async create(folder: Folder): Promise<void> {
