@@ -1,13 +1,12 @@
 import { type Either, right } from '@/core/types/either.ts'
-import type { Folder } from '../../enterprise/entities/folder.ts'
-import type { FolderRepository } from '../repositories/folder-repository.ts'
+import type { FolderRepository, FolderWithCounts } from '../repositories/folder-repository.ts'
 
 interface GetFoldersUseCaseRequest {
   userId: string
   parentId?: string
   workspaceId?: string
 }
-type GetFoldersUseCaseResponse = Either<undefined, { folders: Folder[] }>
+type GetFoldersUseCaseResponse = Either<undefined, { folders: FolderWithCounts[] }>
 
 export class GetFoldersUseCase {
   constructor(private readonly folderRepository: FolderRepository) {}
@@ -17,7 +16,7 @@ export class GetFoldersUseCase {
     parentId,
     workspaceId,
   }: GetFoldersUseCaseRequest): Promise<GetFoldersUseCaseResponse> {
-    const folders = await this.folderRepository.findMany(userId, parentId, workspaceId)
+    const folders = await this.folderRepository.findManyWithCounts(userId, parentId, workspaceId)
 
     return right({ folders })
   }
