@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { UserCogIcon } from 'lucide-react'
 import { ChangePasswordSection } from '@/components/app/settings/change-password-section'
+import { UpdateProfileSection } from '@/components/app/settings/update-profile-section'
 import {
   InlineCodeContent,
   InlineCodeRoot,
@@ -35,7 +36,8 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className='max-w-md'>
+      <div className='max-w-md flex flex-col gap-8'>
+        <UpdateProfileSection />
         <ChangePasswordSection />
       </div>
     </main>
