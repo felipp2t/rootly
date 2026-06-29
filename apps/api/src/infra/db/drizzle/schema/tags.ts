@@ -21,6 +21,7 @@ export const tags = pgTable(
       .$defaultFn(() => nanoid()),
     workspaceId: text('workspace_id').notNull(),
     name: text('name').notNull(),
+    slug: text('slug').notNull(),
     color: tagColorEnum('color').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
