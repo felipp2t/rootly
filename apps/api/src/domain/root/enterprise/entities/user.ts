@@ -19,6 +19,11 @@ export class User extends Entity<UserProps> {
     return this.props.name
   }
 
+  set name(value: string) {
+    this.props.name = value
+    this.touch()
+  }
+
   get passwordHash() {
     return this.props.passwordHash
   }
