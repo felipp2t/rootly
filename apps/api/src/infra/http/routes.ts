@@ -4,6 +4,7 @@ import { assignRoleToMemberController } from './controllers/assign-role-to-membe
 import { assignTagToFolderController } from './controllers/assign-tag-to-folder.controller.ts'
 import { assignTagToItemController } from './controllers/assign-tag-to-item.controller.ts'
 import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
+import { changePasswordController } from './controllers/change-password.controller.ts'
 import { createAccountController } from './controllers/create-account.controller.ts'
 import { createFolderController } from './controllers/create-folder.controller.ts'
 import { createItemsController } from './controllers/create-item.controller.ts'
@@ -40,6 +41,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(authenticateUserController)
   app.register(refreshAccessTokenController)
   app.register(getMeController)
+  app.register(changePasswordController)
   app.register(getMyWorkspacePermissionsController)
   app.register(createAccountController)
   app.register(createFolderController)
