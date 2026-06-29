@@ -34,6 +34,7 @@ import { removeMemberController } from './controllers/remove-member.controller.t
 import { resolveFolderPathController } from './controllers/resolve-folder-path.controller.ts'
 import { revokeInviteController } from './controllers/revoke-invite.controller.ts'
 import { setRolePermissionsController } from './controllers/set-role-permissions.controller.ts'
+import { updateProfileController } from './controllers/update-profile.controller.ts'
 import { updateWorkspaceController } from './controllers/update-workspace.controller.ts'
 import { uploadItemController } from './controllers/upload-item.controller.ts'
 
@@ -41,6 +42,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(authenticateUserController)
   app.register(refreshAccessTokenController)
   app.register(getMeController)
+  app.register(updateProfileController)
   app.register(changePasswordController)
   app.register(getMyWorkspacePermissionsController)
   app.register(createAccountController)
