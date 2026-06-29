@@ -8,8 +8,12 @@ export class InMemoryTagRepository implements TagRepository {
     return this.items.find((tag) => tag.id.toString() === id) ?? null
   }
 
-  async findByName(name: string): Promise<Tag | null> {
-    return this.items.find((tag) => tag.name === name) ?? null
+  async findBySlug(slug: string, workspaceId: string): Promise<Tag | null> {
+    return (
+      this.items.find(
+        (tag) => tag.slug === slug && tag.workspaceId === workspaceId,
+      ) ?? null
+    )
   }
 
   async findAll(): Promise<Tag[]> {

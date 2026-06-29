@@ -16,9 +16,13 @@ export function makeTag(
   override: WithRequired<TagProps, 'workspaceId'>,
   id?: UniqueEntityID,
 ) {
+  const name = override.name ?? faker.lorem.word()
+  const slug = override.slug ?? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
   const tag = Tag.create(
     {
-      name: faker.lorem.word(),
+      name,
+      slug,
       color: faker.helpers.arrayElement(TAG_COLORS),
       ...override,
     },
