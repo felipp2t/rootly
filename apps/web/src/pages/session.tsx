@@ -8,6 +8,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { Loader2Icon } from 'lucide-react'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import { authenticateUser } from '@/api/auth/auth'
 import { Button } from '@/components/ui/button'
@@ -62,14 +63,7 @@ function RouteComponent() {
       })
 
       if (result.status !== 201) {
-        signInForm.setFieldMeta('email', (meta) => ({
-          ...meta,
-          isTouched: true,
-          errorMap: {
-            ...meta.errorMap,
-            onServer: { message: result.data.message },
-          },
-        }))
+        toast.error(result.data.message)
         return
       }
 
