@@ -4,15 +4,18 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
@@ -20,6 +23,11 @@ import type {
 } from '@tanstack/react-query'
 
 import type {
+  ChangePassword204,
+  ChangePassword400,
+  ChangePassword401,
+  ChangePassword500,
+  ChangePasswordBody,
   GetMe200,
   GetMe401,
   GetMe500,
@@ -290,6 +298,133 @@ export function useGetMeSuspense<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
+/**
+ * Change the authenticated user password
+ * @summary Change Password
+ */
+export type changePasswordResponse204 = {
+  data: ChangePassword204
+  status: 204
+}
+
+export type changePasswordResponse400 = {
+  data: ChangePassword400
+  status: 400
+}
+
+export type changePasswordResponse401 = {
+  data: ChangePassword401
+  status: 401
+}
+
+export type changePasswordResponse500 = {
+  data: ChangePassword500
+  status: 500
+}
+
+export type changePasswordResponseSuccess = changePasswordResponse204 & {
+  headers: Headers
+}
+export type changePasswordResponseError = (
+  | changePasswordResponse400
+  | changePasswordResponse401
+  | changePasswordResponse500
+) & {
+  headers: Headers
+}
+
+export type changePasswordResponse =
+  | changePasswordResponseSuccess
+  | changePasswordResponseError
+
+export const getChangePasswordUrl = () => {
+  return `http://localhost:3333/api/me/password`
+}
+
+export const changePassword = async (
+  changePasswordBody: ChangePasswordBody,
+  options?: RequestInit,
+): Promise<changePasswordResponse> => {
+  return fetchWithAuth<changePasswordResponse>(getChangePasswordUrl(), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(changePasswordBody),
+  })
+}
+
+export const getChangePasswordMutationOptions = <
+  TError = ChangePassword400 | ChangePassword401 | ChangePassword500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changePassword>>,
+    TError,
+    { data: ChangePasswordBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changePassword>>,
+  TError,
+  { data: ChangePasswordBody },
+  TContext
+> => {
+  const mutationKey = ['changePassword']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changePassword>>,
+    { data: ChangePasswordBody }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return changePassword(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type ChangePasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changePassword>>
+>
+export type ChangePasswordMutationBody = ChangePasswordBody
+export type ChangePasswordMutationError =
+  | ChangePassword400
+  | ChangePassword401
+  | ChangePassword500
+
+/**
+ * @summary Change Password
+ */
+export const useChangePassword = <
+  TError = ChangePassword400 | ChangePassword401 | ChangePassword500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changePassword>>,
+      TError,
+      { data: ChangePasswordBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changePassword>>,
+  TError,
+  { data: ChangePasswordBody },
+  TContext
+> => {
+  return useMutation(getChangePasswordMutationOptions(options), queryClient)
+}
 /**
  * Get the authenticated user permissions in a workspace
  * @summary Get My Workspace Permissions
