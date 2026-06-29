@@ -29,6 +29,7 @@ import type {
 import type {
   AssignTagToFolder401,
   AssignTagToFolder404,
+  AssignTagToFolder409,
   AssignTagToFolder500,
   CreateFolder201,
   CreateFolder400,
@@ -361,6 +362,11 @@ export type assignTagToFolderResponse404 = {
   status: 404
 }
 
+export type assignTagToFolderResponse409 = {
+  data: AssignTagToFolder409
+  status: 409
+}
+
 export type assignTagToFolderResponse500 = {
   data: AssignTagToFolder500
   status: 500
@@ -369,7 +375,7 @@ export type assignTagToFolderResponse500 = {
 export type assignTagToFolderResponseSuccess = (assignTagToFolderResponse204) & {
   headers: Headers;
 };
-export type assignTagToFolderResponseError = (assignTagToFolderResponse401 | assignTagToFolderResponse404 | assignTagToFolderResponse500) & {
+export type assignTagToFolderResponseError = (assignTagToFolderResponse401 | assignTagToFolderResponse404 | assignTagToFolderResponse409 | assignTagToFolderResponse500) & {
   headers: Headers;
 };
 
@@ -399,7 +405,7 @@ export const assignTagToFolder = async (folderId: string,
 
 
 
-export const getAssignTagToFolderMutationOptions = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
+export const getAssignTagToFolderMutationOptions = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
 ): UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext> => {
 
@@ -428,12 +434,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AssignTagToFolderMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToFolder>>>
     
-    export type AssignTagToFolderMutationError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500
+    export type AssignTagToFolderMutationError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500
 
     /**
  * @summary Assign Tag to Folder
  */
-export const useAssignTagToFolder = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder500,
+export const useAssignTagToFolder = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof assignTagToFolder>>,

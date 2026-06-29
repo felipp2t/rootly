@@ -5,13 +5,25 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery,
+  useSuspenseQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
+  UseSuspenseQueryOptions,
+  UseSuspenseQueryResult
 } from '@tanstack/react-query';
 
 import type {
@@ -19,7 +31,11 @@ import type {
   CreateTag401,
   CreateTag409,
   CreateTag500,
-  CreateTagBody
+  CreateTagBody,
+  GetTags200,
+  GetTags401,
+  GetTags500,
+  GetTagsParams
 } from '../model';
 
 import { fetchWithAuth } from '../../lib/fetch';
@@ -129,4 +145,186 @@ export const useCreateTag = <TError = CreateTag401 | CreateTag409 | CreateTag500
       > => {
       return useMutation(getCreateTagMutationOptions(options), queryClient);
     }
+    /**
+ * List all tags for a workspace
+ * @summary Get Tags
+ */
+export type getTagsResponse200 = {
+  data: GetTags200
+  status: 200
+}
+
+export type getTagsResponse401 = {
+  data: GetTags401
+  status: 401
+}
+
+export type getTagsResponse500 = {
+  data: GetTags500
+  status: 500
+}
+
+export type getTagsResponseSuccess = (getTagsResponse200) & {
+  headers: Headers;
+};
+export type getTagsResponseError = (getTagsResponse401 | getTagsResponse500) & {
+  headers: Headers;
+};
+
+export type getTagsResponse = (getTagsResponseSuccess | getTagsResponseError)
+
+export const getGetTagsUrl = (params: GetTagsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
     
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:3333/api/tags?${stringifiedParams}` : `http://localhost:3333/api/tags`
+}
+
+export const getTags = async (params: GetTagsParams, options?: RequestInit): Promise<getTagsResponse> => {
+  
+  return fetchWithAuth<getTagsResponse>(getGetTagsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
+
+export const getGetTagsQueryKey = (params?: GetTagsParams,) => {
+    return [
+    'http:','localhost:3333','api','tags', ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetTagsQueryOptions = <TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(params: GetTagsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTagsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTags>>> = ({ signal }) => getTags(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTagsQueryResult = NonNullable<Awaited<ReturnType<typeof getTags>>>
+export type GetTagsQueryError = GetTags401 | GetTags500
+
+
+export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTags>>,
+          TError,
+          Awaited<ReturnType<typeof getTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTags>>,
+          TError,
+          Awaited<ReturnType<typeof getTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Tags
+ */
+
+export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTagsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+export const getGetTagsSuspenseQueryOptions = <TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(params: GetTagsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTagsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTags>>> = ({ signal }) => getTags(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTagsSuspenseQueryResult = NonNullable<Awaited<ReturnType<typeof getTags>>>
+export type GetTagsSuspenseQueryError = GetTags401 | GetTags500
+
+
+export function useGetTagsSuspense<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options: { query:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTagsSuspense<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTagsSuspense<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient
+  ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Tags
+ */
+
+export function useGetTagsSuspense<TData = Awaited<ReturnType<typeof getTags>>, TError = GetTags401 | GetTags500>(
+ params: GetTagsParams, options?: { query?:Partial<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTags>>, TError, TData>>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient 
+ ):  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTagsSuspenseQueryOptions(params,options)
+
+  const query = useSuspenseQuery(queryOptions, queryClient) as  UseSuspenseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

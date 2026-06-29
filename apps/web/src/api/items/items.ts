@@ -27,9 +27,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AssignTagToItem401,
-  AssignTagToItem404,
-  AssignTagToItem500,
   CreateItem201,
   CreateItem400,
   CreateItem401,
@@ -454,106 +451,5 @@ export const useUploadItem = <TError = UploadItem400 | UploadItem401 | UploadIte
         TContext
       > => {
       return useMutation(getUploadItemMutationOptions(options), queryClient);
-    }
-    /**
- * Assign an existing tag to an item
- * @summary Assign Tag to Item
- */
-export type assignTagToItemResponse204 = {
-  data: unknown
-  status: 204
-}
-
-export type assignTagToItemResponse401 = {
-  data: AssignTagToItem401
-  status: 401
-}
-
-export type assignTagToItemResponse404 = {
-  data: AssignTagToItem404
-  status: 404
-}
-
-export type assignTagToItemResponse500 = {
-  data: AssignTagToItem500
-  status: 500
-}
-
-export type assignTagToItemResponseSuccess = (assignTagToItemResponse204) & {
-  headers: Headers;
-};
-export type assignTagToItemResponseError = (assignTagToItemResponse401 | assignTagToItemResponse404 | assignTagToItemResponse500) & {
-  headers: Headers;
-};
-
-export type assignTagToItemResponse = (assignTagToItemResponseSuccess | assignTagToItemResponseError)
-
-export const getAssignTagToItemUrl = (itemId: string,
-    tagId: string,) => {
-
-
-  
-
-  return `http://localhost:3333/api/items/${itemId}/tags/${tagId}`
-}
-
-export const assignTagToItem = async (itemId: string,
-    tagId: string, options?: RequestInit): Promise<assignTagToItemResponse> => {
-  
-  return fetchWithAuth<assignTagToItemResponse>(getAssignTagToItemUrl(itemId,tagId),
-  {      
-    ...options,
-    method: 'PATCH'
-    
-    
-  }
-);}
-  
-
-
-
-export const getAssignTagToItemMutationOptions = <TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
-): UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext> => {
-
-const mutationKey = ['assignTagToItem'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTagToItem>>, {itemId: string;tagId: string}> = (props) => {
-          const {itemId,tagId} = props ?? {};
-
-          return  assignTagToItem(itemId,tagId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AssignTagToItemMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToItem>>>
-    
-    export type AssignTagToItemMutationError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500
-
-    /**
- * @summary Assign Tag to Item
- */
-export const useAssignTagToItem = <TError = AssignTagToItem401 | AssignTagToItem404 | AssignTagToItem500,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToItem>>, TError,{itemId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof assignTagToItem>>,
-        TError,
-        {itemId: string;tagId: string},
-        TContext
-      > => {
-      return useMutation(getAssignTagToItemMutationOptions(options), queryClient);
     }
     
