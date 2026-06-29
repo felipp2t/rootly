@@ -10,6 +10,7 @@ import { createFolderController } from './controllers/create-folder.controller.t
 import { createItemsController } from './controllers/create-item.controller.ts'
 import { createRoleController } from './controllers/create-role.controller.ts'
 import { createTagController } from './controllers/create-tag.controller.ts'
+import { getTagsController } from './controllers/get-tags.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
 import { createWsTicketController } from './controllers/create-ws-ticket.controller.ts'
 import { declineInviteController } from './controllers/decline-invite.controller.ts'
@@ -51,6 +52,7 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(createItemsController)
   app.register(uploadItemController)
   app.register(createTagController)
+  app.register(getTagsController)
   app.register(createWorkspaceController)
   app.register(updateWorkspaceController)
   app.register(deleteWorkspaceController)
