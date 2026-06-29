@@ -218,6 +218,7 @@ function RouteComponent() {
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
                           aria-invalid={isInvalid}
+                          type='password'
                           autoComplete='off'
                           placeholder='123456'
                           className={cn(
