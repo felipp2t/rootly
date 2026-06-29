@@ -1,9 +1,9 @@
-import { and, eq, inArray, isNull } from 'drizzle-orm'
+import { and, count, eq, inArray, isNull } from 'drizzle-orm'
 import {
   isPgUniqueViolation,
   UniqueConstraintViolationError,
 } from '@/core/errors/unique-constraint-violation-error.ts'
-import type { FolderRepository } from '@/domain/root/application/repositories/folder-repository.ts'
+import type { FolderRepository, FolderWithCounts } from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleFolderMapper } from '../mappers/drizzle-folder-mapper.ts'
@@ -137,6 +137,40 @@ export class DrizzleFolderRepository implements FolderRepository {
     return rows.map((row) =>
       DrizzleFolderMapper.toDomain(row.folder, tagsByFolder[row.folder.id] ?? []),
     )
+  }
+
+  async findManyWithCounts(userId: string, parentId?: string, workspaceId?: string): Promise<FolderWithCounts[]> {
+    const folders = await this.findMany(userId, parentId, workspaceId)
+
+    if (folders.length === 0) return []
+
+    const folderIds = folders.map((f) => f.id.toString())
+
+    const [itemCounts, subfolderCounts] = await Promise.all([
+      this.db
+        .select({ folderId: schema.items.folderId, total: count() })
+        .from(schema.items)
+        .where(inArray(schema.items.folderId, folderIds))
+        .groupBy(schema.items.folderId),
+      this.db
+        .select({ parentId: schema.folders.parentId, total: count() })
+        .from(schema.folders)
+        .where(inArray(schema.folders.parentId, folderIds))
+        .groupBy(schema.folders.parentId),
+    ])
+
+    const itemCountMap = Object.fromEntries(
+      itemCounts.map((r) => [r.folderId, r.total]),
+    )
+    const subfolderCountMap = Object.fromEntries(
+      subfolderCounts.map((r) => [r.parentId, r.total]),
+    )
+
+    return folders.map((folder) => ({
+      folder,
+      itemCount: itemCountMap[folder.id.toString()] ?? 0,
+      subfolderCount: subfolderCountMap[folder.id.toString()] ?? 0,
+    }))
   }
 
   async create(folder: Folder): Promise<void> {
