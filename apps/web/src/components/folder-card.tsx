@@ -1,9 +1,16 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import { Folder, PlusIcon } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { CheckIcon, Folder, PlusIcon, TagIcon } from 'lucide-react'
 import * as React from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
-import { createFolder } from '@/api/folders/folders'
+import {
+  assignTagToFolder,
+  createFolder,
+  getGetFoldersQueryKey,
+} from '@/api/folders/folders'
+import type { GetTags200TagsItem } from '@/api/model'
+import { TAG_COLOR_MAP, type TagColor } from '@/lib/tag-colors'
 import { cn } from '@/lib/utils'
 import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
@@ -18,21 +25,59 @@ import {
 } from './ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from './ui/popover'
 import { Skeleton } from './ui/skeleton'
 
 interface FolderCardProps extends React.ComponentProps<'div'> {
+  folderId: string
   name: string
   itemCount: number
   subfolderCount: number
+  tagIds: string[]
+  workspaceTags: GetTags200TagsItem[]
+  workspaceId: string
 }
 
 function FolderCard({
+  folderId,
   name,
   itemCount,
   subfolderCount,
+  tagIds,
+  workspaceTags,
+  workspaceId,
   className,
   ...props
 }: FolderCardProps) {
+  const qc = useQueryClient()
+  const [assigningTagId, setAssigningTagId] = React.useState<string | null>(null)
+
+  const folderTags = workspaceTags.filter((t) => tagIds.includes(t.id))
+
+  async function handleAssignTag(tagId: string, e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (tagIds.includes(tagId)) return
+    if (tagIds.length >= 3) {
+      toast.error('Folders can have at most 3 tags')
+      return
+    }
+    setAssigningTagId(tagId)
+    const res = await assignTagToFolder(folderId, tagId)
+    setAssigningTagId(null)
+    if (res.status === 204) {
+      qc.invalidateQueries({ queryKey: getGetFoldersQueryKey({ workspaceId }) })
+    } else if (res.status === 409) {
+      toast.error('Folder already has 3 tags')
+    } else {
+      toast.error('Failed to assign tag')
+    }
+  }
+
   return (
     <div
       data-slot='folder-card'
@@ -48,15 +93,59 @@ function FolderCard({
           {name}
         </span>
       </div>
-      <div className='flex items-center gap-3'>
-        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-          {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
-        </span>
-        {subfolderCount > 0 && (
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
           <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-            {subfolderCount} {subfolderCount === 1 ? 'SUBFOLDER' : 'SUBFOLDERS'}
+            {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
           </span>
-        )}
+          {subfolderCount > 0 && (
+            <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+              {subfolderCount} {subfolderCount === 1 ? 'SUBFOLDER' : 'SUBFOLDERS'}
+            </span>
+          )}
+        </div>
+        <div className='flex items-center gap-1.5'>
+          {folderTags.map((tag) => (
+            <span
+              key={tag.id}
+              title={tag.name}
+              className={cn('size-2.5 rounded-full', TAG_COLOR_MAP[tag.color as TagColor].bg)}
+            />
+          ))}
+          {workspaceTags.length > 0 && tagIds.length < 3 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type='button'
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
+                  className='flex size-4 items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer'
+                  title='Assign tag'
+                >
+                  <TagIcon className='size-3' />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className='w-48 p-1' align='end'>
+                <p className='font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground px-2 py-1'>
+                  Assign tag
+                </p>
+                {workspaceTags
+                  .filter((t) => !tagIds.includes(t.id))
+                  .map((tag) => (
+                    <button
+                      key={tag.id}
+                      type='button'
+                      disabled={assigningTagId === tag.id}
+                      onClick={(e) => handleAssignTag(tag.id, e)}
+                      className='flex w-full items-center gap-2 px-2 py-1.5 hover:bg-primary/5 transition-colors cursor-pointer'
+                    >
+                      <span className={cn('size-2.5 rounded-full shrink-0', TAG_COLOR_MAP[tag.color as TagColor].bg)} />
+                      <span className='font-mono text-xs truncate'>{tag.name}</span>
+                    </button>
+                  ))}
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
       </div>
     </div>
   )
