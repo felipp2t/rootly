@@ -61,6 +61,7 @@ export default defineConfig({
         name: 'get-workspace-members',
         description: 'Get workspace members use case',
       },
+      { name: 'get-tags', description: 'Get workspace tags use case' },
       { name: 'logout', description: 'Logout use case' },
     ],
   },
