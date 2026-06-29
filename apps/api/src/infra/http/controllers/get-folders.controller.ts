@@ -26,6 +26,8 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
                 workspaceId: z.string(),
                 parentId: z.string().nullable(),
                 tagIds: z.array(z.string()),
+                itemCount: z.number(),
+                subfolderCount: z.number(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
               }),
@@ -47,12 +49,14 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
       }
 
       return reply.status(200).send({
-        folders: result.value.folders.map((folder) => ({
+        folders: result.value.folders.map(({ folder, itemCount, subfolderCount }) => ({
           id: folder.id.toString(),
           name: folder.name,
           workspaceId: folder.workspaceId,
           parentId: folder.parentId ?? null,
           tagIds: folder.tagIds,
+          itemCount,
+          subfolderCount,
           createdAt: folder.createdAt,
           updatedAt: folder.updatedAt,
         })),
