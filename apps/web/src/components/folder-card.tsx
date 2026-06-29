@@ -1,6 +1,6 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { useQueryClient } from '@tanstack/react-query'
-import { CheckIcon, Folder, PlusIcon, TagIcon } from 'lucide-react'
+import { Folder, PlusIcon, TagIcon } from 'lucide-react'
 import * as React from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -15,6 +15,15 @@ import { cn } from '@/lib/utils'
 import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
 import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from './ui/context-menu'
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -25,43 +34,95 @@ import {
 } from './ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from './ui/popover'
 import { Skeleton } from './ui/skeleton'
 
 interface FolderCardProps extends React.ComponentProps<'div'> {
-  folderId: string
   name: string
   itemCount: number
   subfolderCount: number
   tagIds: string[]
   workspaceTags: GetTags200TagsItem[]
-  workspaceId: string
 }
 
 function FolderCard({
-  folderId,
   name,
   itemCount,
   subfolderCount,
   tagIds,
   workspaceTags,
-  workspaceId,
   className,
   ...props
 }: FolderCardProps) {
-  const qc = useQueryClient()
-  const [assigningTagId, setAssigningTagId] = React.useState<string | null>(null)
-
   const folderTags = workspaceTags.filter((t) => tagIds.includes(t.id))
 
-  async function handleAssignTag(tagId: string, e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    if (tagIds.includes(tagId)) return
+  return (
+    <div
+      data-slot='folder-card'
+      className={cn(
+        'flex cursor-pointer flex-col justify-between gap-2.5 border-2 border-border hover:border-primary/50 bg-card p-4 transition-all',
+        className,
+      )}
+      {...props}
+    >
+      <div className='flex w-full items-center gap-2'>
+        <Folder className='size-4.5 text-muted-foreground shrink-0' />
+        <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
+          {name}
+        </span>
+      </div>
+
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+            {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
+          </span>
+          {subfolderCount > 0 && (
+            <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+              {subfolderCount}{' '}
+              {subfolderCount === 1 ? 'SUBFOLDER' : 'SUBFOLDERS'}
+            </span>
+          )}
+        </div>
+        <div className='flex items-center gap-1.5'>
+          {folderTags.map((tag) => (
+            <span
+              key={tag.id}
+              title={tag.name}
+              className={cn(
+                'size-2.5 rounded-full',
+                TAG_COLOR_MAP[tag.color as TagColor].bg,
+              )}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type FolderCardMenuProps = {
+  folderId: string
+  tagIds: string[]
+  workspaceTags: GetTags200TagsItem[]
+  workspaceId: string
+  children: React.ReactNode
+}
+
+function FolderCardMenu({
+  folderId,
+  tagIds,
+  workspaceTags,
+  workspaceId,
+  children,
+}: FolderCardMenuProps) {
+  const qc = useQueryClient()
+  const [assigningTagId, setAssigningTagId] = React.useState<string | null>(
+    null,
+  )
+
+  const unassignedTags = workspaceTags.filter((t) => !tagIds.includes(t.id))
+
+  async function handleAssignTag(tagId: string) {
     if (tagIds.length >= 3) {
       toast.error('Folders can have at most 3 tags')
       return
@@ -79,75 +140,42 @@ function FolderCard({
   }
 
   return (
-    <div
-      data-slot='folder-card'
-      className={cn(
-        'flex cursor-pointer flex-col justify-between gap-2.5 border-2 border-border hover:border-primary/50 bg-card p-4 transition-all',
-        className,
-      )}
-      {...props}
-    >
-      <div className='flex w-full items-center gap-2'>
-        <Folder className='size-4.5 text-muted-foreground shrink-0' />
-        <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
-          {name}
-        </span>
-      </div>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-            {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
-          </span>
-          {subfolderCount > 0 && (
-            <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-              {subfolderCount} {subfolderCount === 1 ? 'SUBFOLDER' : 'SUBFOLDERS'}
-            </span>
-          )}
-        </div>
-        <div className='flex items-center gap-1.5'>
-          {folderTags.map((tag) => (
-            <span
-              key={tag.id}
-              title={tag.name}
-              className={cn('size-2.5 rounded-full', TAG_COLOR_MAP[tag.color as TagColor].bg)}
-            />
-          ))}
-          {workspaceTags.length > 0 && tagIds.length < 3 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type='button'
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
-                  className='flex size-4 items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer'
-                  title='Assign tag'
-                >
-                  <TagIcon className='size-3' />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className='w-48 p-1' align='end'>
-                <p className='font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground px-2 py-1'>
-                  Assign tag
+    <ContextMenu>
+      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+      {workspaceTags.length > 0 && (
+        <ContextMenuContent className='min-w-40 2xl:min-w-60'>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <TagIcon />
+              Assign tag
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              {unassignedTags.length === 0 ? (
+                <p className='px-2 py-1.5 font-mono text-xs text-muted-foreground'>
+                  All tags assigned
                 </p>
-                {workspaceTags
-                  .filter((t) => !tagIds.includes(t.id))
-                  .map((tag) => (
-                    <button
-                      key={tag.id}
-                      type='button'
-                      disabled={assigningTagId === tag.id}
-                      onClick={(e) => handleAssignTag(tag.id, e)}
-                      className='flex w-full items-center gap-2 px-2 py-1.5 hover:bg-primary/5 transition-colors cursor-pointer'
-                    >
-                      <span className={cn('size-2.5 rounded-full shrink-0', TAG_COLOR_MAP[tag.color as TagColor].bg)} />
-                      <span className='font-mono text-xs truncate'>{tag.name}</span>
-                    </button>
-                  ))}
-              </PopoverContent>
-            </Popover>
-          )}
-        </div>
-      </div>
-    </div>
+              ) : (
+                unassignedTags.map((tag) => (
+                  <ContextMenuItem
+                    key={tag.id}
+                    disabled={assigningTagId === tag.id}
+                    onSelect={() => handleAssignTag(tag.id)}
+                  >
+                    <span
+                      className={cn(
+                        'size-2.5 rounded-full shrink-0',
+                        TAG_COLOR_MAP[tag.color as TagColor].bg,
+                      )}
+                    />
+                    {tag.name}
+                  </ContextMenuItem>
+                ))
+              )}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        </ContextMenuContent>
+      )}
+    </ContextMenu>
   )
 }
 
@@ -297,4 +325,4 @@ function FolderCardSkeleton({ className }: { className?: string }) {
   )
 }
 
-export { FolderCard, FolderCardSkeleton, NewFolderCard }
+export { FolderCard, FolderCardMenu, FolderCardSkeleton, NewFolderCard }

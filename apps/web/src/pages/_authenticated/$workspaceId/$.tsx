@@ -10,6 +10,7 @@ import { useGetTagsSuspense } from '@/api/tags/tags'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
 import {
   FolderCard,
+  FolderCardMenu,
   FolderCardSkeleton,
   NewFolderCard,
 } from '@/components/folder-card'
@@ -194,24 +195,29 @@ function RoutePage() {
         ) : (
           <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
             {folders.map((folder) => (
-              <Link
+              <FolderCardMenu
                 key={folder.id}
-                to='/$workspaceId/$'
-                params={{
-                  workspaceId,
-                  _splat: [...folderPath, folder.id].join('/'),
-                }}
+                folderId={folder.id}
+                tagIds={folder.tagIds}
+                workspaceTags={workspaceTags}
+                workspaceId={workspaceId}
               >
-                <FolderCard
-                  folderId={folder.id}
-                  name={folder.name}
-                  itemCount={folder.itemCount}
-                  subfolderCount={folder.subfolderCount}
-                  tagIds={folder.tagIds}
-                  workspaceTags={workspaceTags}
-                  workspaceId={workspaceId}
-                />
-              </Link>
+                <Link
+                  to='/$workspaceId/$'
+                  params={{
+                    workspaceId,
+                    _splat: [...folderPath, folder.id].join('/'),
+                  }}
+                >
+                  <FolderCard
+                    name={folder.name}
+                    itemCount={folder.itemCount}
+                    subfolderCount={folder.subfolderCount}
+                    tagIds={folder.tagIds}
+                    workspaceTags={workspaceTags}
+                  />
+                </Link>
+              </FolderCardMenu>
             ))}
           </div>
         )}
