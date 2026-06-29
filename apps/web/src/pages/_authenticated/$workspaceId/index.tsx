@@ -133,7 +133,7 @@ function RoutePage() {
                 to='/$workspaceId/$'
                 params={{ workspaceId, _splat: folder.id }}
               >
-                <FolderCard itemCount={0} name={folder.name} />
+                <FolderCard itemCount={folder.itemCount} subfolderCount={folder.subfolderCount} name={folder.name} />
               </Link>
             ))}
           </div>

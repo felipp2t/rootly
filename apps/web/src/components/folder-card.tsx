@@ -23,9 +23,16 @@ import { Skeleton } from './ui/skeleton'
 interface FolderCardProps extends React.ComponentProps<'div'> {
   name: string
   itemCount: number
+  subfolderCount: number
 }
 
-function FolderCard({ name, itemCount, className, ...props }: FolderCardProps) {
+function FolderCard({
+  name,
+  itemCount,
+  subfolderCount,
+  className,
+  ...props
+}: FolderCardProps) {
   return (
     <div
       data-slot='folder-card'
@@ -41,9 +48,16 @@ function FolderCard({ name, itemCount, className, ...props }: FolderCardProps) {
           {name}
         </span>
       </div>
-      <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
-        {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
-      </span>
+      <div className='flex items-center gap-3'>
+        <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+          {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
+        </span>
+        {subfolderCount > 0 && (
+          <span className='font-mono text-xs font-medium text-muted-foreground uppercase'>
+            {subfolderCount} {subfolderCount === 1 ? 'SUBFOLDER' : 'SUBFOLDERS'}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

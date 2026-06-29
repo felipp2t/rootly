@@ -199,7 +199,7 @@ function RoutePage() {
                   _splat: [...folderPath, folder.id].join('/'),
                 }}
               >
-                <FolderCard itemCount={0} name={folder.name} />
+                <FolderCard itemCount={folder.itemCount} subfolderCount={folder.subfolderCount} name={folder.name} />
               </Link>
             ))}
           </div>
