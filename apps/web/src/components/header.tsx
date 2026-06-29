@@ -1,5 +1,7 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { FoldersIcon, LogOutIcon, SettingsIcon } from 'lucide-react'
+import { useLogout } from '@/api/auth/auth'
 import { NotificationBell } from '@/components/notification-bell'
 import {
   DropdownMenu,
@@ -8,8 +10,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useAuth } from '@/lib/auth'
 
 export function Header() {
+  const navigate = useNavigate()
+  const { setAuthenticated } = useAuth()
+  const logoutMutation = useLogout()
+
+  function handleLogout() {
+    setAuthenticated(false)
+    navigate({ to: '/session' })
+    logoutMutation.mutate()
+  }
+
   return (
     <header className='sticky top-0 z-10 h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm'>
       <div className='container mx-auto flex h-full items-center gap-4 px-8'>
@@ -44,7 +57,11 @@ export function Header() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant='destructive' className='flex items-center gap-2 cursor-pointer'>
+            <DropdownMenuItem
+              variant='destructive'
+              className='flex items-center gap-2 cursor-pointer'
+              onSelect={handleLogout}
+            >
               <LogOutIcon size={14} />
               Logout
             </DropdownMenuItem>
