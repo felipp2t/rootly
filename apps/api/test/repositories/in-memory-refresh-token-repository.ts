@@ -16,4 +16,8 @@ export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
     const index = this.items.findIndex((t) => t.id.toString() === id)
     if (index !== -1) this.items.splice(index, 1)
   }
+
+  async deleteManyByUserId(userId: string): Promise<void> {
+    this.items = this.items.filter((t) => t.userId !== userId)
+  }
 }

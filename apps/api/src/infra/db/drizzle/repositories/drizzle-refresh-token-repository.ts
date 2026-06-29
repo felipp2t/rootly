@@ -30,4 +30,10 @@ export class DrizzleRefreshTokenRepository implements RefreshTokenRepository {
       .delete(schema.refreshTokens)
       .where(eq(schema.refreshTokens.id, id))
   }
+
+  async deleteManyByUserId(userId: string): Promise<void> {
+    await this.db
+      .delete(schema.refreshTokens)
+      .where(eq(schema.refreshTokens.userId, userId))
+  }
 }

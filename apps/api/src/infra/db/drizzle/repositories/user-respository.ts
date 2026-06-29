@@ -36,4 +36,16 @@ export class DrizzleUserRepository implements UserRepository {
   async create(user: User): Promise<void> {
     await this.db.insert(schema.users).values(DrizzleUserMapper.toDrizzle(user))
   }
+
+  async save(user: User): Promise<void> {
+    await this.db
+      .update(schema.users)
+      .set({
+        name: user.name,
+        email: user.email,
+        passwordHash: user.passwordHash,
+        updatedAt: user.updatedAt ?? null,
+      })
+      .where(eq(schema.users.id, user.id.toString()))
+  }
 }
