@@ -16,6 +16,10 @@ export class InMemoryTagRepository implements TagRepository {
     )
   }
 
+  async findManyByWorkspaceId(workspaceId: string): Promise<Tag[]> {
+    return this.items.filter((tag) => tag.workspaceId === workspaceId)
+  }
+
   async findAll(): Promise<Tag[]> {
     return this.items
   }

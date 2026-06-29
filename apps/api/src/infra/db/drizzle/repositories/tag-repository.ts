@@ -30,6 +30,15 @@ export class DrizzleTagRepository implements TagRepository {
     return DrizzleTagMapper.toDomain(rows[0])
   }
 
+  async findManyByWorkspaceId(workspaceId: string): Promise<Tag[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.tags)
+      .where(eq(schema.tags.workspaceId, workspaceId))
+
+    return rows.map(DrizzleTagMapper.toDomain)
+  }
+
   async findAll(): Promise<Tag[]> {
     const rows = await this.db.select().from(schema.tags)
 
