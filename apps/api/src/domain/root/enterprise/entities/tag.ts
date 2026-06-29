@@ -6,6 +6,7 @@ type TagColor = 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'
 
 export interface TagProps {
   name: string
+  slug: string
   color: TagColor
   workspaceId: string
   createdAt: Date
@@ -20,6 +21,10 @@ export class Tag extends Entity<TagProps> {
   set name(value: string) {
     this.props.name = value
     this.touch()
+  }
+
+  get slug() {
+    return this.props.slug
   }
 
   get color() {

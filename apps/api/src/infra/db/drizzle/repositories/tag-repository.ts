@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { TagRepository } from '@/domain/root/application/repositories/tag-repository.ts'
 import type { Tag } from '@/domain/root/enterprise/entities/tag.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -19,11 +19,11 @@ export class DrizzleTagRepository implements TagRepository {
     return DrizzleTagMapper.toDomain(rows[0])
   }
 
-  async findByName(name: string): Promise<Tag | null> {
+  async findBySlug(slug: string, workspaceId: string): Promise<Tag | null> {
     const rows = await this.db
       .select()
       .from(schema.tags)
-      .where(eq(schema.tags.name, name))
+      .where(and(eq(schema.tags.slug, slug), eq(schema.tags.workspaceId, workspaceId)))
 
     if (rows.length === 0) return null
 

@@ -11,6 +11,7 @@ export class DrizzleTagMapper {
     return Tag.create(
       {
         name: raw.name,
+        slug: raw.slug,
         color: raw.color,
         workspaceId: raw.workspaceId,
         createdAt: raw.createdAt,
@@ -24,6 +25,7 @@ export class DrizzleTagMapper {
     return {
       id: tag.id.toString(),
       name: tag.name,
+      slug: tag.slug,
       color: tag.color,
       workspaceId: tag.workspaceId,
       createdAt: tag.createdAt,

@@ -20,13 +20,20 @@ export class CreateTagUseCase {
     color,
     workspaceId,
   }: CreateTagUseCaseRequest): Promise<CreateTagUseCaseResponse> {
-    const existing = await this.tagRepository.findByName(name)
+    const slug = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
 
-    if (existing && existing.workspaceId === workspaceId) {
+    const existing = await this.tagRepository.findBySlug(slug, workspaceId)
+
+    if (existing) {
       return left(new TagAlreadyExistsError())
     }
 
-    const tag = Tag.create({ name, color, workspaceId })
+    const tag = Tag.create({ name, slug, color, workspaceId })
 
     await this.tagRepository.create(tag)
 
