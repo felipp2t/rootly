@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
-import { SettingsIcon, ShieldIcon, UsersIcon } from 'lucide-react'
+import { SettingsIcon, ShieldIcon, TagIcon, UsersIcon } from 'lucide-react'
 import {
   InlineCodeContent,
   InlineCodeRoot,
@@ -31,6 +31,11 @@ const NAV_ITEMS: {
     to: '/$workspaceId/settings/roles',
     label: 'Roles & Permissions',
     icon: ShieldIcon,
+  },
+  {
+    to: '/$workspaceId/settings/tags',
+    label: 'Tags',
+    icon: TagIcon,
   },
 ]
 
