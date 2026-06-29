@@ -17,9 +17,12 @@ export function Header() {
 
         <NotificationBell />
 
-        <div className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300'>
+        <Link
+          to='/account'
+          className='w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-600'
+        >
           U
-        </div>
+        </Link>
       </div>
     </header>
   )
