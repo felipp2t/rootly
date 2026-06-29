@@ -3,6 +3,7 @@ import { type Either, left, right } from '@/core/types/either.ts'
 import type { FolderRepository } from '../repositories/folder-repository.ts'
 import type { TagRepository } from '../repositories/tag-repository.ts'
 import { FolderNotFoundError } from './errors/folder-not-found-error.ts'
+import { FolderTagLimitReachedError } from './errors/folder-tag-limit-reached-error.ts'
 import { TagNotFoundError } from './errors/tag-not-found-error.ts'
 
 interface AssignTagToFolderUseCaseRequest {
@@ -36,6 +37,10 @@ export class AssignTagToFolderUseCase {
 
     if (folder.tagIds.includes(tagId)) {
       return right(undefined)
+    }
+
+    if (folder.tagIds.length >= 3) {
+      return left(new FolderTagLimitReachedError())
     }
 
     folder.tagIds = [...folder.tagIds, tagId]

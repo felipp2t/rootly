@@ -23,6 +23,7 @@ export const assignTagToFolderController: FastifyPluginCallbackZod = async (
           204: z.void(),
           401: z.object({ message: z.string() }),
           404: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
         },
       },
@@ -40,6 +41,8 @@ export const assignTagToFolderController: FastifyPluginCallbackZod = async (
           case 'FolderNotFoundError':
           case 'TagNotFoundError':
             return reply.status(404).send({ message: error.message })
+          case 'FolderTagLimitReachedError':
+            return reply.status(409).send({ message: error.message })
           default:
             return reply.status(500).send({ message: 'Internal Server Error' })
         }
