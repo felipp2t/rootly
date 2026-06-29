@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetRolePermissions200PermissionsItem } from './getRolePermissions200PermissionsItem'
+import type { GetRolePermissions200PermissionsItem } from './getRolePermissions200PermissionsItem';
 
 export type GetRolePermissions200 = {
-  permissions: GetRolePermissions200PermissionsItem[]
-}
+  permissions: GetRolePermissions200PermissionsItem[];
+};

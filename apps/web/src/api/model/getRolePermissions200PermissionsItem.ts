@@ -4,14 +4,14 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetRolePermissions200PermissionsItemAction } from './getRolePermissions200PermissionsItemAction'
-import type { GetRolePermissions200PermissionsItemResource } from './getRolePermissions200PermissionsItemResource'
+import type { GetRolePermissions200PermissionsItemAction } from './getRolePermissions200PermissionsItemAction';
+import type { GetRolePermissions200PermissionsItemResource } from './getRolePermissions200PermissionsItemResource';
 
 export type GetRolePermissions200PermissionsItem = {
-  id: string
-  roleId: string
-  resource: GetRolePermissions200PermissionsItemResource
-  action: GetRolePermissions200PermissionsItemAction
-  createdAt: string
-  updatedAt: string
-}
+  id: string;
+  roleId: string;
+  resource: GetRolePermissions200PermissionsItemResource;
+  action: GetRolePermissions200PermissionsItemAction;
+  createdAt: string;
+  updatedAt: string;
+};

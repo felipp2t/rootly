@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetRoles200RolesItem } from './getRoles200RolesItem'
+import type { GetRoles200RolesItem } from './getRoles200RolesItem';
 
 export type GetRoles200 = {
-  roles: GetRoles200RolesItem[]
-}
+  roles: GetRoles200RolesItem[];
+};

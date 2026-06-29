@@ -6,5 +6,5 @@
  */
 
 export type DeleteRole500 = {
-  message: string
-}
+  message: string;
+};

@@ -5,11 +5,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetNotifications200NotificationsItemMetadata =
-  | {
-      type: 'info'
-    }
-  | {
-      type: 'workspace_invite'
-      inviteId: string
-    }
+export type GetNotifications200NotificationsItemMetadata = {
+  type: 'info';
+} | {
+  type: 'workspace_invite';
+  inviteId: string;
+};

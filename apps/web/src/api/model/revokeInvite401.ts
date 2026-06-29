@@ -6,5 +6,5 @@
  */
 
 export type RevokeInvite401 = {
-  message: string
-}
+  message: string;
+};

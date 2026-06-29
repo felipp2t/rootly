@@ -6,9 +6,9 @@
  */
 
 export type GetRoles200RolesItem = {
-  id: string
-  name: string
-  workspaceId: string
-  createdAt: string
-  updatedAt: string
-}
+  id: string;
+  name: string;
+  workspaceId: string;
+  createdAt: string;
+  updatedAt: string;
+};

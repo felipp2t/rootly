@@ -6,12 +6,12 @@
  */
 
 export type GetWorkspaceInvites200InvitesItem = {
-  id: string
-  email: string
-  name: string
-  roleId: string
-  roleName: string
-  status: string
-  createdAt: string
-  expiresAt: string
-}
+  id: string;
+  email: string;
+  name: string;
+  roleId: string;
+  roleName: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type GetWorkspaceInvites404 = {
-  message: string
-}
+  message: string;
+};

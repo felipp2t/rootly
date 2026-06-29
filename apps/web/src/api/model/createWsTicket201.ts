@@ -6,5 +6,5 @@
  */
 
 export type CreateWsTicket201 = {
-  ticket: string
-}
+  ticket: string;
+};

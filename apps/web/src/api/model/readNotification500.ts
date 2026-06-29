@@ -6,5 +6,5 @@
  */
 
 export type ReadNotification500 = {
-  message: string
-}
+  message: string;
+};

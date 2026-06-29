@@ -6,5 +6,5 @@
  */
 
 export type SetRolePermissions400 = {
-  message: string
-}
+  message: string;
+};

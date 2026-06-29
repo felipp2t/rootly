@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SetRolePermissionsBodyPermissionsItemResource =
-  (typeof SetRolePermissionsBodyPermissionsItemResource)[keyof typeof SetRolePermissionsBodyPermissionsItemResource]
+export type SetRolePermissionsBodyPermissionsItemResource = typeof SetRolePermissionsBodyPermissionsItemResource[keyof typeof SetRolePermissionsBodyPermissionsItemResource];
+
 
 export const SetRolePermissionsBodyPermissionsItemResource = {
   workspace: 'workspace',
@@ -15,4 +15,4 @@ export const SetRolePermissionsBodyPermissionsItemResource = {
   tag: 'tag',
   member: 'member',
   role: 'role',
-} as const
+} as const;

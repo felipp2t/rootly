@@ -6,5 +6,5 @@
  */
 
 export type DeclineInvite401 = {
-  message: string
-}
+  message: string;
+};

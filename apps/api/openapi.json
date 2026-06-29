@@ -871,6 +871,12 @@
                               "type": "string"
                             }
                           },
+                          "itemCount": {
+                            "type": "number"
+                          },
+                          "subfolderCount": {
+                            "type": "number"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -886,6 +892,8 @@
                           "workspaceId",
                           "parentId",
                           "tagIds",
+                          "itemCount",
+                          "subfolderCount",
                           "createdAt",
                           "updatedAt"
                         ],

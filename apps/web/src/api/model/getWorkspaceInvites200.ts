@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetWorkspaceInvites200InvitesItem } from './getWorkspaceInvites200InvitesItem'
+import type { GetWorkspaceInvites200InvitesItem } from './getWorkspaceInvites200InvitesItem';
 
 export type GetWorkspaceInvites200 = {
-  invites: GetWorkspaceInvites200InvitesItem[]
-}
+  invites: GetWorkspaceInvites200InvitesItem[];
+};

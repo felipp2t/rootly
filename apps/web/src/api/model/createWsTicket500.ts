@@ -6,5 +6,5 @@
  */
 
 export type CreateWsTicket500 = {
-  message: string
-}
+  message: string;
+};

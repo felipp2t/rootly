@@ -4,8 +4,8 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetNotifications200NotificationsItem } from './getNotifications200NotificationsItem'
+import type { GetNotifications200NotificationsItem } from './getNotifications200NotificationsItem';
 
 export type GetNotifications200 = {
-  notifications: GetNotifications200NotificationsItem[]
-}
+  notifications: GetNotifications200NotificationsItem[];
+};

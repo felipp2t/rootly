@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetRolePermissions200PermissionsItemAction =
-  (typeof GetRolePermissions200PermissionsItemAction)[keyof typeof GetRolePermissions200PermissionsItemAction]
+export type GetRolePermissions200PermissionsItemAction = typeof GetRolePermissions200PermissionsItemAction[keyof typeof GetRolePermissions200PermissionsItemAction];
+
 
 export const GetRolePermissions200PermissionsItemAction = {
   read: 'read',
@@ -15,4 +15,4 @@ export const GetRolePermissions200PermissionsItemAction = {
   delete: 'delete',
   invite: 'invite',
   all: 'all',
-} as const
+} as const;

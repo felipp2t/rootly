@@ -4,10 +4,10 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { SetRolePermissionsBodyPermissionsItemAction } from './setRolePermissionsBodyPermissionsItemAction'
-import type { SetRolePermissionsBodyPermissionsItemResource } from './setRolePermissionsBodyPermissionsItemResource'
+import type { SetRolePermissionsBodyPermissionsItemAction } from './setRolePermissionsBodyPermissionsItemAction';
+import type { SetRolePermissionsBodyPermissionsItemResource } from './setRolePermissionsBodyPermissionsItemResource';
 
 export type SetRolePermissionsBodyPermissionsItem = {
-  resource: SetRolePermissionsBodyPermissionsItemResource
-  action: SetRolePermissionsBodyPermissionsItemAction
-}
+  resource: SetRolePermissionsBodyPermissionsItemResource;
+  action: SetRolePermissionsBodyPermissionsItemAction;
+};

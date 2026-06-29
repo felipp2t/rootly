@@ -12,6 +12,8 @@ export type GetFolders200FoldersItem = {
   /** @nullable */
   parentId: string | null
   tagIds: string[]
+  itemCount: number
+  subfolderCount: number
   createdAt: string
   updatedAt: string
 }

@@ -6,5 +6,5 @@
  */
 
 export type GetRoles500 = {
-  message: string
-}
+  message: string;
+};

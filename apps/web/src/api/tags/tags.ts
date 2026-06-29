@@ -4,25 +4,30 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation } from '@tanstack/react-query'
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from '@tanstack/react-query'
+  UseMutationResult
+} from '@tanstack/react-query';
 
 import type {
   CreateTag201,
   CreateTag401,
   CreateTag409,
   CreateTag500,
-  CreateTagBody,
-} from '../model'
+  CreateTagBody
+} from '../model';
 
-import { fetchWithAuth } from '../../lib/fetch'
+import { fetchWithAuth } from '../../lib/fetch';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * Create a new tag
@@ -48,103 +53,80 @@ export type createTagResponse500 = {
   status: 500
 }
 
-export type createTagResponseSuccess = createTagResponse201 & {
-  headers: Headers
-}
-export type createTagResponseError = (
-  | createTagResponse401
-  | createTagResponse409
-  | createTagResponse500
-) & {
-  headers: Headers
-}
+export type createTagResponseSuccess = (createTagResponse201) & {
+  headers: Headers;
+};
+export type createTagResponseError = (createTagResponse401 | createTagResponse409 | createTagResponse500) & {
+  headers: Headers;
+};
 
-export type createTagResponse =
-  | createTagResponseSuccess
-  | createTagResponseError
+export type createTagResponse = (createTagResponseSuccess | createTagResponseError)
 
 export const getCreateTagUrl = () => {
+
+
+  
+
   return `http://localhost:3333/api/tags`
 }
 
-export const createTag = async (
-  createTagBody: CreateTagBody,
-  options?: RequestInit,
-): Promise<createTagResponse> => {
-  return fetchWithAuth<createTagResponse>(getCreateTagUrl(), {
+export const createTag = async (createTagBody: CreateTagBody, options?: RequestInit): Promise<createTagResponse> => {
+  
+  return fetchWithAuth<createTagResponse>(getCreateTagUrl(),
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createTagBody),
-  })
-}
-
-export const getCreateTagMutationOptions = <
-  TError = CreateTag401 | CreateTag409 | CreateTag500,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createTag>>,
-    TError,
-    { data: CreateTagBody },
-    TContext
-  >
-  request?: SecondParameter<typeof fetchWithAuth>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createTag>>,
-  TError,
-  { data: CreateTagBody },
-  TContext
-> => {
-  const mutationKey = ['createTag']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createTag>>,
-    { data: CreateTagBody }
-  > = (props) => {
-    const { data } = props ?? {}
-
-    return createTag(data, requestOptions)
+    body: JSON.stringify(
+      createTagBody,)
   }
+);}
+  
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type CreateTagMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createTag>>
->
-export type CreateTagMutationBody = CreateTagBody
-export type CreateTagMutationError = CreateTag401 | CreateTag409 | CreateTag500
 
-/**
+export const getCreateTagMutationOptions = <TError = CreateTag401 | CreateTag409 | CreateTag500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTag>>, TError,{data: CreateTagBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTag>>, TError,{data: CreateTagBody}, TContext> => {
+
+const mutationKey = ['createTag'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTag>>, {data: CreateTagBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTag(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTagMutationResult = NonNullable<Awaited<ReturnType<typeof createTag>>>
+    export type CreateTagMutationBody = CreateTagBody
+    export type CreateTagMutationError = CreateTag401 | CreateTag409 | CreateTag500
+
+    /**
  * @summary Create Tag
  */
-export const useCreateTag = <
-  TError = CreateTag401 | CreateTag409 | CreateTag500,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createTag>>,
-      TError,
-      { data: CreateTagBody },
-      TContext
-    >
-    request?: SecondParameter<typeof fetchWithAuth>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createTag>>,
-  TError,
-  { data: CreateTagBody },
-  TContext
-> => {
-  return useMutation(getCreateTagMutationOptions(options), queryClient)
-}
+export const useCreateTag = <TError = CreateTag401 | CreateTag409 | CreateTag500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTag>>, TError,{data: CreateTagBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createTag>>,
+        TError,
+        {data: CreateTagBody},
+        TContext
+      > => {
+      return useMutation(getCreateTagMutationOptions(options), queryClient);
+    }
+    

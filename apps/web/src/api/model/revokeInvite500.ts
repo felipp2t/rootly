@@ -6,5 +6,5 @@
  */
 
 export type RevokeInvite500 = {
-  message: string
-}
+  message: string;
+};

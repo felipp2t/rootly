@@ -7,5 +7,5 @@
 
 export type CreateRoleBody = {
   /** @minLength 1 */
-  name: string
-}
+  name: string;
+};

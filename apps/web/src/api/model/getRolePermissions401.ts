@@ -6,5 +6,5 @@
  */
 
 export type GetRolePermissions401 = {
-  message: string
-}
+  message: string;
+};

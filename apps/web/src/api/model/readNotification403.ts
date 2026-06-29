@@ -6,5 +6,5 @@
  */
 
 export type ReadNotification403 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type CreateRole201 = {
-  roleId: string
-}
+  roleId: string;
+};

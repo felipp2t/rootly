@@ -6,5 +6,5 @@
  */
 
 export type CreateRole401 = {
-  message: string
-}
+  message: string;
+};

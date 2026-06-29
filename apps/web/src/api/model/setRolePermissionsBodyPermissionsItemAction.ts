@@ -5,8 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SetRolePermissionsBodyPermissionsItemAction =
-  (typeof SetRolePermissionsBodyPermissionsItemAction)[keyof typeof SetRolePermissionsBodyPermissionsItemAction]
+export type SetRolePermissionsBodyPermissionsItemAction = typeof SetRolePermissionsBodyPermissionsItemAction[keyof typeof SetRolePermissionsBodyPermissionsItemAction];
+
 
 export const SetRolePermissionsBodyPermissionsItemAction = {
   read: 'read',
@@ -15,4 +15,4 @@ export const SetRolePermissionsBodyPermissionsItemAction = {
   delete: 'delete',
   invite: 'invite',
   all: 'all',
-} as const
+} as const;

@@ -4,14 +4,14 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetNotifications200NotificationsItemMetadata } from './getNotifications200NotificationsItemMetadata'
+import type { GetNotifications200NotificationsItemMetadata } from './getNotifications200NotificationsItemMetadata';
 
 export type GetNotifications200NotificationsItem = {
-  id: string
-  title: string
-  content: string
-  metadata: GetNotifications200NotificationsItemMetadata
+  id: string;
+  title: string;
+  content: string;
+  metadata: GetNotifications200NotificationsItemMetadata;
   /** @nullable */
-  readAt: string | null
-  createdAt: string
-}
+  readAt: string | null;
+  createdAt: string;
+};

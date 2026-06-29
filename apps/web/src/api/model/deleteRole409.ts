@@ -6,5 +6,5 @@
  */
 
 export type DeleteRole409 = {
-  message: string
-}
+  message: string;
+};

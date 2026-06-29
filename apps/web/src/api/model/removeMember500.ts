@@ -6,5 +6,5 @@
  */
 
 export type RemoveMember500 = {
-  message: string
-}
+  message: string;
+};

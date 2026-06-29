@@ -6,5 +6,5 @@
  */
 
 export type InviteUser403 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type RemoveMember403 = {
-  message: string
-}
+  message: string;
+};

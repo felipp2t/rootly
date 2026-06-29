@@ -6,5 +6,5 @@
  */
 
 export type GetNotifications401 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type RemoveMember404 = {
-  message: string
-}
+  message: string;
+};

@@ -6,5 +6,5 @@
  */
 
 export type GetNotifications500 = {
-  message: string
-}
+  message: string;
+};
