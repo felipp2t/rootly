@@ -4,7 +4,7 @@
  * Rootly API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,7 +21,8 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
-
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { fetchWithAuth } from '../../lib/fetch'
 import type {
   ChangePassword204,
   ChangePassword400,
@@ -35,9 +36,12 @@ import type {
   GetMyWorkspacePermissions401,
   GetMyWorkspacePermissions404,
   GetMyWorkspacePermissions500,
+  UpdateProfile204,
+  UpdateProfile400,
+  UpdateProfile401,
+  UpdateProfile500,
+  UpdateProfileBody,
 } from '../model'
-
-import { fetchWithAuth } from '../../lib/fetch'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
@@ -298,6 +302,133 @@ export function useGetMeSuspense<
   return { ...query, queryKey: queryOptions.queryKey }
 }
 
+/**
+ * Update the authenticated user profile
+ * @summary Update Profile
+ */
+export type updateProfileResponse204 = {
+  data: UpdateProfile204
+  status: 204
+}
+
+export type updateProfileResponse400 = {
+  data: UpdateProfile400
+  status: 400
+}
+
+export type updateProfileResponse401 = {
+  data: UpdateProfile401
+  status: 401
+}
+
+export type updateProfileResponse500 = {
+  data: UpdateProfile500
+  status: 500
+}
+
+export type updateProfileResponseSuccess = updateProfileResponse204 & {
+  headers: Headers
+}
+export type updateProfileResponseError = (
+  | updateProfileResponse400
+  | updateProfileResponse401
+  | updateProfileResponse500
+) & {
+  headers: Headers
+}
+
+export type updateProfileResponse =
+  | updateProfileResponseSuccess
+  | updateProfileResponseError
+
+export const getUpdateProfileUrl = () => {
+  return `http://localhost:3333/api/me`
+}
+
+export const updateProfile = async (
+  updateProfileBody: UpdateProfileBody,
+  options?: RequestInit,
+): Promise<updateProfileResponse> => {
+  return fetchWithAuth<updateProfileResponse>(getUpdateProfileUrl(), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateProfileBody),
+  })
+}
+
+export const getUpdateProfileMutationOptions = <
+  TError = UpdateProfile400 | UpdateProfile401 | UpdateProfile500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateProfile>>,
+    TError,
+    { data: UpdateProfileBody },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchWithAuth>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateProfile>>,
+  TError,
+  { data: UpdateProfileBody },
+  TContext
+> => {
+  const mutationKey = ['updateProfile']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateProfile>>,
+    { data: UpdateProfileBody }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return updateProfile(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type UpdateProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateProfile>>
+>
+export type UpdateProfileMutationBody = UpdateProfileBody
+export type UpdateProfileMutationError =
+  | UpdateProfile400
+  | UpdateProfile401
+  | UpdateProfile500
+
+/**
+ * @summary Update Profile
+ */
+export const useUpdateProfile = <
+  TError = UpdateProfile400 | UpdateProfile401 | UpdateProfile500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateProfile>>,
+      TError,
+      { data: UpdateProfileBody },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchWithAuth>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateProfile>>,
+  TError,
+  { data: UpdateProfileBody },
+  TContext
+> => {
+  return useMutation(getUpdateProfileMutationOptions(options), queryClient)
+}
 /**
  * Change the authenticated user password
  * @summary Change Password
