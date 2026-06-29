@@ -1,8 +1,24 @@
+import { cva, type VariantProps } from 'class-variance-authority'
 import { CheckIcon } from 'lucide-react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
+
+const dropdownMenuItemVariants = cva(
+  'relative flex cursor-pointer select-none items-center gap-2 px-2.5 py-2 font-mono text-xs font-semibold uppercase tracking-wide outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        default: 'text-muted-foreground focus:bg-primary/5 focus:text-primary',
+        destructive: 'text-red-400 focus:bg-red-500/20 focus:text-red-400',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+)
 
 function DropdownMenu({
   ...props
@@ -43,15 +59,14 @@ function DropdownMenuContent({
 
 function DropdownMenuItem({
   className,
+  variant,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Item>) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> &
+  VariantProps<typeof dropdownMenuItemVariants>) {
   return (
     <DropdownMenuPrimitive.Item
       data-slot='dropdown-menu-item'
-      className={cn(
-        'relative flex cursor-pointer select-none items-center gap-2 px-2.5 py-2 font-mono text-xs font-semibold uppercase tracking-wide text-muted-foreground outline-none transition-colors focus:bg-primary/5 focus:text-primary data-disabled:pointer-events-none data-disabled:opacity-50',
-        className,
-      )}
+      className={cn(dropdownMenuItemVariants({ variant }), className)}
       {...props}
     />
   )
