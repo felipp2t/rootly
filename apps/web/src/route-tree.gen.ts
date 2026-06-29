@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './pages/__root'
 import { Route as SignupRouteImport } from './pages/signup'
 import { Route as SessionRouteImport } from './pages/session'
 import { Route as AuthenticatedLayoutRouteImport } from './pages/_authenticated/layout'
+import { Route as AuthenticatedAccountRouteImport } from './pages/_authenticated/account'
 import { Route as AuthenticateddashboardIndexRouteImport } from './pages/_authenticated/(dashboard)/index'
 import { Route as AuthenticatedWorkspaceIdIndexRouteImport } from './pages/_authenticated/$workspaceId/index'
 import { Route as AuthenticatedWorkspaceIdSplatRouteImport } from './pages/_authenticated/$workspaceId/$'
@@ -34,6 +35,11 @@ const SessionRoute = SessionRouteImport.update({
 const AuthenticatedLayoutRoute = AuthenticatedLayoutRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedLayoutRoute,
 } as any)
 const AuthenticateddashboardIndexRoute =
   AuthenticateddashboardIndexRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticateddashboardIndexRoute
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/$workspaceId': typeof AuthenticatedWorkspaceIdIndexRoute
   '/': typeof AuthenticateddashboardIndexRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedLayoutRouteWithChildren
   '/session': typeof SessionRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   '/_authenticated/$workspaceId/$': typeof AuthenticatedWorkspaceIdSplatRoute
   '/_authenticated/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/session'
     | '/signup'
+    | '/account'
     | '/$workspaceId/settings'
     | '/$workspaceId/$'
     | '/$workspaceId/'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
   to:
     | '/session'
     | '/signup'
+    | '/account'
     | '/$workspaceId/$'
     | '/$workspaceId'
     | '/'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/session'
     | '/signup'
+    | '/_authenticated/account'
     | '/_authenticated/$workspaceId/settings'
     | '/_authenticated/$workspaceId/$'
     | '/_authenticated/$workspaceId/'
@@ -188,6 +200,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedLayoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
     }
     '/_authenticated/(dashboard)/': {
       id: '/_authenticated/(dashboard)/'
@@ -273,6 +292,7 @@ const AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren =
   )
 
 interface AuthenticatedLayoutRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedWorkspaceIdSettingsLayoutRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren
   AuthenticatedWorkspaceIdSplatRoute: typeof AuthenticatedWorkspaceIdSplatRoute
   AuthenticatedWorkspaceIdIndexRoute: typeof AuthenticatedWorkspaceIdIndexRoute
@@ -280,6 +300,7 @@ interface AuthenticatedLayoutRouteChildren {
 }
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedWorkspaceIdSettingsLayoutRoute:
     AuthenticatedWorkspaceIdSettingsLayoutRouteWithChildren,
   AuthenticatedWorkspaceIdSplatRoute: AuthenticatedWorkspaceIdSplatRoute,
