@@ -2,7 +2,6 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { acceptInviteController } from './controllers/accept-invite.controller.ts'
 import { assignRoleToMemberController } from './controllers/assign-role-to-member.controller.ts'
 import { assignTagToFolderController } from './controllers/assign-tag-to-folder.controller.ts'
-import { assignTagToItemController } from './controllers/assign-tag-to-item.controller.ts'
 import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
 import { logoutController } from './controllers/logout.controller.ts'
 import { changePasswordController } from './controllers/change-password.controller.ts'
@@ -56,7 +55,6 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(updateWorkspaceController)
   app.register(deleteWorkspaceController)
   app.register(assignTagToFolderController)
-  app.register(assignTagToItemController)
   app.register(getFoldersController)
   app.register(resolveFolderPathController)
   app.register(getItemsController)
