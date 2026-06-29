@@ -23,12 +23,21 @@ export class User extends Entity<UserProps> {
     return this.props.passwordHash
   }
 
+  set passwordHash(value: string) {
+    this.props.passwordHash = value
+    this.touch()
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
 
   get updatedAt() {
     return this.props.updatedAt
+  }
+
+  private touch() {
+    this.props.updatedAt = new Date()
   }
 
   static create(
