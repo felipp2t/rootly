@@ -1,6 +1,6 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { useQueryClient } from '@tanstack/react-query'
-import { Folder, PlusIcon, TagIcon } from 'lucide-react'
+import { Folder, MoreVerticalIcon, PlusIcon, TagIcon } from 'lucide-react'
 import * as React from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -15,15 +15,6 @@ import { cn } from '@/lib/utils'
 import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from './ui/context-menu'
-import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -32,8 +23,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
+import { ScrollArea } from './ui/scroll-area'
 import { Skeleton } from './ui/skeleton'
 
 interface FolderCardProps extends React.ComponentProps<'div'> {
@@ -140,42 +141,57 @@ function FolderCardMenu({
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      {workspaceTags.length > 0 && (
-        <ContextMenuContent className='min-w-40 2xl:min-w-60'>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              <TagIcon />
-              Assign tag
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              {unassignedTags.length === 0 ? (
-                <p className='px-2 py-1.5 font-mono text-xs text-muted-foreground'>
-                  All tags assigned
-                </p>
-              ) : (
-                unassignedTags.map((tag) => (
-                  <ContextMenuItem
-                    key={tag.id}
-                    disabled={assigningTagId === tag.id}
-                    onSelect={() => handleAssignTag(tag.id)}
-                  >
-                    <span
-                      className={cn(
-                        'size-2.5 rounded-full shrink-0',
-                        TAG_COLOR_MAP[tag.color as TagColor].bg,
-                      )}
-                    />
-                    {tag.name}
-                  </ContextMenuItem>
-                ))
-              )}
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-        </ContextMenuContent>
-      )}
-    </ContextMenu>
+    <div className='relative'>
+      {children}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type='button'
+            onClick={(e) => e.stopPropagation()}
+            className='absolute top-3 right-3 cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-accent hover:text-foreground'
+          >
+            <MoreVerticalIcon className='size-4' />
+          </button>
+        </DropdownMenuTrigger>
+        {workspaceTags.length > 0 && (
+          <DropdownMenuContent className='min-w-40 2xl:min-w-60' align='start'>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <TagIcon />
+                Assign tag
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {unassignedTags.length === 0 ? (
+                  <p className='px-2 py-1.5 font-mono text-xs text-muted-foreground'>
+                    All tags assigned
+                  </p>
+                ) : (
+                  <ScrollArea>
+                    <div className='max-h-40'>
+                      {unassignedTags.map((tag) => (
+                        <DropdownMenuItem
+                          key={tag.id}
+                          disabled={assigningTagId === tag.id}
+                          onSelect={() => handleAssignTag(tag.id)}
+                        >
+                          <span
+                            className={cn(
+                              'size-2.5 rounded-full shrink-0',
+                              TAG_COLOR_MAP[tag.color as TagColor].bg,
+                            )}
+                          />
+                          {tag.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuContent>
+        )}
+      </DropdownMenu>
+    </div>
   )
 }
 
