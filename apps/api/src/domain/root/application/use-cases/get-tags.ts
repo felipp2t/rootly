@@ -5,17 +5,21 @@ import type { TagRepository } from '../repositories/tag-repository.ts'
 
 interface GetTagsUseCaseRequest {
   workspaceId: string
+  cursor?: string
+  limit?: number
 }
 
-type GetTagsUseCaseResponse = Either<BaseError, { tags: Tag[] }>
+type GetTagsUseCaseResponse = Either<BaseError, { tags: Tag[]; nextCursor?: string }>
 
 export class GetTagsUseCase {
   constructor(private readonly tagRepository: TagRepository) {}
 
   async execute({
     workspaceId,
+    cursor,
+    limit = 20,
   }: GetTagsUseCaseRequest): Promise<GetTagsUseCaseResponse> {
-    const tags = await this.tagRepository.findManyByWorkspaceId(workspaceId)
-    return right({ tags })
+    const { tags, nextCursor } = await this.tagRepository.findManyByWorkspaceId(workspaceId, { cursor, limit })
+    return right({ tags, nextCursor })
   }
 }

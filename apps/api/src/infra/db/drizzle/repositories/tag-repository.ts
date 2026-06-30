@@ -1,5 +1,5 @@
-import { and, eq } from 'drizzle-orm'
-import type { TagRepository } from '@/domain/root/application/repositories/tag-repository.ts'
+import { and, desc, eq, lt } from 'drizzle-orm'
+import type { FindManyByWorkspaceIdOptions, FindManyByWorkspaceIdResult, TagRepository } from '@/domain/root/application/repositories/tag-repository.ts'
 import type { Tag } from '@/domain/root/enterprise/entities/tag.ts'
 import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleTagMapper } from '../mappers/drizzle-tag-mapper.ts'
@@ -30,13 +30,23 @@ export class DrizzleTagRepository implements TagRepository {
     return DrizzleTagMapper.toDomain(rows[0])
   }
 
-  async findManyByWorkspaceId(workspaceId: string): Promise<Tag[]> {
+  async findManyByWorkspaceId(workspaceId: string, { cursor, limit }: FindManyByWorkspaceIdOptions): Promise<FindManyByWorkspaceIdResult> {
     const rows = await this.db
       .select()
       .from(schema.tags)
-      .where(eq(schema.tags.workspaceId, workspaceId))
+      .where(
+        cursor
+          ? and(eq(schema.tags.workspaceId, workspaceId), lt(schema.tags.createdAt, new Date(cursor)))
+          : eq(schema.tags.workspaceId, workspaceId),
+      )
+      .orderBy(desc(schema.tags.createdAt))
+      .limit(limit + 1)
 
-    return rows.map(DrizzleTagMapper.toDomain)
+    const hasNextPage = rows.length > limit
+    const tags = rows.slice(0, limit).map(DrizzleTagMapper.toDomain)
+    const nextCursor = hasNextPage ? rows[limit - 1].createdAt?.toISOString() : undefined
+
+    return { tags, nextCursor }
   }
 
   async findAll(): Promise<Tag[]> {

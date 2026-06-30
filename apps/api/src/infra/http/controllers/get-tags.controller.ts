@@ -15,6 +15,8 @@ export const getTagsController: FastifyPluginCallbackZod = async (app) => {
         tags: ['Tags'],
         querystring: z.object({
           workspaceId: z.string(),
+          cursor: z.string().optional(),
+          limit: z.coerce.number().int().min(1).max(1000).optional(),
         }),
         response: {
           200: z.object({
@@ -28,6 +30,7 @@ export const getTagsController: FastifyPluginCallbackZod = async (app) => {
                 createdAt: z.string(),
               }),
             ),
+            nextCursor: z.string().optional(),
           }),
           401: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
@@ -35,10 +38,10 @@ export const getTagsController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const { workspaceId } = request.query
+      const { workspaceId, cursor, limit } = request.query
 
       const useCase = makeGetTagsUseCase()
-      const result = await useCase.execute({ workspaceId })
+      const result = await useCase.execute({ workspaceId, cursor, limit })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })
@@ -53,7 +56,7 @@ export const getTagsController: FastifyPluginCallbackZod = async (app) => {
         createdAt: tag.createdAt.toISOString(),
       }))
 
-      return reply.status(200).send({ tags })
+      return reply.status(200).send({ tags, nextCursor: result.value.nextCursor })
     },
   )
 }
