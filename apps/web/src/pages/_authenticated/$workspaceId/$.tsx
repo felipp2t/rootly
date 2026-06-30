@@ -83,7 +83,7 @@ function RoutePage() {
     workspaceId,
     path: _splat,
   })
-  const { data: tagsResult } = useGetTagsSuspense({ workspaceId })
+  const { data: tagsResult } = useGetTagsSuspense({ workspaceId, limit: 1000 })
 
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null

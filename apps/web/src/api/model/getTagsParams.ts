@@ -7,4 +7,10 @@
 
 export type GetTagsParams = {
 workspaceId: string;
+cursor?: string;
+/**
+ * @minimum 1
+ * @maximum 1000
+ */
+limit?: number;
 };

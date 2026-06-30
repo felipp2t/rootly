@@ -66,7 +66,7 @@ function RoutePage() {
   const { data: workspaceResult } = useGetWorkspaceSuspense(workspaceId)
   const { data: foldersResult } = useGetFoldersSuspense({ workspaceId })
   const { data: itemsResult } = useGetItemsSuspense({ workspaceId })
-  const { data: tagsResult } = useGetTagsSuspense({ workspaceId })
+  const { data: tagsResult } = useGetTagsSuspense({ workspaceId, limit: 1000 })
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []

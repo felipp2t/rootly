@@ -1,14 +1,11 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import { useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2Icon, PlusIcon } from 'lucide-react'
-import { Suspense } from 'react'
+import { useEffect } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import {
-  getGetTagsQueryKey,
-  useCreateTag,
-  useGetTagsSuspense,
-} from '@/api/tags/tags'
+import { getTags, getGetTagsQueryKey, useCreateTag } from '@/api/tags/tags'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -29,19 +26,33 @@ const createTagSchema = z.object({
   color: z.enum(['blue', 'green', 'orange', 'purple', 'red', 'yellow']),
 })
 
-export function TagsSection({ workspaceId }: { workspaceId: string }) {
-  return (
-    <Suspense fallback={<TagsSectionSkeleton />}>
-      <TagsSectionLoader workspaceId={workspaceId} />
-    </Suspense>
-  )
-}
+const TAGS_LIMIT = 20
 
-function TagsSectionLoader({ workspaceId }: { workspaceId: string }) {
+export function TagsSection({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient()
-  const { data: tagsRes } = useGetTagsSuspense({ workspaceId })
-  const tags = tagsRes.status === 200 ? tagsRes.data.tags : []
   const createTag = useCreateTag()
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
+      queryKey: getGetTagsQueryKey({ workspaceId, limit: TAGS_LIMIT }),
+      queryFn: ({ pageParam }) =>
+        getTags({ workspaceId, cursor: pageParam as string | undefined, limit: TAGS_LIMIT }),
+      getNextPageParam: (lastPage) => {
+        if (lastPage.status !== 200) return undefined
+        return lastPage.data.nextCursor ?? undefined
+      },
+      initialPageParam: undefined as string | undefined,
+    })
+
+  const { ref, inView } = useInView({ threshold: 0 })
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  const tags = data?.pages.flatMap((p) => (p.status === 200 ? p.data.tags : [])) ?? []
 
   const form = useForm({
     validators: { onSubmit: createTagSchema },
@@ -162,43 +173,50 @@ function TagsSectionLoader({ workspaceId }: { workspaceId: string }) {
 
       <div className='flex flex-col gap-2'>
         <span className='font-mono text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
-          {tags.length} {tags.length === 1 ? 'Tag' : 'Tags'}
+          Tags
         </span>
-        {tags.length === 0 ? (
+        {isLoading ? (
+          <TagsListSkeleton />
+        ) : tags.length === 0 ? (
           <p className='font-mono text-xs text-muted-foreground'>No tags yet</p>
         ) : (
-          <div className='flex flex-wrap gap-2'>
-            {tags.map((tag) => (
-              <div
-                key={tag.id}
-                className='flex items-center gap-1.5 border border-border px-2 py-1'
-              >
-                <span
-                  className={cn(
-                    'size-2 rounded-full',
-                    TAG_COLOR_MAP[tag.color as TagColor].bg,
-                  )}
-                />
-                <span className='font-mono text-xs font-medium'>
-                  {tag.name}
-                </span>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className='flex flex-wrap gap-2'>
+              {tags.map((tag) => (
+                <div
+                  key={tag.id}
+                  className='flex items-center gap-1.5 border border-border px-2 py-1'
+                >
+                  <span
+                    className={cn(
+                      'size-2 rounded-full',
+                      TAG_COLOR_MAP[tag.color as TagColor].bg,
+                    )}
+                  />
+                  <span className='font-mono text-xs font-medium'>
+                    {tag.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div ref={ref} className='flex justify-center py-2'>
+              {isFetchingNextPage && (
+                <Loader2Icon className='size-4 animate-spin text-muted-foreground' />
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>
   )
 }
 
-function TagsSectionSkeleton() {
+function TagsListSkeleton() {
   return (
-    <div className='flex flex-col gap-4'>
-      <Skeleton className='h-5 w-16 rounded-none' />
-      <div className='flex gap-2'>
-        <Skeleton className='h-9 flex-1 rounded-none' />
-        <Skeleton className='h-9 w-24 rounded-none' />
-      </div>
+    <div className='flex flex-wrap gap-2'>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <Skeleton key={i} className='h-6 w-20 rounded-none' />
+      ))}
     </div>
   )
 }

@@ -8,4 +8,5 @@ import type { GetTags200TagsItem } from './getTags200TagsItem';
 
 export type GetTags200 = {
   tags: GetTags200TagsItem[];
+  nextCursor?: string;
 };
