@@ -115,34 +115,36 @@ function RoutePage() {
         </div>
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <h2 className='font-mono text-XS font-semibold text-muted-foreground'>
-          FOLDERS
-        </h2>
-        {folders.length === 0 ? (
-          <div className='flex items-center justify-center py-8'>
-            <p className='font-mono text-xs text-muted-foreground'>
-              No folders yet
-            </p>
-          </div>
-        ) : (
-          <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-            {folders.map((folder) => (
-              <Link
-                key={folder.id}
-                to='/$workspaceId/$'
-                params={{ workspaceId, _splat: folder.id }}
-              >
-                <FolderCard
-                  name={folder.name}
-                  itemCount={folder.itemCount}
-                  subfolderCount={folder.subfolderCount}
-                />
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {(folders.length > 0 || items.length === 0) && (
+        <div className='flex flex-col gap-2'>
+          <h2 className='font-mono text-XS font-semibold text-muted-foreground'>
+            FOLDERS
+          </h2>
+          {folders.length === 0 ? (
+            <div className='flex items-center justify-center py-8'>
+              <p className='font-mono text-xs text-muted-foreground'>
+                No folders yet
+              </p>
+            </div>
+          ) : (
+            <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+              {folders.map((folder) => (
+                <Link
+                  key={folder.id}
+                  to='/$workspaceId/$'
+                  params={{ workspaceId, _splat: folder.id }}
+                >
+                  <FolderCard
+                    name={folder.name}
+                    itemCount={folder.itemCount}
+                    subfolderCount={folder.subfolderCount}
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className='flex flex-col gap-2'>
         <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
