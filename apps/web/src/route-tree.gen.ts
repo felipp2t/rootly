@@ -18,7 +18,6 @@ import { Route as AuthenticatedWorkspaceIdIndexRouteImport } from './pages/_auth
 import { Route as AuthenticatedWorkspaceIdSplatRouteImport } from './pages/_authenticated/$workspaceId/$'
 import { Route as AuthenticatedWorkspaceIdSettingsLayoutRouteImport } from './pages/_authenticated/$workspaceId/settings/layout'
 import { Route as AuthenticatedWorkspaceIdSettingsIndexRouteImport } from './pages/_authenticated/$workspaceId/settings/index'
-import { Route as AuthenticatedWorkspaceIdSettingsTagsRouteImport } from './pages/_authenticated/$workspaceId/settings/tags'
 import { Route as AuthenticatedWorkspaceIdSettingsRolesRouteImport } from './pages/_authenticated/$workspaceId/settings/roles'
 import { Route as AuthenticatedWorkspaceIdSettingsMembersRouteImport } from './pages/_authenticated/$workspaceId/settings/members'
 import { Route as AuthenticatedWorkspaceIdSettingsGeneralRouteImport } from './pages/_authenticated/$workspaceId/settings/general'
@@ -72,12 +71,6 @@ const AuthenticatedWorkspaceIdSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
   } as any)
-const AuthenticatedWorkspaceIdSettingsTagsRoute =
-  AuthenticatedWorkspaceIdSettingsTagsRouteImport.update({
-    id: '/tags',
-    path: '/tags',
-    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
-  } as any)
 const AuthenticatedWorkspaceIdSettingsRolesRoute =
   AuthenticatedWorkspaceIdSettingsRolesRouteImport.update({
     id: '/roles',
@@ -108,7 +101,6 @@ export interface FileRoutesByFullPath {
   '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
-  '/$workspaceId/settings/tags': typeof AuthenticatedWorkspaceIdSettingsTagsRoute
   '/$workspaceId/settings/': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -121,7 +113,6 @@ export interface FileRoutesByTo {
   '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
-  '/$workspaceId/settings/tags': typeof AuthenticatedWorkspaceIdSettingsTagsRoute
   '/$workspaceId/settings': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -137,7 +128,6 @@ export interface FileRoutesById {
   '/_authenticated/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/_authenticated/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/_authenticated/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
-  '/_authenticated/$workspaceId/settings/tags': typeof AuthenticatedWorkspaceIdSettingsTagsRoute
   '/_authenticated/$workspaceId/settings/': typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/$workspaceId/settings/general'
     | '/$workspaceId/settings/members'
     | '/$workspaceId/settings/roles'
-    | '/$workspaceId/settings/tags'
     | '/$workspaceId/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -166,7 +155,6 @@ export interface FileRouteTypes {
     | '/$workspaceId/settings/general'
     | '/$workspaceId/settings/members'
     | '/$workspaceId/settings/roles'
-    | '/$workspaceId/settings/tags'
     | '/$workspaceId/settings'
   id:
     | '__root__'
@@ -181,7 +169,6 @@ export interface FileRouteTypes {
     | '/_authenticated/$workspaceId/settings/general'
     | '/_authenticated/$workspaceId/settings/members'
     | '/_authenticated/$workspaceId/settings/roles'
-    | '/_authenticated/$workspaceId/settings/tags'
     | '/_authenticated/$workspaceId/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -256,13 +243,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
     }
-    '/_authenticated/$workspaceId/settings/tags': {
-      id: '/_authenticated/$workspaceId/settings/tags'
-      path: '/tags'
-      fullPath: '/$workspaceId/settings/tags'
-      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsTagsRouteImport
-      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
-    }
     '/_authenticated/$workspaceId/settings/roles': {
       id: '/_authenticated/$workspaceId/settings/roles'
       path: '/roles'
@@ -291,7 +271,6 @@ interface AuthenticatedWorkspaceIdSettingsLayoutRouteChildren {
   AuthenticatedWorkspaceIdSettingsGeneralRoute: typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   AuthenticatedWorkspaceIdSettingsMembersRoute: typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   AuthenticatedWorkspaceIdSettingsRolesRoute: typeof AuthenticatedWorkspaceIdSettingsRolesRoute
-  AuthenticatedWorkspaceIdSettingsTagsRoute: typeof AuthenticatedWorkspaceIdSettingsTagsRoute
   AuthenticatedWorkspaceIdSettingsIndexRoute: typeof AuthenticatedWorkspaceIdSettingsIndexRoute
 }
 
@@ -303,8 +282,6 @@ const AuthenticatedWorkspaceIdSettingsLayoutRouteChildren: AuthenticatedWorkspac
       AuthenticatedWorkspaceIdSettingsMembersRoute,
     AuthenticatedWorkspaceIdSettingsRolesRoute:
       AuthenticatedWorkspaceIdSettingsRolesRoute,
-    AuthenticatedWorkspaceIdSettingsTagsRoute:
-      AuthenticatedWorkspaceIdSettingsTagsRoute,
     AuthenticatedWorkspaceIdSettingsIndexRoute:
       AuthenticatedWorkspaceIdSettingsIndexRoute,
   }

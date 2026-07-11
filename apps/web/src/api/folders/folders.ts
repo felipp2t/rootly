@@ -27,10 +27,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AssignTagToFolder401,
-  AssignTagToFolder404,
-  AssignTagToFolder409,
-  AssignTagToFolder500,
   CreateFolder201,
   CreateFolder400,
   CreateFolder401,
@@ -344,112 +340,6 @@ export function useGetFoldersSuspense<TData = Awaited<ReturnType<typeof getFolde
 
 
 /**
- * Assign an existing tag to a folder
- * @summary Assign Tag to Folder
- */
-export type assignTagToFolderResponse204 = {
-  data: unknown
-  status: 204
-}
-
-export type assignTagToFolderResponse401 = {
-  data: AssignTagToFolder401
-  status: 401
-}
-
-export type assignTagToFolderResponse404 = {
-  data: AssignTagToFolder404
-  status: 404
-}
-
-export type assignTagToFolderResponse409 = {
-  data: AssignTagToFolder409
-  status: 409
-}
-
-export type assignTagToFolderResponse500 = {
-  data: AssignTagToFolder500
-  status: 500
-}
-
-export type assignTagToFolderResponseSuccess = (assignTagToFolderResponse204) & {
-  headers: Headers;
-};
-export type assignTagToFolderResponseError = (assignTagToFolderResponse401 | assignTagToFolderResponse404 | assignTagToFolderResponse409 | assignTagToFolderResponse500) & {
-  headers: Headers;
-};
-
-export type assignTagToFolderResponse = (assignTagToFolderResponseSuccess | assignTagToFolderResponseError)
-
-export const getAssignTagToFolderUrl = (folderId: string,
-    tagId: string,) => {
-
-
-  
-
-  return `http://localhost:3333/api/folders/${folderId}/tags/${tagId}`
-}
-
-export const assignTagToFolder = async (folderId: string,
-    tagId: string, options?: RequestInit): Promise<assignTagToFolderResponse> => {
-  
-  return fetchWithAuth<assignTagToFolderResponse>(getAssignTagToFolderUrl(folderId,tagId),
-  {      
-    ...options,
-    method: 'PATCH'
-    
-    
-  }
-);}
-  
-
-
-
-export const getAssignTagToFolderMutationOptions = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
-): UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext> => {
-
-const mutationKey = ['assignTagToFolder'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTagToFolder>>, {folderId: string;tagId: string}> = (props) => {
-          const {folderId,tagId} = props ?? {};
-
-          return  assignTagToFolder(folderId,tagId,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AssignTagToFolderMutationResult = NonNullable<Awaited<ReturnType<typeof assignTagToFolder>>>
-    
-    export type AssignTagToFolderMutationError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500
-
-    /**
- * @summary Assign Tag to Folder
- */
-export const useAssignTagToFolder = <TError = AssignTagToFolder401 | AssignTagToFolder404 | AssignTagToFolder409 | AssignTagToFolder500,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTagToFolder>>, TError,{folderId: string;tagId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof assignTagToFolder>>,
-        TError,
-        {folderId: string;tagId: string},
-        TContext
-      > => {
-      return useMutation(getAssignTagToFolderMutationOptions(options), queryClient);
-    }
-    /**
  * Resolve a folder path (list of ids separated by /) into the ordered chain of folder names. Validates that every id belongs to the workspace and that each folder is a child of the previous.
  * @summary Resolve Folder Path
  */

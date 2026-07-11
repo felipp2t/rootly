@@ -12,7 +12,6 @@ export const GetRolePermissions200PermissionsItemResource = {
   workspace: 'workspace',
   folder: 'folder',
   item: 'item',
-  tag: 'tag',
   member: 'member',
   role: 'role',
 } as const;

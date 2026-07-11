@@ -11,7 +11,6 @@ export const RESOURCES = [
   'workspace',
   'folder',
   'item',
-  'tag',
   'member',
   'role',
 ] as const

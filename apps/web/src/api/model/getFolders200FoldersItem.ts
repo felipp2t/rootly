@@ -11,7 +11,6 @@ export type GetFolders200FoldersItem = {
   workspaceId: string;
   /** @nullable */
   parentId: string | null;
-  tagIds: string[];
   itemCount: number;
   subfolderCount: number;
   createdAt: string;

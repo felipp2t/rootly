@@ -15,7 +15,6 @@ export type GetItems200ItemsItem = {
   workspaceId: string;
   /** @nullable */
   folderId: string | null;
-  tagIds: string[];
   createdAt: string;
   updatedAt: string;
 };

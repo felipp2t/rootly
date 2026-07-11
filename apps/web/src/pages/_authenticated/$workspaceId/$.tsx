@@ -6,11 +6,9 @@ import {
   useResolveFolderPathSuspense,
 } from '@/api/folders/folders'
 import { useGetItemsSuspense } from '@/api/items/items'
-import { useGetTagsSuspense } from '@/api/tags/tags'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
 import {
   FolderCard,
-  FolderCardMenu,
   FolderCardSkeleton,
   NewFolderCard,
 } from '@/components/folder-card'
@@ -83,13 +81,11 @@ function RoutePage() {
     workspaceId,
     path: _splat,
   })
-  const { data: tagsResult } = useGetTagsSuspense({ workspaceId, limit: 1000 })
 
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
   const items = itemsResult.status === 200 ? itemsResult.data.items : []
-  const workspaceTags = tagsResult.status === 200 ? tagsResult.data.tags : []
   const resolvedPath =
     resolvedPathResult.status === 200 ? resolvedPathResult.data.path : []
   const currentFolderName = resolvedPath.at(-1)?.name
@@ -195,29 +191,20 @@ function RoutePage() {
         ) : (
           <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
             {folders.map((folder) => (
-              <FolderCardMenu
+              <Link
                 key={folder.id}
-                folderId={folder.id}
-                tagIds={folder.tagIds}
-                workspaceTags={workspaceTags}
-                workspaceId={workspaceId}
+                to='/$workspaceId/$'
+                params={{
+                  workspaceId,
+                  _splat: [...folderPath, folder.id].join('/'),
+                }}
               >
-                <Link
-                  to='/$workspaceId/$'
-                  params={{
-                    workspaceId,
-                    _splat: [...folderPath, folder.id].join('/'),
-                  }}
-                >
-                  <FolderCard
-                    name={folder.name}
-                    itemCount={folder.itemCount}
-                    subfolderCount={folder.subfolderCount}
-                    tagIds={folder.tagIds}
-                    workspaceTags={workspaceTags}
-                  />
-                </Link>
-              </FolderCardMenu>
+                <FolderCard
+                  name={folder.name}
+                  itemCount={folder.itemCount}
+                  subfolderCount={folder.subfolderCount}
+                />
+              </Link>
             ))}
           </div>
         )}

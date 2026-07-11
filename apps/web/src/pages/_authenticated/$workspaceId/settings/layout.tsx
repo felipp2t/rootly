@@ -1,7 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
-import { type QueryClient, useQueryClient } from '@tanstack/react-query'
-import { SettingsIcon, ShieldIcon, TagIcon, UsersIcon } from 'lucide-react'
-import { getTags, getGetTagsQueryKey } from '@/api/tags/tags'
+import { SettingsIcon, ShieldIcon, UsersIcon } from 'lucide-react'
 import {
   InlineCodeContent,
   InlineCodeRoot,
@@ -14,13 +12,10 @@ export const Route = createFileRoute('/_authenticated/$workspaceId/settings')({
   component: RouteComponent,
 })
 
-const TAGS_LIMIT = 20
-
 const NAV_ITEMS: {
   to: string
   label: string
   icon: React.ElementType
-  prefetch?: (workspaceId: string, qc: QueryClient) => void
 }[] = [
   {
     to: '/$workspaceId/settings/general',
@@ -37,24 +32,10 @@ const NAV_ITEMS: {
     label: 'Roles & Permissions',
     icon: ShieldIcon,
   },
-  {
-    to: '/$workspaceId/settings/tags',
-    label: 'Tags',
-    icon: TagIcon,
-    prefetch: (workspaceId, qc) => {
-      qc.prefetchInfiniteQuery({
-        queryKey: getGetTagsQueryKey({ workspaceId, limit: TAGS_LIMIT }),
-        queryFn: ({ pageParam }) =>
-          getTags({ workspaceId, cursor: pageParam as string | undefined, limit: TAGS_LIMIT }),
-        initialPageParam: undefined as string | undefined,
-      })
-    },
-  },
 ]
 
 function RouteComponent() {
   const { workspaceId } = Route.useParams()
-  const qc = useQueryClient()
 
   return (
     <main className='container mx-auto px-8 py-12 space-y-6'>
@@ -87,7 +68,6 @@ function RouteComponent() {
                 key={item.to}
                 to={item.to}
                 params={{ workspaceId }}
-                onMouseEnter={() => item.prefetch?.(workspaceId, qc)}
                 className='flex items-center gap-2.5 px-3 py-2 text-left font-mono text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer border-l-2'
                 activeProps={{
                   className: 'bg-primary/10 text-primary border-primary',
