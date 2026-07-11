@@ -64,7 +64,12 @@ const createItemSchema = z.discriminatedUnion('type', [
   }),
   createItemSchemaCommon.extend({
     type: z.literal('link'),
-    content: z.url('Please enter a valid URL'),
+    content: z
+      .string()
+      .min(1, 'Please enter a valid URL')
+      .refine((value) => z.url().safeParse(`https://${value}`).success, {
+        message: 'Please enter a valid URL',
+      }),
   }),
   createItemSchemaCommon.extend({
     type: z.literal('text'),
@@ -196,7 +201,10 @@ export function NewItemCard({
           : await createItem({
               title: value.title,
               type: value.type,
-              content: value.content as string,
+              content:
+                value.type === 'link'
+                  ? `https://${value.content as string}`
+                  : (value.content as string),
               workspaceId,
               folderId,
             })
@@ -360,9 +368,11 @@ export function NewItemCard({
                             className={cn(
                               'flex items-center border border-input rounded-none',
                               'focus-within:border-primary/50 focus-within:outline-none focus-within:ring-0',
+                              isInvalid &&
+                                'border-destructive ring-3 ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40',
                             )}
                           >
-                            <span className='px-3 py-2.5 bg-muted flex gap-2 items-center text-muted-foreground font-mono text-xs'>
+                            <span className='pl-3 pr-1 py-2.5 bg-muted flex gap-2 items-center text-muted-foreground font-mono text-xs'>
                               <LinkIcon className='size-3' /> https://
                             </span>
                             <Input
@@ -377,8 +387,8 @@ export function NewItemCard({
                               autoComplete='off'
                               type='text'
                               className={cn(
-                                'flex-1 px-3 py-2.5 border-0 outline-none rounded-none',
-                                'focus-visible:ring-0 focus-visible:outline-none',
+                                'flex-1 pr-3 pl-0 py-2.5 border-0 outline-none rounded-none',
+                                'focus-visible:ring-0 focus-visible:outline-none aria-invalid:ring-0',
                               )}
                             />
                           </div>
