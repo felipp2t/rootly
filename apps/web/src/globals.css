@@ -15,6 +15,7 @@
 }
 
 :root {
+  color-scheme: light;
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.1 0 0);
   --card: oklch(1 0 0);
@@ -52,6 +53,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /* Design tokens from Pencil — dark terminal aesthetic */
   --background: oklch(0.077 0 0); /* #0C0C0C */
   --foreground: oklch(1 0 0); /* #FFFFFF */
