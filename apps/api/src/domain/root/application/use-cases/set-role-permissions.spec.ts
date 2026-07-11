@@ -75,11 +75,11 @@ describe('SetRolePermissions', () => {
       userId: user.id.toString(),
       workspaceId: workspace.id.toString(),
       roleId: role.id.toString(),
-      permissions: [{ resource: 'tag', action: 'delete' }],
+      permissions: [{ resource: 'item', action: 'delete' }],
     })
 
     expect(rolePermissionRepository.items[0].roleId).toBe(role.id.toString())
-    expect(rolePermissionRepository.items[0].resource).toBe('tag')
+    expect(rolePermissionRepository.items[0].resource).toBe('item')
     expect(rolePermissionRepository.items[0].action).toBe('delete')
   })
 
@@ -166,7 +166,7 @@ describe('SetRolePermissions', () => {
 
     const permForB = RolePermission.create({
       roleId: roleB.id.toString(),
-      resource: 'tag',
+      resource: 'item',
       action: 'read',
     })
     rolePermissionRepository.items.push(permForB)
@@ -182,7 +182,7 @@ describe('SetRolePermissions', () => {
       (p) => p.roleId === roleB.id.toString(),
     )
     expect(permissionsForB).toHaveLength(1)
-    expect(permissionsForB[0].resource).toBe('tag')
+    expect(permissionsForB[0].resource).toBe('item')
   })
 
   it('should return ResourceNotFoundError when the workspace does not exist', {

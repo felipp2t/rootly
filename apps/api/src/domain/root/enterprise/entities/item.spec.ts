@@ -108,23 +108,6 @@ describe('Item', () => {
     ).toThrow(InvalidItemTypeError)
   })
 
-  it('should default tagIds to an empty array', () => {
-    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
-
-    expect(item.tagIds).toEqual([])
-  })
-
-  it('should create an item with provided tagIds', () => {
-    const item = Item.create({
-      workspaceId: 'ws-1',
-      type: 'text',
-      title: 'Note',
-      tagIds: ['tag-1', 'tag-2'],
-    })
-
-    expect(item.tagIds).toEqual(['tag-1', 'tag-2'])
-  })
-
   it('should create an item with an optional folderId', () => {
     const item = Item.create({
       workspaceId: 'ws-1',
@@ -174,16 +157,6 @@ describe('Item', () => {
     item.content = 'new content'
 
     expect(item.content).toBe('new content')
-    expect(item.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
-  })
-
-  it('should update tagIds and touch updatedAt', () => {
-    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
-    const beforeUpdate = item.updatedAt
-
-    item.tagIds = ['tag-1']
-
-    expect(item.tagIds).toEqual(['tag-1'])
     expect(item.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
   })
 

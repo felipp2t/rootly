@@ -13,7 +13,6 @@ export const permissionResourceEnum = pgEnum('permission_resource', [
   'workspace',
   'folder',
   'item',
-  'tag',
   'member',
   'role',
 ])

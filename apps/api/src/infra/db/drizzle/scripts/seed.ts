@@ -7,13 +7,11 @@ import { schema } from '../schema/index.ts'
 
 faker.seed(42)
 
-type Resource = 'workspace' | 'folder' | 'item' | 'tag' | 'member' | 'role'
+type Resource = 'workspace' | 'folder' | 'item' | 'member' | 'role'
 type Action = 'read' | 'create' | 'update' | 'delete' | 'invite' | 'all'
 type ItemType = 'link' | 'document' | 'secret' | 'text'
-type TagColor = 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'
 
-const RESOURCES: Resource[] = ['workspace', 'folder', 'item', 'tag', 'member', 'role']
-const TAG_COLORS: TagColor[] = ['blue', 'green', 'orange', 'purple', 'red', 'yellow']
+const RESOURCES: Resource[] = ['workspace', 'folder', 'item', 'member', 'role']
 const ITEM_TYPES: ItemType[] = ['link', 'document', 'secret', 'text']
 
 function adminPerms(roleId: string) {
@@ -34,8 +32,6 @@ function editorPerms(roleId: string) {
     { resource: 'item', action: 'read' },
     { resource: 'item', action: 'create' },
     { resource: 'item', action: 'update' },
-    { resource: 'tag', action: 'read' },
-    { resource: 'tag', action: 'create' },
     { resource: 'member', action: 'read' },
     { resource: 'role', action: 'read' },
   ]
@@ -76,10 +72,8 @@ async function seed() {
   // ── Cleanup (ordem inversa das FKs) ──────────────────────────────────────
   // workspace_members tem ON DELETE RESTRICT no roleId, então membros
   // precisam ser deletados antes das roles. O restante cascateia via users/workspaces.
-  await db.delete(schema.folderTags)
   await db.delete(schema.items)
   await db.delete(schema.folders)
-  await db.delete(schema.tags)
   await db.delete(schema.workspaceInvites)
   await db.delete(schema.workspaceMembers)
   await db.delete(schema.rolePermissions)
@@ -198,27 +192,6 @@ async function seed() {
   await db.insert(schema.workspaceMembers).values(memberRows)
   console.log(`  ✓ ${memberRows.length} workspace members`)
 
-  // ── Tags ─────────────────────────────────────────────────────────────────
-  const tagRows = workspaces.flatMap((ws) => {
-    const names = faker.helpers.uniqueArray(
-      faker.hacker.adjective,
-      faker.number.int({ min: 3, max: 5 }),
-    )
-    return names.map((name) => {
-      const normalized = name.toLowerCase()
-      return {
-        id: nanoid(),
-        workspaceId: ws.id,
-        name: normalized,
-        slug: normalized.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-        color: faker.helpers.arrayElement(TAG_COLORS),
-      }
-    })
-  })
-
-  const tags = await db.insert(schema.tags).values(tagRows).returning()
-  console.log(`  ✓ ${tags.length} tags`)
-
   // ── Folders ──────────────────────────────────────────────────────────────
   const rootFolderRows = workspaces.flatMap((ws) => {
     const count = faker.number.int({ min: 3, max: 5 })
@@ -276,19 +249,6 @@ async function seed() {
 
   const items = await db.insert(schema.items).values(itemRows).returning()
   console.log(`  ✓ ${items.length} items`)
-
-  // ── Folder tags ──────────────────────────────────────────────────────────
-  const folderTagRows = folders.flatMap((folder) => {
-    const wsTags = tags.filter((t) => t.workspaceId === folder.workspaceId)
-    if (wsTags.length === 0) return []
-    const picked = faker.helpers.arrayElements(wsTags, faker.number.int({ min: 0, max: 3 }))
-    return picked.map((tag) => ({ folderId: folder.id, tagId: tag.id }))
-  })
-
-  if (folderTagRows.length > 0) {
-    await db.insert(schema.folderTags).values(folderTagRows)
-  }
-  console.log(`  ✓ ${folderTagRows.length} folder tags`)
 
   console.log('\n✅ Seed complete!')
   console.log('\n📧 Login credentials (password: password123):')

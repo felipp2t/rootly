@@ -2,14 +2,13 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { Folder } from './folder.ts'
 
 describe('Folder', () => {
-  it('should create a folder with default timestamps and empty tagIds', () => {
+  it('should create a folder with default timestamps', () => {
     const before = new Date()
     const folder = Folder.create({ name: 'My Folder', workspaceId: 'ws-1' })
     const after = new Date()
 
     expect(folder.name).toBe('My Folder')
     expect(folder.workspaceId).toBe('ws-1')
-    expect(folder.tagIds).toEqual([])
     expect(folder.parentId).toBeUndefined()
     expect(folder.createdAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
     expect(folder.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
@@ -42,16 +41,6 @@ describe('Folder', () => {
     expect(folder.parentId).toBe('parent-folder-id')
   })
 
-  it('should create a folder with provided tagIds', () => {
-    const folder = Folder.create({
-      name: 'Tagged',
-      workspaceId: 'ws-1',
-      tagIds: ['tag-1', 'tag-2'],
-    })
-
-    expect(folder.tagIds).toEqual(['tag-1', 'tag-2'])
-  })
-
   it('should create a folder with a provided id', () => {
     const id = new UniqueEntityID('folder-fixed-id')
     const folder = Folder.create({ name: 'Fixed', workspaceId: 'ws-1' }, id)
@@ -66,16 +55,6 @@ describe('Folder', () => {
     folder.name = 'New Name'
 
     expect(folder.name).toBe('New Name')
-    expect(folder.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
-  })
-
-  it('should update tagIds and touch updatedAt', () => {
-    const folder = Folder.create({ name: 'Folder', workspaceId: 'ws-1' })
-    const beforeUpdate = folder.updatedAt
-
-    folder.tagIds = ['tag-x']
-
-    expect(folder.tagIds).toEqual(['tag-x'])
     expect(folder.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
   })
 })

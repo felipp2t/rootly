@@ -12,22 +12,6 @@ import { schema } from '../schema/index.ts'
 export class DrizzleFolderRepository implements FolderRepository {
   constructor(private readonly db: DrizzleDatabase) {}
 
-  private async loadTagIdsByFolderIds(
-    folderIds: string[],
-  ): Promise<Record<string, string[]>> {
-    if (folderIds.length === 0) return {}
-
-    const rows = await this.db
-      .select()
-      .from(schema.folderTags)
-      .where(inArray(schema.folderTags.folderId, folderIds))
-
-    return rows.reduce<Record<string, string[]>>((acc, row) => {
-      acc[row.folderId] = [...(acc[row.folderId] ?? []), row.tagId]
-      return acc
-    }, {})
-  }
-
   async findManyByIds(ids: string[]): Promise<Folder[]> {
     if (ids.length === 0) return []
 
@@ -36,13 +20,7 @@ export class DrizzleFolderRepository implements FolderRepository {
       .from(schema.folders)
       .where(inArray(schema.folders.id, ids))
 
-    if (rows.length === 0) return []
-
-    const tagsByFolder = await this.loadTagIdsByFolderIds(rows.map((r) => r.id))
-
-    return rows.map((row) =>
-      DrizzleFolderMapper.toDomain(row, tagsByFolder[row.id] ?? []),
-    )
+    return rows.map((row) => DrizzleFolderMapper.toDomain(row))
   }
 
   async findById(id: string): Promise<Folder | null> {
@@ -53,9 +31,7 @@ export class DrizzleFolderRepository implements FolderRepository {
 
     if (rows.length === 0) return null
 
-    const tagsByFolder = await this.loadTagIdsByFolderIds([id])
-
-    return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[id] ?? [])
+    return DrizzleFolderMapper.toDomain(rows[0])
   }
 
   async findByName(name: string): Promise<Folder | null> {
@@ -66,9 +42,7 @@ export class DrizzleFolderRepository implements FolderRepository {
 
     if (rows.length === 0) return null
 
-    const tagsByFolder = await this.loadTagIdsByFolderIds([rows[0].id])
-
-    return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[rows[0].id] ?? [])
+    return DrizzleFolderMapper.toDomain(rows[0])
   }
 
   async findByNameInParent(
@@ -91,9 +65,7 @@ export class DrizzleFolderRepository implements FolderRepository {
 
     if (rows.length === 0) return null
 
-    const tagsByFolder = await this.loadTagIdsByFolderIds([rows[0].id])
-
-    return DrizzleFolderMapper.toDomain(rows[0], tagsByFolder[rows[0].id] ?? [])
+    return DrizzleFolderMapper.toDomain(rows[0])
   }
 
   async findByWorkspaceId(workspaceId: string): Promise<Folder[]> {
@@ -102,13 +74,7 @@ export class DrizzleFolderRepository implements FolderRepository {
       .from(schema.folders)
       .where(eq(schema.folders.workspaceId, workspaceId))
 
-    if (rows.length === 0) return []
-
-    const tagsByFolder = await this.loadTagIdsByFolderIds(rows.map((r) => r.id))
-
-    return rows.map((row) =>
-      DrizzleFolderMapper.toDomain(row, tagsByFolder[row.id] ?? []),
-    )
+    return rows.map((row) => DrizzleFolderMapper.toDomain(row))
   }
 
   async findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Folder[]> {
@@ -130,13 +96,7 @@ export class DrizzleFolderRepository implements FolderRepository {
             : undefined,
       )
 
-    if (rows.length === 0) return []
-
-    const tagsByFolder = await this.loadTagIdsByFolderIds(rows.map((r) => r.folder.id))
-
-    return rows.map((row) =>
-      DrizzleFolderMapper.toDomain(row.folder, tagsByFolder[row.folder.id] ?? []),
-    )
+    return rows.map((row) => DrizzleFolderMapper.toDomain(row.folder))
   }
 
   async findManyWithCounts(userId: string, parentId?: string, workspaceId?: string): Promise<FolderWithCounts[]> {
@@ -184,15 +144,6 @@ export class DrizzleFolderRepository implements FolderRepository {
       }
       throw error
     }
-
-    if (folder.tagIds.length > 0) {
-      await this.db.insert(schema.folderTags).values(
-        folder.tagIds.map((tagId) => ({
-          folderId: folder.id.toString(),
-          tagId,
-        })),
-      )
-    }
   }
 
   async save(folder: Folder): Promise<void> {
@@ -200,19 +151,6 @@ export class DrizzleFolderRepository implements FolderRepository {
       .update(schema.folders)
       .set(DrizzleFolderMapper.toDrizzle(folder))
       .where(eq(schema.folders.id, folder.id.toString()))
-
-    await this.db
-      .delete(schema.folderTags)
-      .where(eq(schema.folderTags.folderId, folder.id.toString()))
-
-    if (folder.tagIds.length > 0) {
-      await this.db.insert(schema.folderTags).values(
-        folder.tagIds.map((tagId) => ({
-          folderId: folder.id.toString(),
-          tagId,
-        })),
-      )
-    }
   }
 
   async delete(id: string): Promise<void> {

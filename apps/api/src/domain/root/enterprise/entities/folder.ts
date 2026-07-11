@@ -6,7 +6,6 @@ export interface FolderProps {
   name: string
   parentId?: string
   workspaceId: string
-  tagIds: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -41,23 +40,13 @@ export class Folder extends Entity<FolderProps> {
     this.props.updatedAt = new Date()
   }
 
-  get tagIds() {
-    return this.props.tagIds
-  }
-
-  set tagIds(value: string[]) {
-    this.props.tagIds = value
-    this.touch()
-  }
-
   static create(
-    props: Optional<FolderProps, 'createdAt' | 'updatedAt' | 'tagIds'>,
+    props: Optional<FolderProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
   ) {
     return new Folder(
       {
         ...props,
-        tagIds: props.tagIds ?? [],
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },

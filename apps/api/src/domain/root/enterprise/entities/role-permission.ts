@@ -6,7 +6,6 @@ export const permissionResource = [
   'workspace',
   'folder',
   'item',
-  'tag',
   'member',
   'role',
 ] as const

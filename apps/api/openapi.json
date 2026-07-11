@@ -554,7 +554,6 @@
                               "workspace",
                               "folder",
                               "item",
-                              "tag",
                               "member",
                               "role"
                             ]
@@ -927,12 +926,6 @@
                             "nullable": true,
                             "type": "string"
                           },
-                          "tagIds": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          },
                           "itemCount": {
                             "type": "number"
                           },
@@ -953,7 +946,6 @@
                           "name",
                           "workspaceId",
                           "parentId",
-                          "tagIds",
                           "itemCount",
                           "subfolderCount",
                           "createdAt",
@@ -1220,12 +1212,6 @@
                             "nullable": true,
                             "type": "string"
                           },
-                          "tagIds": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -1242,7 +1228,6 @@
                           "content",
                           "workspaceId",
                           "folderId",
-                          "tagIds",
                           "createdAt",
                           "updatedAt"
                         ],
@@ -1396,266 +1381,6 @@
             }
           },
           "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/tags": {
-      "post": {
-        "operationId": "createTag",
-        "summary": "Create Tag",
-        "tags": [
-          "Tags"
-        ],
-        "description": "Create a new tag",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "color": {
-                    "type": "string",
-                    "enum": [
-                      "blue",
-                      "green",
-                      "orange",
-                      "purple",
-                      "red",
-                      "yellow"
-                    ]
-                  },
-                  "workspaceId": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "name",
-                  "color",
-                  "workspaceId"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tagId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "tagId"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "getTags",
-        "summary": "Get Tags",
-        "tags": [
-          "Tags"
-        ],
-        "description": "List all tags for a workspace",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "workspaceId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "cursor",
-            "required": false
-          },
-          {
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 1000
-            },
-            "in": "query",
-            "name": "limit",
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "slug": {
-                            "type": "string"
-                          },
-                          "color": {
-                            "type": "string",
-                            "enum": [
-                              "blue",
-                              "green",
-                              "orange",
-                              "purple",
-                              "red",
-                              "yellow"
-                            ]
-                          },
-                          "workspaceId": {
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "name",
-                          "slug",
-                          "color",
-                          "workspaceId",
-                          "createdAt"
-                        ],
-                        "additionalProperties": false
-                      }
-                    },
-                    "nextCursor": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "tags"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
             "description": "Default Response",
             "content": {
               "application/json": {
@@ -2192,121 +1917,6 @@
             }
           },
           "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/folders/{folderId}/tags/{tagId}": {
-      "patch": {
-        "operationId": "assignTagToFolder",
-        "summary": "Assign Tag to Folder",
-        "tags": [
-          "Folders",
-          "Tags"
-        ],
-        "description": "Assign an existing tag to a folder",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "folderId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "tagId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "409": {
             "description": "Default Response",
             "content": {
               "application/json": {
@@ -4198,7 +3808,6 @@
                               "workspace",
                               "folder",
                               "item",
-                              "tag",
                               "member",
                               "role"
                             ]
@@ -4327,7 +3936,6 @@
                             "workspace",
                             "folder",
                             "item",
-                            "tag",
                             "member",
                             "role"
                           ]

@@ -105,7 +105,6 @@ export class InMemorySomeRepository implements SomeRepository {
 | `InMemoryWorkspaceRepository` | `Workspace` |
 | `InMemoryFolderRepository` | `Folder` |
 | `InMemoryItemRepository` | `Item` |
-| `InMemoryTagRepository` | `Tag` |
 
 ## Cryptography Fakes
 

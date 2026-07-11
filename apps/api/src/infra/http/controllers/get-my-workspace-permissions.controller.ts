@@ -25,7 +25,6 @@ export const getMyWorkspacePermissionsController: FastifyPluginCallbackZod =
                     'workspace',
                     'folder',
                     'item',
-                    'tag',
                     'member',
                     'role',
                   ]),

@@ -52,7 +52,7 @@ describe('GetFolders', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].workspaceId).toBe(userWorkspace.id.toString())
+      expect(response.value.folders[0].folder.workspaceId).toBe(userWorkspace.id.toString())
     }
   })
 
@@ -74,7 +74,7 @@ describe('GetFolders', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(2)
-      expect(response.value.folders.every((f) => f.parentId === parent.id.toString())).toBe(true)
+      expect(response.value.folders.every((f) => f.folder.parentId === parent.id.toString())).toBe(true)
     }
   })
 
@@ -98,7 +98,7 @@ describe('GetFolders', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].parentId).toBe(parentA.id.toString())
+      expect(response.value.folders[0].folder.parentId).toBe(parentA.id.toString())
     }
   })
 
@@ -151,7 +151,7 @@ describe('GetFolders', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].id.toString()).toBe(root.id.toString())
+      expect(response.value.folders[0].folder.id.toString()).toBe(root.id.toString())
     }
   })
 
@@ -175,7 +175,7 @@ describe('GetFolders', () => {
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
       expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].workspaceId).toBe(workspaceA.id.toString())
+      expect(response.value.folders[0].folder.workspaceId).toBe(workspaceA.id.toString())
     }
   })
 })

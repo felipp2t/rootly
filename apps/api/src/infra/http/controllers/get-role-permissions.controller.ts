@@ -23,7 +23,7 @@ export const getRolePermissionsController: FastifyPluginCallbackZod = async (app
               z.object({
                 id: z.string(),
                 roleId: z.string(),
-                resource: z.enum(['workspace', 'folder', 'item', 'tag', 'member', 'role']),
+                resource: z.enum(['workspace', 'folder', 'item', 'member', 'role']),
                 action: z.enum(['read', 'create', 'update', 'delete', 'invite', 'all']),
                 createdAt: z.date(),
                 updatedAt: z.date(),

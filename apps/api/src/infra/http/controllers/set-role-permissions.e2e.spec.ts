@@ -115,7 +115,7 @@ describe('PUT /workspaces/:workspaceId/roles/:roleId/permissions', () => {
       url: `/api/workspaces/${workspaceId}/roles/${roleId}/permissions`,
       headers: { cookie: cookieHeader },
       payload: {
-        permissions: [{ resource: 'tag', action: 'delete' }],
+        permissions: [{ resource: 'item', action: 'delete' }],
       },
     })
 
@@ -128,7 +128,7 @@ describe('PUT /workspaces/:workspaceId/roles/:roleId/permissions', () => {
     expect(getResponse.statusCode).toBe(200)
     expect(getResponse.json().permissions).toHaveLength(1)
     expect(getResponse.json().permissions[0]).toMatchObject({
-      resource: 'tag',
+      resource: 'item',
       action: 'delete',
     })
   })

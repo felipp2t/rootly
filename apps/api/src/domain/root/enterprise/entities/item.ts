@@ -11,7 +11,6 @@ export interface ItemProps {
   type: ItemType
   title: string
   content?: string
-  tagIds: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -55,24 +54,12 @@ export class Item extends Entity<ItemProps> {
     return this.props.updatedAt
   }
 
-  get tagIds() {
-    return this.props.tagIds
-  }
-
-  set tagIds(value: string[]) {
-    this.props.tagIds = value
-    this.touch()
-  }
-
   private touch() {
     this.props.updatedAt = new Date()
   }
 
   static create(
-    props: Optional<
-      ItemProps,
-      'createdAt' | 'updatedAt' | 'tagIds' | 'folderId'
-    >,
+    props: Optional<ItemProps, 'createdAt' | 'updatedAt' | 'folderId'>,
     id?: UniqueEntityID,
   ) {
     validateTypeAndContent(props.type, props.content)
@@ -80,7 +67,6 @@ export class Item extends Entity<ItemProps> {
     return new Item(
       {
         ...props,
-        tagIds: props.tagIds ?? [],
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
