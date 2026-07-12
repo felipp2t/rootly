@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { ThemeProvider } from 'next-themes'
 import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthProvider, useAuth } from '@/lib/auth.tsx'
@@ -32,11 +33,13 @@ export function App() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <App />
-        <Toaster richColors />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <App />
+          <Toaster richColors />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
