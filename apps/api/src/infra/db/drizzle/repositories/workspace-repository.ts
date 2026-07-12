@@ -1,4 +1,6 @@
 import { and, countDistinct, eq, exists, inArray, or } from 'drizzle-orm'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
 import type { Workspace } from '@/domain/root/enterprise/entities/workspace.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -73,10 +75,14 @@ export class DrizzleWorkspaceRepository implements WorkspaceRepository {
       .update(schema.workspaces)
       .set(DrizzleWorkspaceMapper.toDrizzle(workspace))
       .where(eq(schema.workspaces.id, workspace.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(workspace.id)
   }
 
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.workspaces).where(eq(schema.workspaces.id, id))
+
+    DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(id))
   }
 
   async findManyByIds(ids: string[]): Promise<Workspace[]> {
