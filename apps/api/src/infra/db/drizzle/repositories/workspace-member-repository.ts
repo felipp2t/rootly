@@ -1,4 +1,5 @@
 import { and, eq } from 'drizzle-orm'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { WorkspaceMemberRepository } from '@/domain/root/application/repositories/workspace-member-repository.ts'
 import type { WorkspaceMember } from '@/domain/root/enterprise/entities/workspace-member.ts'
@@ -89,5 +90,7 @@ export class DrizzleWorkspaceMemberRepository
     await this.db
       .delete(schema.workspaceMembers)
       .where(eq(schema.workspaceMembers.id, id))
+
+    DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(id))
   }
 }
