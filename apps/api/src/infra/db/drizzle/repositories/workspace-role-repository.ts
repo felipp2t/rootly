@@ -1,4 +1,6 @@
 import { and, eq } from 'drizzle-orm'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { WorkspaceRoleRepository } from '@/domain/root/application/repositories/workspace-role-repository.ts'
 import type { WorkspaceRole } from '@/domain/root/enterprise/entities/workspace-role.ts'
 import type { DrizzleDatabase } from '../index.ts'
@@ -62,11 +64,24 @@ export class DrizzleWorkspaceRoleRepository implements WorkspaceRoleRepository {
     await this.db
       .insert(schema.workspaceRoles)
       .values(DrizzleWorkspaceRoleMapper.toDrizzle(workspaceRole))
+
+    DomainEvents.dispatchEventsForAggregate(workspaceRole.id)
+  }
+
+  async save(workspaceRole: WorkspaceRole): Promise<void> {
+    await this.db
+      .update(schema.workspaceRoles)
+      .set(DrizzleWorkspaceRoleMapper.toDrizzle(workspaceRole))
+      .where(eq(schema.workspaceRoles.id, workspaceRole.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(workspaceRole.id)
   }
 
   async delete(id: string): Promise<void> {
     await this.db
       .delete(schema.workspaceRoles)
       .where(eq(schema.workspaceRoles.id, id))
+
+    DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(id))
   }
 }

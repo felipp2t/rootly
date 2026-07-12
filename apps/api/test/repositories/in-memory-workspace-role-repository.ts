@@ -34,6 +34,13 @@ export class InMemoryWorkspaceRoleRepository
     this.items.push(workspace)
   }
 
+  async save(workspace: WorkspaceRole): Promise<void> {
+    const index = this.items.findIndex(
+      (role) => role.id.toString() === workspace.id.toString(),
+    )
+    if (index !== -1) this.items[index] = workspace
+  }
+
   async delete(id: string): Promise<void> {
     const index = this.items.findIndex((role) => role.id.toString() === id)
     if (index !== -1) {
