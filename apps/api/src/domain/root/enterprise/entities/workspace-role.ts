@@ -1,6 +1,10 @@
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { RoleCreatedEvent } from '../events/role-created-event.ts'
+import { RoleDeletedEvent } from '../events/role-deleted-event.ts'
+import { RolePermissionsChangedEvent } from '../events/role-permissions-changed-event.ts'
+import type { PermissionAction, PermissionResource } from './role-permission.ts'
 
 export interface WorkspaceRoleProps {
   workspaceId: string
@@ -9,7 +13,12 @@ export interface WorkspaceRoleProps {
   updatedAt: Date
 }
 
-export class WorkspaceRole extends Entity<WorkspaceRoleProps> {
+export type PermissionPair = {
+  resource: PermissionResource
+  action: PermissionAction
+}
+
+export class WorkspaceRole extends AggregateRoot<WorkspaceRoleProps> {
   get workspaceId() {
     return this.props.workspaceId
   }
@@ -35,11 +44,26 @@ export class WorkspaceRole extends Entity<WorkspaceRoleProps> {
     this.props.updatedAt = new Date()
   }
 
+  delete(actorId?: string) {
+    this.addDomainEvent(new RoleDeletedEvent(this, actorId))
+  }
+
+  changePermissions(
+    before: PermissionPair[],
+    after: PermissionPair[],
+    actorId?: string,
+  ) {
+    this.addDomainEvent(
+      new RolePermissionsChangedEvent(this, { before, after }, actorId),
+    )
+  }
+
   static create(
     props: Optional<WorkspaceRoleProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
+    actorId?: string,
   ) {
-    return new WorkspaceRole(
+    const role = new WorkspaceRole(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -47,5 +71,11 @@ export class WorkspaceRole extends Entity<WorkspaceRoleProps> {
       },
       id,
     )
+
+    if (!id) {
+      role.addDomainEvent(new RoleCreatedEvent(role, actorId))
+    }
+
+    return role
   }
 }

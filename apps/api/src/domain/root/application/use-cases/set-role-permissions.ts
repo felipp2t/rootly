@@ -35,7 +35,10 @@ export class SetRolePermissionsUseCase {
     roleId,
     permissions,
   }: SetRolePermissionsUseCaseRequest): Promise<SetRolePermissionsUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(userId, workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))
@@ -54,10 +57,11 @@ export class SetRolePermissionsUseCase {
     }
 
     const current = await this.rolePermissionRepository.findByRoleId(roleId)
-    const normalized = normalizePermissions(
-      current.map((p) => ({ resource: p.resource, action: p.action })),
-      permissions,
-    )
+    const currentPairs = current.map((p) => ({
+      resource: p.resource,
+      action: p.action,
+    }))
+    const normalized = normalizePermissions(currentPairs, permissions)
 
     await this.rolePermissionRepository.deleteByRoleId(roleId)
 
@@ -66,6 +70,25 @@ export class SetRolePermissionsUseCase {
       await this.rolePermissionRepository.create(permission)
     }
 
+    if (!permissionSetsEqual(currentPairs, normalized)) {
+      role.changePermissions(currentPairs, normalized, userId)
+      await this.workspaceRoleRepository.save(role)
+    }
+
     return right(null)
   }
+}
+
+function permissionSetsEqual(
+  a: { resource: PermissionResource; action: PermissionAction }[],
+  b: { resource: PermissionResource; action: PermissionAction }[],
+): boolean {
+  const toKey = (p: {
+    resource: PermissionResource
+    action: PermissionAction
+  }) => `${p.resource}:${p.action}`
+  const aKeys = new Set(a.map(toKey))
+  const bKeys = new Set(b.map(toKey))
+
+  return aKeys.size === bKeys.size && [...aKeys].every((key) => bKeys.has(key))
 }

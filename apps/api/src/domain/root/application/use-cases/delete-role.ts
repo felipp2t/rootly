@@ -26,7 +26,10 @@ export class DeleteRoleUseCase {
     workspaceId,
     roleId,
   }: DeleteRoleUseCaseRequest): Promise<DeleteRoleUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(userId, workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))
@@ -43,6 +46,8 @@ export class DeleteRoleUseCase {
     if (members.length > 0) {
       return left(new RoleInUseError(role.name))
     }
+
+    role.delete(userId)
 
     await this.workspaceRoleRepository.delete(roleId)
 

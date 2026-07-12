@@ -50,7 +50,7 @@ export class CreateRoleUseCase {
       return left(new RoleAlreadyExistsError(name))
     }
 
-    const role = WorkspaceRole.create({ name, workspaceId })
+    const role = WorkspaceRole.create({ name, workspaceId }, undefined, userId)
 
     await this.workspaceRoleRepository.create(role)
 
