@@ -170,7 +170,7 @@ function ItemsSection({ workspaceId }: { workspaceId: string }) {
   const [showArchived, setShowArchived] = useState(false)
   const { data: itemsResult } = useGetItemsSuspense({
     workspaceId,
-    includeArchived: showArchived,
+    includeArchived: String(showArchived),
   })
   const items = itemsResult.status === 200 ? itemsResult.data.items : []
 

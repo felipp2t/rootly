@@ -252,7 +252,7 @@ function ItemsSection({
   const { data: itemsResult } = useGetItemsSuspense({
     workspaceId,
     parentId,
-    includeArchived: showArchived,
+    includeArchived: String(showArchived),
   })
   const items = itemsResult.status === 200 ? itemsResult.data.items : []
 
