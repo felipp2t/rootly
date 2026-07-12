@@ -118,10 +118,7 @@ function FolderCard({
       </div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent
-          onClick={(e) => e.stopPropagation()}
-          className='flex flex-col gap-4'
-        >
+        <DialogContent onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Delete folder</DialogTitle>
             <DialogDescription>
