@@ -1,4 +1,5 @@
 import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { InMemoryWorkspaceInviteRepository } from '@test/repositories/in-memory-workspace-invite-repository.ts'
 import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
@@ -132,6 +133,38 @@ describe('AcceptInvite', () => {
     expect(workspaceMemberRepository.items[0]).toMatchObject({
       props: { userId, workspaceId, roleId },
     })
+  })
+
+  it('should not create a duplicate workspace member when the user already belongs to the workspace', {
+    tags: ['accept-invite'],
+  }, async () => {
+    const inviteId = new UniqueEntityID()
+    const userId = new UniqueEntityID().toString()
+    const workspaceId = new UniqueEntityID().toString()
+    const roleId = new UniqueEntityID().toString()
+
+    const invite = makeWorkspaceInvite(
+      {
+        workspaceId,
+        invitedUserId: userId,
+        invitedByUserId: new UniqueEntityID().toString(),
+        roleId,
+      },
+      inviteId,
+    )
+    workspaceInviteRepository.items.push(invite)
+
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({ userId, workspaceId, roleId }),
+    )
+
+    const response = await sut.execute({
+      inviteId: inviteId.toString(),
+      userId,
+    })
+
+    expect(response.isRight()).toBe(true)
+    expect(workspaceMemberRepository.items).toHaveLength(1)
   })
 
   it('should return ResourceNotFoundError when the invite does not exist', {

@@ -118,6 +118,58 @@ describe('GetWorkspaceMembers', () => {
     }
   })
 
+  it('should exclude orphaned members whose user or role no longer resolve', {
+    tags: ['get-workspace-members'],
+  }, async () => {
+    const owner = makeUser()
+    const workspace = makeWorkspace({ userId: owner.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    const validMember = makeUser({
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+    })
+    userRepository.items.push(owner, validMember)
+
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId: validMember.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+      }),
+      makeWorkspaceMember({
+        userId: 'non-existent-user-id',
+        workspaceId: workspace.id.toString(),
+        roleId: role.id.toString(),
+      }),
+      makeWorkspaceMember({
+        userId: validMember.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: 'non-existent-role-id',
+      }),
+    )
+
+    const response = await sut.execute({
+      userId: owner.id.toString(),
+      workspaceId: workspace.id.toString(),
+    })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.members).toHaveLength(1)
+      expect(response.value.members[0]).toMatchObject({
+        userId: validMember.id.toString(),
+        roleId: role.id.toString(),
+      })
+    }
+  })
+
   it('should return an empty array when the workspace has no members', {
     tags: ['get-workspace-members'],
   }, async () => {

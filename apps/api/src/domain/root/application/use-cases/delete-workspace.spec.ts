@@ -1,8 +1,12 @@
 import { FakeHasher } from '@test/cryptography/faker-hasher.ts'
 import { makeUser } from '@test/factories/make-user.ts'
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { InMemoryUserRepository } from '@test/repositories/in-memory-user-repository.ts'
+import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
 import { DeleteWorkspaceUseCase } from './delete-workspace.ts'
 import { WrongCredentialsError } from './errors/wrong-credencials-error.ts'
@@ -77,6 +81,59 @@ describe('DeleteWorkspace', () => {
 
     const response = await sut.execute({
       userId: other.id.toString(),
+      workspaceId: workspace.id.toString(),
+      password: '123456',
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(ResourceNotFoundError)
+    expect(workspaceRepository.items).toHaveLength(1)
+  })
+
+  it('should return NotAllowedError when a non-owner member tries to delete the workspace', async () => {
+    const owner = makeUser()
+    const member = makeUser()
+    userRepository.items.push(owner, member)
+
+    const workspace = makeWorkspace({ userId: owner.id.toString() })
+    const memberWorkspaceRepository = new InMemoryWorkspaceMemberRepository()
+    memberWorkspaceRepository.items.push(
+      makeWorkspaceMember({
+        userId: member.id.toString(),
+        workspaceId: workspace.id.toString(),
+        roleId: new UniqueEntityID().toString(),
+      }),
+    )
+    const scopedWorkspaceRepository = new InMemoryWorkspaceRepository(
+      undefined,
+      memberWorkspaceRepository,
+    )
+    scopedWorkspaceRepository.items.push(workspace)
+
+    const scopedSut = new DeleteWorkspaceUseCase(
+      scopedWorkspaceRepository,
+      userRepository,
+      fakeHasher,
+    )
+
+    const response = await scopedSut.execute({
+      userId: member.id.toString(),
+      workspaceId: workspace.id.toString(),
+      password: '123456',
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(NotAllowedError)
+    expect(scopedWorkspaceRepository.items).toHaveLength(1)
+  })
+
+  it('should return ResourceNotFoundError(User) when the owner user record is missing', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    const response = await sut.execute({
+      userId: ownerId,
       workspaceId: workspace.id.toString(),
       password: '123456',
     })

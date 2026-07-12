@@ -41,4 +41,22 @@ describe('Send Notification', () => {
     expect(fakeNotificationGateway.sent).toHaveLength(1)
     expect(fakeNotificationGateway.sent[0].recipientId).toBe('1')
   })
+
+  it('should be able to send a workspace_invite notification', async () => {
+    const result = await sut.execute({
+      recipientId: '1',
+      title: 'Você foi convidado',
+      content: 'Você recebeu um convite para um workspace',
+      metadata: { type: 'workspace_invite', inviteId: 'invite-1' },
+    })
+
+    expect(result.isRight()).toBe(true)
+    expect(result.value?.notification.metadata).toEqual({
+      type: 'workspace_invite',
+      inviteId: 'invite-1',
+    })
+    expect(inMemoryNotificationsRepository.items[0]).toEqual(
+      result.value?.notification,
+    )
+  })
 })

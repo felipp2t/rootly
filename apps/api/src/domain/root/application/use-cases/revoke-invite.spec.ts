@@ -1,5 +1,6 @@
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
 import { InMemoryWorkspaceInviteRepository } from '@test/repositories/in-memory-workspace-invite-repository.ts'
 import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
@@ -19,8 +20,11 @@ let sut: RevokeInviteUseCase
 describe('RevokeInvite', () => {
   beforeEach(() => {
     workspaceInviteRepository = new InMemoryWorkspaceInviteRepository()
-    workspaceRepository = new InMemoryWorkspaceRepository()
     workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    workspaceRepository = new InMemoryWorkspaceRepository(
+      undefined,
+      workspaceMemberRepository,
+    )
     rolePermissionRepository = new InMemoryRolePermissionRepository()
     sut = new RevokeInviteUseCase(
       workspaceInviteRepository,
@@ -97,6 +101,30 @@ describe('RevokeInvite', () => {
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not allow a member without member:invite permission to revoke', async () => {
+    const { invite } = seedOwnedWorkspaceWithInvite()
+
+    const memberId = new UniqueEntityID().toString()
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId: memberId,
+        workspaceId: invite.workspaceId,
+        roleId: new UniqueEntityID().toString(),
+      }),
+    )
+
+    const result = await sut.execute({
+      userId: memberId,
+      inviteId: invite.id.toString(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
+    expect(workspaceInviteRepository.items[0].status).toBe(
+      workspaceInviteStatus.PENDING,
+    )
   })
 
   it('should tag the invite-revoked event with the caller as actorId', async () => {
