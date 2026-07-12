@@ -58,4 +58,22 @@ describe('UpdateWorkspace', () => {
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
   })
+
+  it('should tag the workspace-renamed event with the caller as actorId', async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({
+      userId: user.id.toString(),
+      name: 'Old Name',
+    })
+    workspaceRepository.items.push(workspace)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      name: 'New Name',
+    })
+
+    const event = workspace.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: user.id.toString() })
+  })
 })

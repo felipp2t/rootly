@@ -1,4 +1,5 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { WorkspaceRenamedEvent } from '../events/workspace-renamed-event.ts'
 import { Workspace } from './workspace.ts'
 
 describe('Workspace', () => {
@@ -59,5 +60,43 @@ describe('Workspace', () => {
 
     expect(workspace.name).toBe('New Name')
     expect(workspace.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+  })
+
+  it('should register a WorkspaceRenamedEvent with before/after and actorId on rename', () => {
+    const workspace = Workspace.create(
+      { name: 'Old Name', userId: 'user-1' },
+      new UniqueEntityID('ws-1'),
+    )
+
+    workspace.rename('New Name', 'user-1')
+
+    expect(workspace.domainEvents).toHaveLength(1)
+    const event = workspace.domainEvents[0] as WorkspaceRenamedEvent
+    expect(event).toBeInstanceOf(WorkspaceRenamedEvent)
+    expect(event.changes).toEqual({ before: 'Old Name', after: 'New Name' })
+    expect(event.actorId).toBe('user-1')
+  })
+
+  it('should not register a WorkspaceRenamedEvent when the name does not change', () => {
+    const workspace = Workspace.create(
+      { name: 'Same Name', userId: 'user-1' },
+      new UniqueEntityID('ws-1'),
+    )
+
+    workspace.rename('Same Name', 'user-1')
+
+    expect(workspace.domainEvents).toHaveLength(0)
+  })
+
+  it('should register a WorkspaceRenamedEvent with undefined actorId when not provided', () => {
+    const workspace = Workspace.create(
+      { name: 'Old Name', userId: 'user-1' },
+      new UniqueEntityID('ws-1'),
+    )
+
+    workspace.rename('New Name')
+
+    const event = workspace.domainEvents[0] as WorkspaceRenamedEvent
+    expect(event.actorId).toBeUndefined()
   })
 })
