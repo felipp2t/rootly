@@ -24,6 +24,7 @@ import { Route as AuthenticatedWorkspaceIdSettingsIndexRouteImport } from './pag
 import { Route as AuthenticatedWorkspaceIdSettingsRolesRouteImport } from './pages/_authenticated/$workspaceId/settings/roles'
 import { Route as AuthenticatedWorkspaceIdSettingsMembersRouteImport } from './pages/_authenticated/$workspaceId/settings/members'
 import { Route as AuthenticatedWorkspaceIdSettingsGeneralRouteImport } from './pages/_authenticated/$workspaceId/settings/general'
+import { Route as AuthenticatedWorkspaceIdSettingsActivityRouteImport } from './pages/_authenticated/$workspaceId/settings/activity'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -111,6 +112,12 @@ const AuthenticatedWorkspaceIdSettingsGeneralRoute =
     path: '/general',
     getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
   } as any)
+const AuthenticatedWorkspaceIdSettingsActivityRoute =
+  AuthenticatedWorkspaceIdSettingsActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedWorkspaceIdSettingsLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticateddashboardIndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/account/profile': typeof AuthenticatedAccountProfileRoute
   '/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
   '/account/': typeof AuthenticatedAccountIndexRoute
+  '/$workspaceId/settings/activity': typeof AuthenticatedWorkspaceIdSettingsActivityRoute
   '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
@@ -137,6 +145,7 @@ export interface FileRoutesByTo {
   '/$workspaceId': typeof AuthenticatedWorkspaceIdIndexRoute
   '/': typeof AuthenticateddashboardIndexRoute
   '/account': typeof AuthenticatedAccountIndexRoute
+  '/$workspaceId/settings/activity': typeof AuthenticatedWorkspaceIdSettingsActivityRoute
   '/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
@@ -155,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/$workspaceId/': typeof AuthenticatedWorkspaceIdIndexRoute
   '/_authenticated/(dashboard)/': typeof AuthenticateddashboardIndexRoute
   '/_authenticated/account/': typeof AuthenticatedAccountIndexRoute
+  '/_authenticated/$workspaceId/settings/activity': typeof AuthenticatedWorkspaceIdSettingsActivityRoute
   '/_authenticated/$workspaceId/settings/general': typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   '/_authenticated/$workspaceId/settings/members': typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   '/_authenticated/$workspaceId/settings/roles': typeof AuthenticatedWorkspaceIdSettingsRolesRoute
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/$workspaceId/'
     | '/account/'
+    | '/$workspaceId/settings/activity'
     | '/$workspaceId/settings/general'
     | '/$workspaceId/settings/members'
     | '/$workspaceId/settings/roles'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/$workspaceId'
     | '/'
     | '/account'
+    | '/$workspaceId/settings/activity'
     | '/$workspaceId/settings/general'
     | '/$workspaceId/settings/members'
     | '/$workspaceId/settings/roles'
@@ -204,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$workspaceId/'
     | '/_authenticated/(dashboard)/'
     | '/_authenticated/account/'
+    | '/_authenticated/$workspaceId/settings/activity'
     | '/_authenticated/$workspaceId/settings/general'
     | '/_authenticated/$workspaceId/settings/members'
     | '/_authenticated/$workspaceId/settings/roles'
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsGeneralRouteImport
       parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
     }
+    '/_authenticated/$workspaceId/settings/activity': {
+      id: '/_authenticated/$workspaceId/settings/activity'
+      path: '/activity'
+      fullPath: '/$workspaceId/settings/activity'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIdSettingsActivityRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceIdSettingsLayoutRoute
+    }
   }
 }
 
@@ -345,6 +365,7 @@ const AuthenticatedAccountLayoutRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceIdSettingsLayoutRouteChildren {
+  AuthenticatedWorkspaceIdSettingsActivityRoute: typeof AuthenticatedWorkspaceIdSettingsActivityRoute
   AuthenticatedWorkspaceIdSettingsGeneralRoute: typeof AuthenticatedWorkspaceIdSettingsGeneralRoute
   AuthenticatedWorkspaceIdSettingsMembersRoute: typeof AuthenticatedWorkspaceIdSettingsMembersRoute
   AuthenticatedWorkspaceIdSettingsRolesRoute: typeof AuthenticatedWorkspaceIdSettingsRolesRoute
@@ -353,6 +374,8 @@ interface AuthenticatedWorkspaceIdSettingsLayoutRouteChildren {
 
 const AuthenticatedWorkspaceIdSettingsLayoutRouteChildren: AuthenticatedWorkspaceIdSettingsLayoutRouteChildren =
   {
+    AuthenticatedWorkspaceIdSettingsActivityRoute:
+      AuthenticatedWorkspaceIdSettingsActivityRoute,
     AuthenticatedWorkspaceIdSettingsGeneralRoute:
       AuthenticatedWorkspaceIdSettingsGeneralRoute,
     AuthenticatedWorkspaceIdSettingsMembersRoute:
