@@ -33,9 +33,9 @@ export function ThemePreferenceSection() {
                 type='button'
                 onClick={() => setTheme(option.value)}
                 className={cn(
-                  'flex flex-1 cursor-pointer flex-col items-center gap-2 border px-4 py-3 font-mono text-xs font-semibold uppercase tracking-wide transition-colors',
+                  'flex flex-1 cursor-pointer flex-col items-center gap-2 border-2 bg-card px-4 py-3 font-mono text-xs font-semibold uppercase tracking-wide transition-all',
                   isActive
-                    ? 'border-primary bg-primary/10 text-primary'
+                    ? 'border-primary text-primary'
                     : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground',
                 )}
               >
