@@ -1,3 +1,4 @@
+import * as activityLogs from './activity-logs.ts'
 import * as folders from './folders.ts'
 import * as items from './items.ts'
 import * as notifications from './notifications.ts'
@@ -10,6 +11,7 @@ import * as workspaceRoles from './workspace-roles.ts'
 import * as workspaces from './workspaces.ts'
 
 export const schema = {
+  ...activityLogs,
   ...folders,
   ...items,
   ...notifications,
