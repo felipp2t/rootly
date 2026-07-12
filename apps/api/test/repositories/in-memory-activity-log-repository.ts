@@ -1,4 +1,7 @@
-import type { ActivityLogRepository } from '@/domain/activity/application/repositories/activity-log-repository.ts'
+import type {
+  ActivityLogRepository,
+  FindManyActivityLogsOptions,
+} from '@/domain/activity/application/repositories/activity-log-repository.ts'
 import type { ActivityLog } from '@/domain/activity/enterprise/entities/activity-log.ts'
 
 export class InMemoryActivityLogRepository implements ActivityLogRepository {
@@ -6,5 +9,21 @@ export class InMemoryActivityLogRepository implements ActivityLogRepository {
 
   async create(activityLog: ActivityLog): Promise<void> {
     this.items.push(activityLog)
+  }
+
+  async findManyByWorkspaceId(
+    workspaceId: string,
+    options?: FindManyActivityLogsOptions,
+  ): Promise<ActivityLog[]> {
+    return this.items
+      .filter((log) => log.workspaceId === workspaceId)
+      .filter(
+        (log) => !options?.resourceId || log.resourceId === options.resourceId,
+      )
+      .filter(
+        (log) =>
+          !options?.resourceType || log.resourceType === options.resourceType,
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 }
