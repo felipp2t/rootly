@@ -33,6 +33,8 @@ const ACTION_LABELS: Record<GetActivityLogs200ActivityLogsItemAction, string> =
     member_joined: 'joined the workspace',
     member_role_changed: 'changed role for',
     member_removed: 'removed',
+    member_invite_revoked: 'revoked invite for',
+    member_invite_declined: 'declined the invite to join the workspace',
     workspace_renamed: 'renamed workspace',
     role_created: 'created role',
     role_deleted: 'deleted role',
@@ -105,7 +107,8 @@ function ActivityLogRow({
             ? ShieldIcon
             : TextIcon
 
-  const isSelfAction = log.action === 'member_joined'
+  const isSelfAction =
+    log.action === 'member_joined' || log.action === 'member_invite_declined'
 
   return (
     <div
