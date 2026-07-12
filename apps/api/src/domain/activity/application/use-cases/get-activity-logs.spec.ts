@@ -1,9 +1,11 @@
 import { makeWorkspace } from '@test/factories/make-workspace.ts'
+import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
 import { InMemoryActivityLogRepository } from '@test/repositories/in-memory-activity-log-repository.ts'
 import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
 import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
 import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
 import { ActivityLog } from '../../enterprise/entities/activity-log.ts'
 import { GetActivityLogsUseCase } from './get-activity-logs.ts'
@@ -16,8 +18,11 @@ let sut: GetActivityLogsUseCase
 
 describe('GetActivityLogs', () => {
   beforeEach(() => {
-    workspaceRepository = new InMemoryWorkspaceRepository()
     workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    workspaceRepository = new InMemoryWorkspaceRepository(
+      undefined,
+      workspaceMemberRepository,
+    )
     rolePermissionRepository = new InMemoryRolePermissionRepository()
     activityLogRepository = new InMemoryActivityLogRepository()
     sut = new GetActivityLogsUseCase(
@@ -156,6 +161,29 @@ describe('GetActivityLogs', () => {
         result.value.activityLogs.every((log) => log.resourceId === 'folder-1'),
       ).toBe(true)
     }
+  })
+
+  it('should return NotAllowedError when the caller lacks activity:read permission', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    const memberId = new UniqueEntityID().toString()
+    workspaceMemberRepository.items.push(
+      makeWorkspaceMember({
+        userId: memberId,
+        workspaceId: workspace.id.toString(),
+        roleId: new UniqueEntityID().toString(),
+      }),
+    )
+
+    const result = await sut.execute({
+      userId: memberId,
+      workspaceId: workspace.id.toString(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 
   it('should return ResourceNotFoundError when the workspace is not accessible', async () => {
