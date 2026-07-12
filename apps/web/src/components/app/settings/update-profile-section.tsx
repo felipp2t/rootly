@@ -4,7 +4,11 @@ import { Loader2Icon, SaveIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
-import { getGetMeQueryKey, useGetMeSuspense, useUpdateProfile } from '@/api/me/me'
+import {
+  getGetMeQueryKey,
+  useGetMeSuspense,
+  useUpdateProfile,
+} from '@/api/me/me'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'

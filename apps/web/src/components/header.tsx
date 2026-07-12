@@ -1,5 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { FoldersIcon, LogOutIcon, SettingsIcon } from 'lucide-react'
 import { useLogout } from '@/api/auth/auth'
 import { NotificationBell } from '@/components/notification-bell'
