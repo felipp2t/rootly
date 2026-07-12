@@ -42,23 +42,34 @@ function RouteSuspense() {
         <h1 className='text-4xl font-bold text-white'>FOLDER</h1>
       </div>
 
+      <FoldersSectionSkeleton />
+      <ItemsSectionSkeleton />
+    </>
+  )
+}
+
+function FoldersSectionSkeleton() {
+  return (
+    <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <FolderCardSkeleton key={i} />
+      ))}
+    </div>
+  )
+}
+
+function ItemsSectionSkeleton() {
+  return (
+    <div className='flex flex-col gap-2'>
+      <h2 className='font-mono text-xs font-semibold text-muted-foreground'>
+        ITEMS
+      </h2>
       <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
         {Array.from({ length: 3 }).map((_, i) => (
-          <FolderCardSkeleton key={i} />
+          <ItemCardSkeleton key={i} />
         ))}
       </div>
-
-      <div className='flex flex-col gap-2'>
-        <h2 className='font-mono text-xs font-semibold text-muted-foreground'>
-          ITEMS
-        </h2>
-        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <ItemCardSkeleton key={i} />
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   )
 }
 
@@ -67,18 +78,8 @@ function RoutePage() {
 
   const folderPath = (_splat ?? '').split('/').filter(Boolean)
   const currentFolderId = folderPath.at(-1)
-  const [showArchived, setShowArchived] = useState(false)
 
   const { data: workspaceResult } = useGetWorkspaceSuspense(workspaceId)
-  const { data: foldersResult } = useGetFoldersSuspense({
-    workspaceId,
-    parentId: currentFolderId,
-  })
-  const { data: itemsResult } = useGetItemsSuspense({
-    workspaceId,
-    parentId: currentFolderId,
-    includeArchived: showArchived,
-  })
   const { data: resolvedPathResult } = useResolveFolderPathSuspense({
     workspaceId,
     path: _splat,
@@ -86,8 +87,6 @@ function RoutePage() {
 
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
-  const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
-  const items = itemsResult.status === 200 ? itemsResult.data.items : []
   const resolvedPath =
     resolvedPathResult.status === 200 ? resolvedPathResult.data.path : []
   const currentFolderName = resolvedPath.at(-1)?.name
@@ -180,63 +179,113 @@ function RoutePage() {
         </div>
       </div>
 
-      {folders.length > 0 && (
-        <div className='flex flex-col gap-2'>
-          <h2 className='font-mono text-XS font-semibold text-muted-foreground'>
-            FOLDERS
-          </h2>
-          <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-            {folders.map((folder) => (
-              <Link
-                key={folder.id}
-                to='/$workspaceId/$'
-                params={{
-                  workspaceId,
-                  _splat: [...folderPath, folder.id].join('/'),
-                }}
-              >
-                <FolderCard
-                  folderId={folder.id}
-                  name={folder.name}
-                  itemCount={folder.itemCount}
-                  subfolderCount={folder.subfolderCount}
-                />
-              </Link>
-            ))}
-          </div>
+      <Suspense fallback={<FoldersSectionSkeleton />}>
+        <FoldersSection
+          workspaceId={workspaceId}
+          parentId={currentFolderId}
+          folderPath={folderPath}
+        />
+      </Suspense>
+
+      <Suspense fallback={<ItemsSectionSkeleton />}>
+        <ItemsSection workspaceId={workspaceId} parentId={currentFolderId} />
+      </Suspense>
+    </div>
+  )
+}
+
+function FoldersSection({
+  workspaceId,
+  parentId,
+  folderPath,
+}: {
+  workspaceId: string
+  parentId: string | undefined
+  folderPath: string[]
+}) {
+  const { data: foldersResult } = useGetFoldersSuspense({
+    workspaceId,
+    parentId,
+  })
+  const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
+
+  if (folders.length === 0) {
+    return null
+  }
+
+  return (
+    <div className='flex flex-col gap-2'>
+      <h2 className='font-mono text-xs font-semibold text-muted-foreground'>
+        FOLDERS
+      </h2>
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+        {folders.map((folder) => (
+          <Link
+            key={folder.id}
+            to='/$workspaceId/$'
+            params={{
+              workspaceId,
+              _splat: [...folderPath, folder.id].join('/'),
+            }}
+          >
+            <FolderCard
+              folderId={folder.id}
+              name={folder.name}
+              itemCount={folder.itemCount}
+              subfolderCount={folder.subfolderCount}
+            />
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ItemsSection({
+  workspaceId,
+  parentId,
+}: {
+  workspaceId: string
+  parentId: string | undefined
+}) {
+  const [showArchived, setShowArchived] = useState(false)
+  const { data: itemsResult } = useGetItemsSuspense({
+    workspaceId,
+    parentId,
+    includeArchived: showArchived,
+  })
+  const items = itemsResult.status === 200 ? itemsResult.data.items : []
+
+  return (
+    <div className='flex flex-col gap-2'>
+      <div className='flex items-center justify-between'>
+        <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
+          ITEMS
+        </h2>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          className='cursor-pointer'
+          onClick={() => setShowArchived((value) => !value)}
+        >
+          <ArchiveIcon className='size-3.5' />
+          {showArchived ? 'Hide archived' : 'Show archived'}
+        </Button>
+      </div>
+      {items.length === 0 ? (
+        <div className='flex items-center justify-center py-8'>
+          <p className='font-mono text-xs text-muted-foreground'>
+            No items yet
+          </p>
+        </div>
+      ) : (
+        <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+          {items.map((item) => (
+            <ItemCard key={item.id} item={item} />
+          ))}
         </div>
       )}
-
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center justify-between'>
-          <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
-            ITEMS
-          </h2>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='cursor-pointer'
-            onClick={() => setShowArchived((value) => !value)}
-          >
-            <ArchiveIcon className='size-3.5' />
-            {showArchived ? 'Hide archived' : 'Show archived'}
-          </Button>
-        </div>
-        {items.length === 0 ? (
-          <div className='flex items-center justify-center py-8'>
-            <p className='font-mono text-xs text-muted-foreground'>
-              No items yet
-            </p>
-          </div>
-        ) : (
-          <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
-            {items.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   )
 }
