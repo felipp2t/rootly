@@ -1,6 +1,7 @@
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { WorkspaceRenamedEvent } from '../events/workspace-renamed-event.ts'
 
 export interface WorkspaceProps {
   userId: string
@@ -11,7 +12,7 @@ export interface WorkspaceProps {
   updatedAt: Date
 }
 
-export class Workspace extends Entity<WorkspaceProps> {
+export class Workspace extends AggregateRoot<WorkspaceProps> {
   get name() {
     return this.props.name
   }
@@ -43,6 +44,17 @@ export class Workspace extends Entity<WorkspaceProps> {
 
   private touch() {
     this.props.updatedAt = new Date()
+  }
+
+  rename(name: string, actorId?: string) {
+    if (name === this.props.name) return
+
+    const before = this.props.name
+    this.name = name
+
+    this.addDomainEvent(
+      new WorkspaceRenamedEvent(this, { before, after: name }, actorId),
+    )
   }
 
   static create(
