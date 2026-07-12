@@ -21,6 +21,8 @@ export const GetActivityLogs200ActivityLogsItemAction = {
   member_joined: 'member_joined',
   member_role_changed: 'member_role_changed',
   member_removed: 'member_removed',
+  member_invite_revoked: 'member_invite_revoked',
+  member_invite_declined: 'member_invite_declined',
   workspace_renamed: 'workspace_renamed',
   role_created: 'role_created',
   role_deleted: 'role_deleted',
