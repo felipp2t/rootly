@@ -17,7 +17,7 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
         querystring: z.object({
           parentId: z.string().optional(),
           workspaceId: z.string().optional(),
-          includeArchived: z.coerce.boolean().optional(),
+          includeArchived: z.stringbool().optional(),
         }),
         response: {
           200: z.object({
