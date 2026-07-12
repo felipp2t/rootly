@@ -2,6 +2,7 @@ import {
   ArrowRightIcon,
   FolderIcon,
   LayoutPanelLeftIcon,
+  ShieldIcon,
   ShieldOffIcon,
   TextIcon,
   UserIcon,
@@ -32,6 +33,9 @@ const ACTION_LABELS: Record<GetActivityLogs200ActivityLogsItemAction, string> =
     member_role_changed: 'changed role for',
     member_removed: 'removed',
     workspace_renamed: 'renamed workspace',
+    role_created: 'created role',
+    role_deleted: 'deleted role',
+    role_permissions_changed: 'changed permissions for role',
   }
 
 export function ActivitySection({ workspaceId }: { workspaceId: string }) {
@@ -96,7 +100,9 @@ function ActivityLogRow({
         ? UserIcon
         : log.resourceType === 'workspace'
           ? LayoutPanelLeftIcon
-          : TextIcon
+          : log.resourceType === 'role'
+            ? ShieldIcon
+            : TextIcon
 
   const isSelfAction = log.action === 'member_joined'
 
