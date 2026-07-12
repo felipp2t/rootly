@@ -11,10 +11,16 @@ export class FolderRenamedEvent implements DomainEvent {
   public ocurredAt: Date
   public folder: Folder
   public changes: FolderRenamedEventChanges
+  public actorId?: string
 
-  constructor(folder: Folder, changes: FolderRenamedEventChanges) {
+  constructor(
+    folder: Folder,
+    changes: FolderRenamedEventChanges,
+    actorId?: string,
+  ) {
     this.folder = folder
     this.changes = changes
+    this.actorId = actorId
     this.ocurredAt = new Date()
   }
 

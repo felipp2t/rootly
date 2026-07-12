@@ -1,16 +1,16 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
-import { ItemArchivedError } from '../validators/_errors/item-archived-error.ts'
-import { validateTypeAndContent } from '../validators/item-type-validator.ts'
 import { ItemArchivedEvent } from '../events/item-archived-event.ts'
 import { ItemCreatedEvent } from '../events/item-created-event.ts'
 import { ItemDeletedEvent } from '../events/item-deleted-event.ts'
 import { ItemRestoredEvent } from '../events/item-restored-event.ts'
 import {
-  type ItemUpdatedEventFields,
   ItemUpdatedEvent,
+  type ItemUpdatedEventFields,
 } from '../events/item-updated-event.ts'
+import { ItemArchivedError } from '../validators/_errors/item-archived-error.ts'
+import { validateTypeAndContent } from '../validators/item-type-validator.ts'
 
 export type ItemType = 'link' | 'document' | 'secret' | 'text'
 
@@ -74,19 +74,19 @@ export class Item extends AggregateRoot<ItemProps> {
     return this.props.updatedAt
   }
 
-  archive() {
+  archive(actorId?: string) {
     this.props.archivedAt = new Date()
     this.touch()
-    this.addDomainEvent(new ItemArchivedEvent(this))
+    this.addDomainEvent(new ItemArchivedEvent(this, actorId))
   }
 
-  restore() {
+  restore(actorId?: string) {
     this.props.archivedAt = undefined
     this.touch()
-    this.addDomainEvent(new ItemRestoredEvent(this))
+    this.addDomainEvent(new ItemRestoredEvent(this, actorId))
   }
 
-  update(fields: ItemUpdatedEventFields) {
+  update(fields: ItemUpdatedEventFields, actorId?: string) {
     const before: ItemUpdatedEventFields = {}
     const after: ItemUpdatedEventFields = {}
 
@@ -104,11 +104,11 @@ export class Item extends AggregateRoot<ItemProps> {
 
     if (Object.keys(after).length === 0) return
 
-    this.addDomainEvent(new ItemUpdatedEvent(this, { before, after }))
+    this.addDomainEvent(new ItemUpdatedEvent(this, { before, after }, actorId))
   }
 
-  delete() {
-    this.addDomainEvent(new ItemDeletedEvent(this))
+  delete(actorId?: string) {
+    this.addDomainEvent(new ItemDeletedEvent(this, actorId))
   }
 
   private touch() {
@@ -118,6 +118,7 @@ export class Item extends AggregateRoot<ItemProps> {
   static create(
     props: Optional<ItemProps, 'createdAt' | 'updatedAt' | 'folderId'>,
     id?: UniqueEntityID,
+    actorId?: string,
   ) {
     validateTypeAndContent(props.type, props.content)
 
@@ -131,7 +132,7 @@ export class Item extends AggregateRoot<ItemProps> {
     )
 
     if (!id) {
-      item.addDomainEvent(new ItemCreatedEvent(item))
+      item.addDomainEvent(new ItemCreatedEvent(item, actorId))
     }
 
     return item

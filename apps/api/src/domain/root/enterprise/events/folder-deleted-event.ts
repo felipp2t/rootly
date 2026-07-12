@@ -5,9 +5,11 @@ import type { Folder } from '../entities/folder.ts'
 export class FolderDeletedEvent implements DomainEvent {
   public ocurredAt: Date
   public folder: Folder
+  public actorId?: string
 
-  constructor(folder: Folder) {
+  constructor(folder: Folder, actorId?: string) {
     this.folder = folder
+    this.actorId = actorId
     this.ocurredAt = new Date()
   }
 

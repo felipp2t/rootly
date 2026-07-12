@@ -16,10 +16,12 @@ export class ItemUpdatedEvent implements DomainEvent {
   public ocurredAt: Date
   public item: Item
   public changes: ItemUpdatedEventChanges
+  public actorId?: string
 
-  constructor(item: Item, changes: ItemUpdatedEventChanges) {
+  constructor(item: Item, changes: ItemUpdatedEventChanges, actorId?: string) {
     this.item = item
     this.changes = changes
+    this.actorId = actorId
     this.ocurredAt = new Date()
   }
 

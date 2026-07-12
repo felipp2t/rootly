@@ -5,9 +5,11 @@ import type { Item } from '../entities/item.ts'
 export class ItemRestoredEvent implements DomainEvent {
   public ocurredAt: Date
   public item: Item
+  public actorId?: string
 
-  constructor(item: Item) {
+  constructor(item: Item, actorId?: string) {
     this.item = item
+    this.actorId = actorId
     this.ocurredAt = new Date()
   }
 

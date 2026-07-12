@@ -43,22 +43,25 @@ export class Folder extends AggregateRoot<FolderProps> {
     this.props.updatedAt = new Date()
   }
 
-  rename(name: string) {
+  rename(name: string, actorId?: string) {
     if (name === this.props.name) return
 
     const before = this.props.name
     this.name = name
 
-    this.addDomainEvent(new FolderRenamedEvent(this, { before, after: name }))
+    this.addDomainEvent(
+      new FolderRenamedEvent(this, { before, after: name }, actorId),
+    )
   }
 
-  delete() {
-    this.addDomainEvent(new FolderDeletedEvent(this))
+  delete(actorId?: string) {
+    this.addDomainEvent(new FolderDeletedEvent(this, actorId))
   }
 
   static create(
     props: Optional<FolderProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
+    actorId?: string,
   ) {
     const folder = new Folder(
       {
@@ -70,7 +73,7 @@ export class Folder extends AggregateRoot<FolderProps> {
     )
 
     if (!id) {
-      folder.addDomainEvent(new FolderCreatedEvent(folder))
+      folder.addDomainEvent(new FolderCreatedEvent(folder, actorId))
     }
 
     return folder
