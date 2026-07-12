@@ -1,4 +1,10 @@
-import { FolderIcon, ShieldOffIcon, TextIcon, UserIcon } from 'lucide-react'
+import {
+  ArrowRightIcon,
+  FolderIcon,
+  ShieldOffIcon,
+  TextIcon,
+  UserIcon,
+} from 'lucide-react'
 import { Suspense } from 'react'
 import { useGetActivityLogsSuspense } from '@/api/activity/activity'
 import type {
@@ -138,9 +144,13 @@ function MetadataDiff({
   return (
     <div className='flex flex-col gap-0.5'>
       {keys.map((key) => (
-        <span key={key} className='font-mono text-[11px] text-muted-foreground'>
-          {key}:{' '}
-          <span className='line-through'>{String(before[key] ?? '—')}</span> →{' '}
+        <span
+          key={key}
+          className='flex items-center gap-1 font-mono text-[11px] text-muted-foreground'
+        >
+          {key}:
+          <span className='line-through'>{String(before[key] ?? '—')}</span>
+          <ArrowRightIcon className='size-2.5 shrink-0' />
           <span className='text-foreground'>{String(after[key] ?? '—')}</span>
         </span>
       ))}
