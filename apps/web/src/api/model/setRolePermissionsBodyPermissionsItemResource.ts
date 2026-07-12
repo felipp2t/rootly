@@ -14,4 +14,5 @@ export const SetRolePermissionsBodyPermissionsItemResource = {
   item: 'item',
   member: 'member',
   role: 'role',
+  activity: 'activity',
 } as const;

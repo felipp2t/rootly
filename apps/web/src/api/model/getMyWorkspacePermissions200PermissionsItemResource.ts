@@ -14,4 +14,5 @@ export const GetMyWorkspacePermissions200PermissionsItemResource = {
   item: 'item',
   member: 'member',
   role: 'role',
+  activity: 'activity',
 } as const;

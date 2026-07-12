@@ -555,7 +555,8 @@
                               "folder",
                               "item",
                               "member",
-                              "role"
+                              "role",
+                              "activity"
                             ]
                           },
                           "action": {
@@ -1174,7 +1175,7 @@
           },
           {
             "schema": {
-              "type": "boolean"
+              "type": "string"
             },
             "in": "query",
             "name": "includeArchived",
@@ -4227,7 +4228,8 @@
                               "folder",
                               "item",
                               "member",
-                              "role"
+                              "role",
+                              "activity"
                             ]
                           },
                           "action": {
@@ -4355,7 +4357,8 @@
                             "folder",
                             "item",
                             "member",
-                            "role"
+                            "role",
+                            "activity"
                           ]
                         },
                         "action": {
@@ -4426,6 +4429,218 @@
             }
           },
           "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspaces/{workspaceId}/activity": {
+      "get": {
+        "operationId": "getActivityLogs",
+        "summary": "Get Activity Logs",
+        "tags": [
+          "Activity"
+        ],
+        "description": "List the activity log of a workspace, optionally filtered by resourceId or resourceType",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "resourceId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "folder",
+                "item"
+              ]
+            },
+            "in": "query",
+            "name": "resourceType",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "workspaceId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activityLogs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "workspaceId": {
+                            "type": "string"
+                          },
+                          "resourceType": {
+                            "type": "string",
+                            "enum": [
+                              "folder",
+                              "item"
+                            ]
+                          },
+                          "resourceId": {
+                            "type": "string"
+                          },
+                          "resourceName": {
+                            "type": "string"
+                          },
+                          "action": {
+                            "type": "string",
+                            "enum": [
+                              "folder_created",
+                              "folder_renamed",
+                              "folder_deleted",
+                              "item_created",
+                              "item_updated",
+                              "item_archived",
+                              "item_restored",
+                              "item_deleted"
+                            ]
+                          },
+                          "actorUserId": {
+                            "type": "string"
+                          },
+                          "actorName": {
+                            "type": "string"
+                          },
+                          "metadata": {
+                            "nullable": true,
+                            "type": "object",
+                            "properties": {
+                              "before": {
+                                "type": "object",
+                                "additionalProperties": {}
+                              },
+                              "after": {
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "workspaceId",
+                          "resourceType",
+                          "resourceId",
+                          "resourceName",
+                          "action",
+                          "actorUserId",
+                          "actorName",
+                          "metadata",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "activityLogs"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
             "description": "Default Response",
             "content": {
               "application/json": {
