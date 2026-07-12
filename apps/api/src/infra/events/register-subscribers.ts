@@ -1,5 +1,6 @@
 import { OnFolderActivity } from '@/domain/activity/application/subscribers/on-folder-activity.ts'
 import { OnItemActivity } from '@/domain/activity/application/subscribers/on-item-activity.ts'
+import { OnRoleActivity } from '@/domain/activity/application/subscribers/on-role-activity.ts'
 import { OnWorkspaceActivity } from '@/domain/activity/application/subscribers/on-workspace-activity.ts'
 import { OnUserInvited } from '@/domain/notification/application/subsribers/on-user-invited.ts'
 import { makeOnMemberActivity } from '../http/factories/make-on-member-activity.ts'
@@ -11,5 +12,6 @@ export function registerSubscribers() {
   new OnFolderActivity(makeRecordActivityLogUseCase())
   new OnItemActivity(makeRecordActivityLogUseCase())
   new OnWorkspaceActivity(makeRecordActivityLogUseCase())
+  new OnRoleActivity(makeRecordActivityLogUseCase())
   makeOnMemberActivity()
 }
