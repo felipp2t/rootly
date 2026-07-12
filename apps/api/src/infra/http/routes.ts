@@ -1,8 +1,8 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { acceptInviteController } from './controllers/accept-invite.controller.ts'
+import { archiveItemController } from './controllers/archive-item.controller.ts'
 import { assignRoleToMemberController } from './controllers/assign-role-to-member.controller.ts'
 import { authenticateUserController } from './controllers/authenticate-user.controller.ts'
-import { logoutController } from './controllers/logout.controller.ts'
 import { changePasswordController } from './controllers/change-password.controller.ts'
 import { createAccountController } from './controllers/create-account.controller.ts'
 import { createFolderController } from './controllers/create-folder.controller.ts'
@@ -11,6 +11,8 @@ import { createRoleController } from './controllers/create-role.controller.ts'
 import { createWorkspaceController } from './controllers/create-workspace.controller.ts'
 import { createWsTicketController } from './controllers/create-ws-ticket.controller.ts'
 import { declineInviteController } from './controllers/decline-invite.controller.ts'
+import { deleteFolderController } from './controllers/delete-folder.controller.ts'
+import { deleteItemController } from './controllers/delete-item.controller.ts'
 import { deleteRoleController } from './controllers/delete-role.controller.ts'
 import { deleteWorkspaceController } from './controllers/delete-workspace.controller.ts'
 import { getFoldersController } from './controllers/get-folders.controller.ts'
@@ -25,11 +27,13 @@ import { getWorkspaceInvitesController } from './controllers/get-workspace-invit
 import { getWorkspaceMembersController } from './controllers/get-workspace-members.controller.ts'
 import { getWorkspacesController } from './controllers/get-workspaces.controller.ts'
 import { inviteUserController } from './controllers/invite-user.controller.ts'
+import { logoutController } from './controllers/logout.controller.ts'
 import { notificationsWebSocketController } from './controllers/notifications-websocket.controller.ts'
 import { readNotificationController } from './controllers/read-notification.controller.ts'
 import { refreshAccessTokenController } from './controllers/refresh-access-token.controller.ts'
 import { removeMemberController } from './controllers/remove-member.controller.ts'
 import { resolveFolderPathController } from './controllers/resolve-folder-path.controller.ts'
+import { restoreItemController } from './controllers/restore-item.controller.ts'
 import { revokeInviteController } from './controllers/revoke-invite.controller.ts'
 import { setRolePermissionsController } from './controllers/set-role-permissions.controller.ts'
 import { updateProfileController } from './controllers/update-profile.controller.ts'
@@ -53,7 +57,11 @@ export const routes: FastifyPluginCallbackZod = async (app) => {
   app.register(deleteWorkspaceController)
   app.register(getFoldersController)
   app.register(resolveFolderPathController)
+  app.register(deleteFolderController)
   app.register(getItemsController)
+  app.register(archiveItemController)
+  app.register(restoreItemController)
+  app.register(deleteItemController)
   app.register(getWorkspacesController)
   app.register(getWorkspaceController)
   app.register(getWorkspaceMembersController)
