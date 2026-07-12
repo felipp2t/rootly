@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>web</title>
     <script>
-      (function () {
-        var stored = localStorage.getItem('theme') || 'dark'
+      // Key must match STORAGE_KEYS.THEME in src/lib/storage.ts
+      ;(() => {
+        var stored = localStorage.getItem('vite-ui-theme') || 'dark'
         var resolved =
           stored === 'system'
             ? window.matchMedia('(prefers-color-scheme: dark)').matches

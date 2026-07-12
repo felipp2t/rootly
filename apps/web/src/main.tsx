@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes'
 import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthProvider, useAuth } from '@/lib/auth.tsx'
+import { STORAGE_KEYS } from '@/lib/storage.ts'
 import './globals.css'
 import { Toaster } from './components/ui/sonner.tsx'
 import { queryClient } from './lib/query.tsx'
@@ -33,7 +34,12 @@ export function App() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
+    <ThemeProvider
+      attribute='class'
+      defaultTheme='dark'
+      enableSystem
+      storageKey={STORAGE_KEYS.THEME}
+    >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <App />
