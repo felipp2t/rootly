@@ -21,7 +21,10 @@ describe('RefreshToken', () => {
   })
 
   it('should create a refresh token with an explicit token value', () => {
-    const token = RefreshToken.create({ userId: 'user-1', token: 'my-custom-token' })
+    const token = RefreshToken.create({
+      userId: 'user-1',
+      token: 'my-custom-token',
+    })
 
     expect(token.token).toBe('my-custom-token')
   })

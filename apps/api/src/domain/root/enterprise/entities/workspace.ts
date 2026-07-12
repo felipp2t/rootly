@@ -58,7 +58,10 @@ export class Workspace extends AggregateRoot<WorkspaceProps> {
   }
 
   static create(
-    props: Optional<WorkspaceProps, 'createdAt' | 'updatedAt' | 'itemCount' | 'memberCount'>,
+    props: Optional<
+      WorkspaceProps,
+      'createdAt' | 'updatedAt' | 'itemCount' | 'memberCount'
+    >,
     id?: UniqueEntityID,
   ) {
     return new Workspace(

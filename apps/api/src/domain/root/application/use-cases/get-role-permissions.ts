@@ -29,7 +29,10 @@ export class GetRolePermissionsUseCase {
     workspaceId,
     roleId,
   }: GetRolePermissionsUseCaseRequest): Promise<GetRolePermissionsUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(userId, workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))

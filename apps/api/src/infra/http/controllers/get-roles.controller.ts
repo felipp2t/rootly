@@ -38,7 +38,10 @@ export const getRolesController: FastifyPluginCallbackZod = async (app) => {
       const { workspaceId } = request.params
 
       const useCase = makeGetRolesUseCase()
-      const result = await useCase.execute({ userId: request.userId, workspaceId })
+      const result = await useCase.execute({
+        userId: request.userId,
+        workspaceId,
+      })
 
       if (result.isLeft()) {
         const error = result.value

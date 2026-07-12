@@ -5,16 +5,23 @@ import { Workspace } from './workspace.ts'
 describe('Workspace', () => {
   it('should create a workspace with default values', () => {
     const before = new Date()
-    const workspace = Workspace.create({ name: 'My Workspace', userId: 'user-1' })
+    const workspace = Workspace.create({
+      name: 'My Workspace',
+      userId: 'user-1',
+    })
     const after = new Date()
 
     expect(workspace.name).toBe('My Workspace')
     expect(workspace.userId).toBe('user-1')
     expect(workspace.itemCount).toBe(0)
     expect(workspace.memberCount).toBe(0)
-    expect(workspace.createdAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
+    expect(workspace.createdAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
     expect(workspace.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
-    expect(workspace.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
+    expect(workspace.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
+    )
     expect(workspace.updatedAt.getTime()).toBeLessThanOrEqual(after.getTime())
   })
 
@@ -59,7 +66,9 @@ describe('Workspace', () => {
     workspace.name = 'New Name'
 
     expect(workspace.name).toBe('New Name')
-    expect(workspace.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(workspace.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
   })
 
   it('should register a WorkspaceRenamedEvent with before/after and actorId on rename', () => {

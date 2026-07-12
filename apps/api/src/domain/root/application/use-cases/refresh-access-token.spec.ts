@@ -1,9 +1,9 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { FakeEncrypter } from '@test/cryptography/faker-encryper.ts'
 import { makeRefreshToken } from '@test/factories/make-refresh-token.ts'
 import { InMemoryRefreshTokenRepository } from '@test/repositories/in-memory-refresh-token-repository.ts'
-import { RefreshAccessTokenUseCase } from './refresh-access-token.ts'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { InvalidRefreshTokenError } from './errors/invalid-refresh-token-error.ts'
+import { RefreshAccessTokenUseCase } from './refresh-access-token.ts'
 
 let inMemoryRefreshTokenRepository: InMemoryRefreshTokenRepository
 let encrypter: FakeEncrypter
@@ -50,7 +50,9 @@ describe('RefreshAccessToken', () => {
 
     expect(result.isRight()).toBe(true)
     expect(inMemoryRefreshTokenRepository.items).toHaveLength(1)
-    expect(inMemoryRefreshTokenRepository.items[0].token).not.toBe(refreshToken.token)
+    expect(inMemoryRefreshTokenRepository.items[0].token).not.toBe(
+      refreshToken.token,
+    )
     expect(inMemoryRefreshTokenRepository.items[0].userId).toBe(userId)
   })
 

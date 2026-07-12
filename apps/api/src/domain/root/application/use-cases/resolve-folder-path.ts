@@ -64,7 +64,8 @@ export class ResolveFolderPathUseCase {
         return left(new InvalidFolderPathError())
       }
 
-      const expectedParentId = i === 0 ? undefined : resolved[i - 1].id.toString()
+      const expectedParentId =
+        i === 0 ? undefined : resolved[i - 1].id.toString()
 
       if (folder.parentId !== expectedParentId) {
         return left(new InvalidFolderPathError())

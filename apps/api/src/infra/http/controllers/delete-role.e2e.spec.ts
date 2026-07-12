@@ -60,7 +60,11 @@ describe('DELETE /workspaces/:workspaceId/roles/:roleId', () => {
     return workspaceId
   }
 
-  async function createRole(cookieHeader: string, workspaceId: string, name: string) {
+  async function createRole(
+    cookieHeader: string,
+    workspaceId: string,
+    name: string,
+  ) {
     const roleResponse = await app.inject({
       method: 'POST',
       url: `/api/workspaces/${workspaceId}/roles`,
@@ -115,7 +119,8 @@ describe('DELETE /workspaces/:workspaceId/roles/:roleId', () => {
   })
 
   it('should return 404 when the user is not a member of the workspace', async () => {
-    const { cookieHeader: firstCookieHeader } = await createUserAndAuthenticate()
+    const { cookieHeader: firstCookieHeader } =
+      await createUserAndAuthenticate()
     const workspaceId = await createWorkspace(firstCookieHeader)
     const roleId = await createRole(firstCookieHeader, workspaceId, 'Editor')
 

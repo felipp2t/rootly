@@ -80,7 +80,9 @@ describe('WorkspaceInvite', () => {
     invite.accept()
 
     expect(invite.status).toBe(workspaceInviteStatus.ACCEPTED)
-    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
   })
 
   it('should decline an invite and update status and updatedAt', () => {
@@ -90,7 +92,9 @@ describe('WorkspaceInvite', () => {
     invite.decline()
 
     expect(invite.status).toBe(workspaceInviteStatus.DECLINED)
-    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
   })
 
   it('should update status via setter and touch updatedAt', () => {
@@ -100,7 +104,9 @@ describe('WorkspaceInvite', () => {
     invite.status = workspaceInviteStatus.REVOKED
 
     expect(invite.status).toBe('revoked')
-    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(invite.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
   })
 
   it('should expose all workspaceInviteStatus values', () => {

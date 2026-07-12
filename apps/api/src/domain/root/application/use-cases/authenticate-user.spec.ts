@@ -66,7 +66,9 @@ describe('AuthenticateUser', () => {
     })
 
     expect(inMemoryRefreshTokenRepository.items).toHaveLength(1)
-    expect(inMemoryRefreshTokenRepository.items[0].userId).toBe(user.id.toString())
+    expect(inMemoryRefreshTokenRepository.items[0].userId).toBe(
+      user.id.toString(),
+    )
   })
 
   it('should return WrongCredentialsError when email does not exist', {

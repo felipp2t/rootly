@@ -1,5 +1,5 @@
-import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { makeWorkspaceMember } from '@test/factories/make-workspace-member.ts'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { MemberJoinedEvent } from './member-joined-event.ts'
 
 describe('MemberJoinedEvent', () => {

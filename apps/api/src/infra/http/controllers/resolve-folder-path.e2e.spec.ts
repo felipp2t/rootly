@@ -49,8 +49,8 @@ describe('GET /folders/resolve-path', () => {
       payload: { name: 'My Workspace' },
     })
 
-    const workspaceId =
-      workspaceResponse.json<{ workspaceId: string }>().workspaceId
+    const workspaceId = workspaceResponse.json<{ workspaceId: string }>()
+      .workspaceId
 
     return { cookieHeader, workspaceId }
   }

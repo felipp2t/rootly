@@ -1,7 +1,7 @@
-import { AggregateRoot } from "../entities/aggregate-root.ts"
-import type { UniqueEntityID } from "../entities/unique-entity-id.ts"
-import type { DomainEvent } from "./domain-event.ts"
-import { DomainEvents } from "./domain-events.ts"
+import { AggregateRoot } from '../entities/aggregate-root.ts'
+import type { UniqueEntityID } from '../entities/unique-entity-id.ts'
+import type { DomainEvent } from './domain-event.ts'
+import { DomainEvents } from './domain-events.ts'
 
 class CustomAggregateCreated implements DomainEvent {
   public ocurredAt: Date

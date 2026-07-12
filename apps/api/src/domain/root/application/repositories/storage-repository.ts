@@ -5,6 +5,8 @@ export interface UploadStorageRepositoryParams {
 }
 
 export abstract class StorageRepository {
-  abstract upload(params: UploadStorageRepositoryParams): Promise<{ key: string }>
+  abstract upload(
+    params: UploadStorageRepositoryParams,
+  ): Promise<{ key: string }>
   abstract delete(key: string): Promise<void>
 }

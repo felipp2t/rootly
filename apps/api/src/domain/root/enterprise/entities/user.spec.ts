@@ -59,8 +59,16 @@ describe('User', () => {
   })
 
   it('should generate different ids for different users created without an id', () => {
-    const user1 = User.create({ name: 'A', email: 'a@a.com', passwordHash: 'h' })
-    const user2 = User.create({ name: 'B', email: 'b@b.com', passwordHash: 'h' })
+    const user1 = User.create({
+      name: 'A',
+      email: 'a@a.com',
+      passwordHash: 'h',
+    })
+    const user2 = User.create({
+      name: 'B',
+      email: 'b@b.com',
+      passwordHash: 'h',
+    })
 
     expect(user1.id.toString()).not.toBe(user2.id.toString())
   })

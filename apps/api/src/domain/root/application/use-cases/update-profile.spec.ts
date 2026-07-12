@@ -1,8 +1,8 @@
 import { makeUser } from '@test/factories/make-user.ts'
 import { InMemoryUserRepository } from '@test/repositories/in-memory-user-repository.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
-import { UpdateProfileUseCase } from './update-profile.ts'
 import { InvalidProfileNameError } from './errors/invalid-profile-name-error.ts'
+import { UpdateProfileUseCase } from './update-profile.ts'
 
 let userRepository: InMemoryUserRepository
 let sut: UpdateProfileUseCase

@@ -30,7 +30,9 @@ describe('InviteUser', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(response.value).toMatchObject({ workspaceInviteId: expect.any(String) })
+    expect(response.value).toMatchObject({
+      workspaceInviteId: expect.any(String),
+    })
   })
 
   it('should persist the invite in the repository with correct fields', {
@@ -51,7 +53,9 @@ describe('InviteUser', () => {
     })
 
     expect(workspaceInviteRepository.items.length).toBe(1)
-    expect(workspaceInviteRepository.items[0].invitedUserId).toBe(invitedUser.id.toString())
+    expect(workspaceInviteRepository.items[0].invitedUserId).toBe(
+      invitedUser.id.toString(),
+    )
     expect(workspaceInviteRepository.items[0].invitedByUserId).toBe(inviterId)
     expect(workspaceInviteRepository.items[0].workspaceId).toBe(workspaceId)
     expect(workspaceInviteRepository.items[0].roleId).toBe(roleId)

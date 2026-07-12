@@ -54,10 +54,7 @@ describe('POST /items', () => {
     return { cookieHeader, workspaceId }
   }
 
-  async function createFolder(
-    cookieHeader: string,
-    workspaceId: string,
-  ) {
+  async function createFolder(cookieHeader: string, workspaceId: string) {
     const response = await app.inject({
       method: 'POST',
       url: '/api/folders',

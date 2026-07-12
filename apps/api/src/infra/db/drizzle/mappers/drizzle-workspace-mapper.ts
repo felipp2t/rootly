@@ -7,7 +7,11 @@ type DrizzleWorkspace = InferSelectModel<typeof schema.workspaces>
 type DrizzleWorkspaceInsert = InferInsertModel<typeof schema.workspaces>
 
 export class DrizzleWorkspaceMapper {
-  static toDomain(raw: DrizzleWorkspace, itemCount = 0, memberCount = 0): Workspace {
+  static toDomain(
+    raw: DrizzleWorkspace,
+    itemCount = 0,
+    memberCount = 0,
+  ): Workspace {
     return Workspace.create(
       {
         name: raw.name,

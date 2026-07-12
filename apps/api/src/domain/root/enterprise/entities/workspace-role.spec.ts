@@ -32,7 +32,10 @@ describe('WorkspaceRole', () => {
 
   it('should create a workspace role with a provided id', () => {
     const id = new UniqueEntityID('role-fixed-id')
-    const role = WorkspaceRole.create({ name: 'Admin', workspaceId: 'ws-1' }, id)
+    const role = WorkspaceRole.create(
+      { name: 'Admin', workspaceId: 'ws-1' },
+      id,
+    )
 
     expect(role.id.toString()).toBe('role-fixed-id')
   })
@@ -44,7 +47,9 @@ describe('WorkspaceRole', () => {
     role.name = 'New Name'
 
     expect(role.name).toBe('New Name')
-    expect(role.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(role.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
   })
 
   it('should expose workspaceId', () => {

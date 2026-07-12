@@ -1,8 +1,8 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
-import { InvalidProfileNameError } from './errors/invalid-profile-name-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
 import type { UserRepository } from '../repositories/user-repository.ts'
+import { InvalidProfileNameError } from './errors/invalid-profile-name-error.ts'
 
 interface UpdateProfileUseCaseRequest {
   userId: string

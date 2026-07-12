@@ -10,7 +10,8 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
       onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Folders',
-        description: 'List folders. Optionally filter by parentId or workspaceId.',
+        description:
+          'List folders. Optionally filter by parentId or workspaceId.',
         operationId: 'getFolders',
         tags: ['Folders'],
         querystring: z.object({
@@ -41,23 +42,29 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
       const { parentId, workspaceId } = request.query
 
       const useCase = makeGetFoldersUseCase()
-      const result = await useCase.execute({ userId: request.userId, parentId, workspaceId })
+      const result = await useCase.execute({
+        userId: request.userId,
+        parentId,
+        workspaceId,
+      })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })
       }
 
       return reply.status(200).send({
-        folders: result.value.folders.map(({ folder, itemCount, subfolderCount }) => ({
-          id: folder.id.toString(),
-          name: folder.name,
-          workspaceId: folder.workspaceId,
-          parentId: folder.parentId ?? null,
-          itemCount,
-          subfolderCount,
-          createdAt: folder.createdAt,
-          updatedAt: folder.updatedAt,
-        })),
+        folders: result.value.folders.map(
+          ({ folder, itemCount, subfolderCount }) => ({
+            id: folder.id.toString(),
+            name: folder.name,
+            workspaceId: folder.workspaceId,
+            parentId: folder.parentId ?? null,
+            itemCount,
+            subfolderCount,
+            createdAt: folder.createdAt,
+            updatedAt: folder.updatedAt,
+          }),
+        ),
       })
     },
   )

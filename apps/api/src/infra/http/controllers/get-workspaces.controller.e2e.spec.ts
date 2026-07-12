@@ -169,8 +169,9 @@ describe('GET /workspaces', () => {
         password: '123456',
       },
     })
-    const { userId: secondUserId } =
-      secondAccountResponse.json<{ userId: string }>()
+    const { userId: secondUserId } = secondAccountResponse.json<{
+      userId: string
+    }>()
 
     const [role] = await db
       .select()

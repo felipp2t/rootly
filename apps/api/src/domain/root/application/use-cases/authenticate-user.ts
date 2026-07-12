@@ -1,10 +1,10 @@
 import type { BaseError } from '@/core/errors/base-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
+import { RefreshToken } from '../../enterprise/entities/refresh-token.ts'
 import type { Encrypter } from '../cryptography/encrypter.ts'
 import type { HashComparer } from '../cryptography/hash-comparer.ts'
 import type { RefreshTokenRepository } from '../repositories/refresh-token-repository.ts'
 import type { UserRepository } from '../repositories/user-repository.ts'
-import { RefreshToken } from '../../enterprise/entities/refresh-token.ts'
 import { WrongCredentialsError } from './errors/wrong-credencials-error.ts'
 
 interface AuthenticateUserUseCaseRequest {

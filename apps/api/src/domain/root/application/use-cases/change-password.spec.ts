@@ -40,7 +40,9 @@ describe('ChangePassword', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(inMemoryUserRepository.items[0].passwordHash).toBe('newpassword-hashed')
+    expect(inMemoryUserRepository.items[0].passwordHash).toBe(
+      'newpassword-hashed',
+    )
   })
 
   it('should revoke all refresh tokens for the user after a successful password change', async () => {

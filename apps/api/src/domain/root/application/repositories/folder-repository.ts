@@ -16,8 +16,16 @@ export abstract class FolderRepository {
     parentId?: string,
   ): Promise<Folder | null>
   abstract findByWorkspaceId(workspaceId: string): Promise<Folder[]>
-  abstract findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Folder[]>
-  abstract findManyWithCounts(userId: string, parentId?: string, workspaceId?: string): Promise<FolderWithCounts[]>
+  abstract findMany(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<Folder[]>
+  abstract findManyWithCounts(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<FolderWithCounts[]>
   abstract hasSubfolders(folderId: string): Promise<boolean>
   abstract create(folder: Folder): Promise<void>
   abstract save(folder: Folder): Promise<void>

@@ -22,13 +22,17 @@ export class GetRolesUseCase {
     userId,
     workspaceId,
   }: GetRolesUseCaseRequest): Promise<GetRolesUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(userId, workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))
     }
 
-    const roles = await this.workspaceRoleRepository.findByWorkspaceId(workspaceId)
+    const roles =
+      await this.workspaceRoleRepository.findByWorkspaceId(workspaceId)
 
     return right({ roles })
   }

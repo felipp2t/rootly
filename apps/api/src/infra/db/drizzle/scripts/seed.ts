@@ -84,7 +84,6 @@ async function seed() {
 
   console.log('  ✓ banco limpo')
 
-
   // ── Users ────────────────────────────────────────────────────────────────
   const passwordHash = await hash('password123')
 
@@ -175,7 +174,9 @@ async function seed() {
     })
 
     // at least 9 more users (→ 10+ members per workspace) split Editor/Viewer
-    const others = faker.helpers.shuffle(users.filter((u) => u.id !== ws.userId))
+    const others = faker.helpers.shuffle(
+      users.filter((u) => u.id !== ws.userId),
+    )
     const memberCount = faker.number.int({ min: 9, max: 14 })
     const picked = others.slice(0, memberCount)
     const editorCount = Math.ceil(picked.length / 2)
@@ -196,7 +197,9 @@ async function seed() {
   const rootFolderRows = workspaces.flatMap((ws) => {
     const count = faker.number.int({ min: 3, max: 5 })
     const names = faker.helpers.uniqueArray(
-      () => faker.system.directoryPath().split('/').filter(Boolean).pop() ?? faker.hacker.noun(),
+      () =>
+        faker.system.directoryPath().split('/').filter(Boolean).pop() ??
+        faker.hacker.noun(),
       count,
     )
     return names.map((name) => ({
@@ -207,7 +210,10 @@ async function seed() {
     }))
   })
 
-  const rootFolders = await db.insert(schema.folders).values(rootFolderRows).returning()
+  const rootFolders = await db
+    .insert(schema.folders)
+    .values(rootFolderRows)
+    .returning()
 
   // nested subfolders inside the first root folder of each workspace
   const subFolderRows = workspaces.flatMap((ws) => {
@@ -223,7 +229,10 @@ async function seed() {
     }))
   })
 
-  const subFolders = await db.insert(schema.folders).values(subFolderRows).returning()
+  const subFolders = await db
+    .insert(schema.folders)
+    .values(subFolderRows)
+    .returning()
   const folders = [...rootFolders, ...subFolders]
 
   console.log(`  ✓ ${folders.length} folders`)

@@ -30,16 +30,20 @@ export class GetMyWorkspacePermissionsUseCase {
     userId,
     workspaceId,
   }: GetMyWorkspacePermissionsUseCaseRequest): Promise<GetMyWorkspacePermissionsUseCaseResponse> {
-    const workspace = await this.workspaceRepository.findById(userId, workspaceId)
+    const workspace = await this.workspaceRepository.findById(
+      userId,
+      workspaceId,
+    )
 
     if (!workspace) {
       return left(new ResourceNotFoundError('Workspace'))
     }
 
-    const member = await this.workspaceMemberRepository.findByUserIdAndWorkspaceId(
-      userId,
-      workspaceId,
-    )
+    const member =
+      await this.workspaceMemberRepository.findByUserIdAndWorkspaceId(
+        userId,
+        workspaceId,
+      )
 
     if (!member) {
       return right({ permissions: [] })

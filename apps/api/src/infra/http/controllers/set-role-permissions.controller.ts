@@ -11,9 +11,18 @@ const permissionResourceSchema = z.enum([
   'role',
   'activity',
 ])
-const permissionActionSchema = z.enum(['read', 'create', 'update', 'delete', 'invite', 'all'])
+const permissionActionSchema = z.enum([
+  'read',
+  'create',
+  'update',
+  'delete',
+  'invite',
+  'all',
+])
 
-export const setRolePermissionsController: FastifyPluginCallbackZod = async (app) => {
+export const setRolePermissionsController: FastifyPluginCallbackZod = async (
+  app,
+) => {
   app.put(
     '/workspaces/:workspaceId/roles/:roleId/permissions',
     {

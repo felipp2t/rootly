@@ -112,7 +112,8 @@ describe('POST /workspaces/:workspaceId/roles', () => {
   })
 
   it('should return 404 when the user is not a member of the workspace', async () => {
-    const { cookieHeader: firstCookieHeader } = await createUserAndAuthenticate()
+    const { cookieHeader: firstCookieHeader } =
+      await createUserAndAuthenticate()
     const workspaceId = await createWorkspace(firstCookieHeader)
 
     await app.inject({

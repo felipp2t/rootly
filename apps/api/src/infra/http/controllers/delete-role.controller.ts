@@ -30,7 +30,11 @@ export const deleteRoleController: FastifyPluginCallbackZod = async (app) => {
       const { workspaceId, roleId } = request.params
 
       const useCase = makeDeleteRoleUseCase()
-      const result = await useCase.execute({ userId: request.userId, workspaceId, roleId })
+      const result = await useCase.execute({
+        userId: request.userId,
+        workspaceId,
+        roleId,
+      })
 
       if (result.isLeft()) {
         const error = result.value
