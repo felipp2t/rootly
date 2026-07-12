@@ -15,6 +15,7 @@ export class DrizzleItemMapper {
         title: raw.title,
         type: raw.type,
         content: raw.content ?? undefined,
+        archivedAt: raw.archivedAt ?? undefined,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt ?? undefined,
       },
@@ -30,6 +31,7 @@ export class DrizzleItemMapper {
       title: item.title,
       type: item.type,
       content: item.content ?? null,
+      archivedAt: item.archivedAt ?? null,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt ?? null,
     }

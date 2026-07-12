@@ -1,5 +1,8 @@
-import { and, eq, isNull } from 'drizzle-orm'
-import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
+import { and, count, eq, isNull } from 'drizzle-orm'
+import type {
+  FindManyItemsOptions,
+  ItemRepository,
+} from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleItemMapper } from '../mappers/drizzle-item-mapper.ts'
@@ -34,7 +37,22 @@ export class DrizzleItemRepository implements ItemRepository {
     userId: string,
     parentId?: string,
     workspaceId?: string,
+    options?: FindManyItemsOptions,
   ): Promise<Item[]> {
+    const scopeCondition =
+      parentId !== undefined
+        ? eq(schema.items.folderId, parentId)
+        : workspaceId !== undefined
+          ? and(
+              eq(schema.items.workspaceId, workspaceId),
+              isNull(schema.items.folderId),
+            )
+          : undefined
+
+    const archivedCondition = options?.includeArchived
+      ? undefined
+      : isNull(schema.items.archivedAt)
+
     const rows = await this.db
       .selectDistinct({ item: schema.items })
       .from(schema.items)
@@ -46,17 +64,21 @@ export class DrizzleItemRepository implements ItemRepository {
         ),
       )
       .where(
-        parentId !== undefined
-          ? eq(schema.items.folderId, parentId)
-          : workspaceId !== undefined
-            ? and(
-                eq(schema.items.workspaceId, workspaceId),
-                isNull(schema.items.folderId),
-              )
-            : undefined,
+        scopeCondition && archivedCondition
+          ? and(scopeCondition, archivedCondition)
+          : (scopeCondition ?? archivedCondition),
       )
 
     return rows.map((row) => DrizzleItemMapper.toDomain(row.item))
+  }
+
+  async hasItems(folderId: string): Promise<boolean> {
+    const [result] = await this.db
+      .select({ total: count() })
+      .from(schema.items)
+      .where(eq(schema.items.folderId, folderId))
+
+    return (result?.total ?? 0) > 0
   }
 
   async create(item: Item): Promise<void> {

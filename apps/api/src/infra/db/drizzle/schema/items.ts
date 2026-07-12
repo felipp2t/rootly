@@ -29,6 +29,7 @@ export const items = pgTable(
     type: itemTypeEnum('type').notNull(),
     title: text('title').notNull(),
     content: text('content'),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -44,6 +45,6 @@ export const items = pgTable(
       name: 'items_folder_id_fkey',
       columns: [table.folderId],
       foreignColumns: [folders.id],
-    }).onDelete('cascade'),
+    }).onDelete('restrict'),
   ],
 )

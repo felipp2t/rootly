@@ -3,7 +3,10 @@ import {
   isPgUniqueViolation,
   UniqueConstraintViolationError,
 } from '@/core/errors/unique-constraint-violation-error.ts'
-import type { FolderRepository, FolderWithCounts } from '@/domain/root/application/repositories/folder-repository.ts'
+import type {
+  FolderRepository,
+  FolderWithCounts,
+} from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
 import type { DrizzleDatabase } from '../index.ts'
 import { DrizzleFolderMapper } from '../mappers/drizzle-folder-mapper.ts'
@@ -77,7 +80,11 @@ export class DrizzleFolderRepository implements FolderRepository {
     return rows.map((row) => DrizzleFolderMapper.toDomain(row))
   }
 
-  async findMany(userId: string, parentId?: string, workspaceId?: string): Promise<Folder[]> {
+  async findMany(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<Folder[]> {
     const rows = await this.db
       .selectDistinct({ folder: schema.folders })
       .from(schema.folders)
@@ -92,14 +99,21 @@ export class DrizzleFolderRepository implements FolderRepository {
         parentId !== undefined
           ? eq(schema.folders.parentId, parentId)
           : workspaceId !== undefined
-            ? and(eq(schema.folders.workspaceId, workspaceId), isNull(schema.folders.parentId))
+            ? and(
+                eq(schema.folders.workspaceId, workspaceId),
+                isNull(schema.folders.parentId),
+              )
             : undefined,
       )
 
     return rows.map((row) => DrizzleFolderMapper.toDomain(row.folder))
   }
 
-  async findManyWithCounts(userId: string, parentId?: string, workspaceId?: string): Promise<FolderWithCounts[]> {
+  async findManyWithCounts(
+    userId: string,
+    parentId?: string,
+    workspaceId?: string,
+  ): Promise<FolderWithCounts[]> {
     const folders = await this.findMany(userId, parentId, workspaceId)
 
     if (folders.length === 0) return []
@@ -110,7 +124,12 @@ export class DrizzleFolderRepository implements FolderRepository {
       this.db
         .select({ folderId: schema.items.folderId, total: count() })
         .from(schema.items)
-        .where(inArray(schema.items.folderId, folderIds))
+        .where(
+          and(
+            inArray(schema.items.folderId, folderIds),
+            isNull(schema.items.archivedAt),
+          ),
+        )
         .groupBy(schema.items.folderId),
       this.db
         .select({ parentId: schema.folders.parentId, total: count() })
@@ -131,6 +150,15 @@ export class DrizzleFolderRepository implements FolderRepository {
       itemCount: itemCountMap[folder.id.toString()] ?? 0,
       subfolderCount: subfolderCountMap[folder.id.toString()] ?? 0,
     }))
+  }
+
+  async hasSubfolders(folderId: string): Promise<boolean> {
+    const [result] = await this.db
+      .select({ total: count() })
+      .from(schema.folders)
+      .where(eq(schema.folders.parentId, folderId))
+
+    return (result?.total ?? 0) > 0
   }
 
   async create(folder: Folder): Promise<void> {
