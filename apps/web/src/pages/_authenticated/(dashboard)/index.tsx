@@ -30,7 +30,7 @@ function RouteSuspense() {
   return (
     <>
       <div className='space-y-1.5'>
-        <h1 className='text-4xl font-bold text-white'>WORKSPACES</h1>
+        <h1 className='text-4xl font-bold text-foreground'>WORKSPACES</h1>
       </div>
 
       <div className='grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4'>
@@ -49,7 +49,7 @@ function WorkspacePage() {
   return (
     <>
       <div className='space-y-1.5'>
-        <h1 className='text-4xl font-bold text-white'>WORKSPACES</h1>
+        <h1 className='text-4xl font-bold text-foreground'>WORKSPACES</h1>
         <InlineCodeRoot>
           <InlineCodeAddon>{`//`}</InlineCodeAddon>
           <InlineCodeText>

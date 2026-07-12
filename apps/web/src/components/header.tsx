@@ -24,11 +24,11 @@ export function Header() {
   }
 
   return (
-    <header className='sticky top-0 z-10 h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm'>
+    <header className='sticky top-0 z-10 h-14 border-b border-border bg-background/80 backdrop-blur-sm'>
       <div className='container mx-auto flex h-full items-center gap-4 px-8'>
         <Link to='/' className='flex items-center gap-2.5'>
           <FoldersIcon className='text-primary' size={20} />
-          <span className='text-xl font-bold text-white uppercase font-mono tracking-widest'>
+          <span className='text-xl font-bold text-foreground uppercase font-mono tracking-widest'>
             Rootly
           </span>
         </Link>
@@ -41,7 +41,7 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='size-8 cursor-pointer rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+              className='size-8 cursor-pointer rounded-full bg-accent flex items-center justify-center text-xs font-medium text-accent-foreground transition-colors hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
             >
               U
             </button>

@@ -88,7 +88,7 @@ function WorkspaceCard({ workspace, className, ...props }: WorkspaceCardProps) {
         className='absolute top-4 right-4'
       >
         <Button size='icon-sm' className='cursor-pointer group bg-transparent'>
-          <Settings2Icon className='size-4 group-hover:text-white text-muted-foreground transition-all' />
+          <Settings2Icon className='size-4 group-hover:text-foreground text-muted-foreground transition-all' />
         </Button>
       </Link>
     </div>

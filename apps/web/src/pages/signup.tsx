@@ -120,12 +120,8 @@ function RouteComponent() {
                   href='/'
                   className='flex flex-col items-center gap-2 font-medium'
                 >
-                  <div className='flex size-8 items-center justify-center rounded-md'>
-                    <HugeiconsIcon
-                      icon={FolderLibraryIcon}
-                      size={24}
-                      color='#fff'
-                    />
+                  <div className='flex size-8 items-center justify-center rounded-md text-foreground'>
+                    <HugeiconsIcon icon={FolderLibraryIcon} size={24} />
                   </div>
                   <span className='sr-only'>Acme Inc.</span>
                 </a>

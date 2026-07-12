@@ -21,7 +21,7 @@ function RouteComponent() {
   return (
     <div className='relative h-svh'>
       <GridPattern />
-      <div className='relative z-10 flex h-full flex-col bg-zinc-950/80'>
+      <div className='relative z-10 flex h-full flex-col bg-background/80'>
         <Header />
         <div className='flex flex-1 overflow-hidden'>
           <ScrollArea className='flex-1'>

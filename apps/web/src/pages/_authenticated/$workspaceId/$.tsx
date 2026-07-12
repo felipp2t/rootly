@@ -39,7 +39,7 @@ function RouteSuspense() {
   return (
     <>
       <div className='space-y-1.5'>
-        <h1 className='text-4xl font-bold text-white'>FOLDER</h1>
+        <h1 className='text-4xl font-bold text-foreground'>FOLDER</h1>
       </div>
 
       <FoldersSectionSkeleton />

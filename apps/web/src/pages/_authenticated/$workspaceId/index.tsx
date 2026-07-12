@@ -36,7 +36,7 @@ function RouteSuspense() {
   return (
     <>
       <div className='space-y-1.5'>
-        <h1 className='text-4xl font-bold text-white'>WORKSPACES</h1>
+        <h1 className='text-4xl font-bold text-foreground'>WORKSPACES</h1>
       </div>
 
       <FoldersSectionSkeleton />
