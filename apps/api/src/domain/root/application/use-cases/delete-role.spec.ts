@@ -185,4 +185,27 @@ describe('DeleteRole', () => {
     expect(response.value).toBeInstanceOf(RoleInUseError)
     expect(workspaceRoleRepository.items).toHaveLength(1)
   })
+
+  it('should tag the role-deleted event with the caller as actorId', {
+    tags: ['delete-role'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+    })
+
+    const event = role.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: user.id.toString() })
+  })
 })

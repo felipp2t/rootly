@@ -468,4 +468,66 @@ describe('SetRolePermissions', () => {
       expect(actionsFor(role.id.toString(), 'workspace')).toEqual(['all'])
     })
   })
+
+  it('should tag the role-permissions-changed event with the caller as actorId', {
+    tags: ['set-role-permissions'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(role)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+      permissions: [{ resource: 'folder', action: 'read' }],
+    })
+
+    const event = role.domainEvents.at(-1)
+    expect(event).toMatchObject({
+      actorId: user.id.toString(),
+      changes: {
+        before: [],
+        after: [{ resource: 'folder', action: 'read' }],
+      },
+    })
+  })
+
+  it('should not fire a role-permissions-changed event when the permission set is unchanged', {
+    tags: ['set-role-permissions'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const role = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    role.clearEvents()
+    workspaceRoleRepository.items.push(role)
+
+    rolePermissionRepository.items.push(
+      RolePermission.create({
+        roleId: role.id.toString(),
+        resource: 'folder',
+        action: 'read',
+      }),
+    )
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: role.id.toString(),
+      permissions: [{ resource: 'folder', action: 'read' }],
+    })
+
+    expect(role.domainEvents).toHaveLength(0)
+  })
 })

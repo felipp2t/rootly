@@ -126,4 +126,22 @@ describe('CreateRole', () => {
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(RoleAlreadyExistsError)
   })
+
+  it('should tag the role-created event with the caller as actorId', {
+    tags: ['create-role'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+
+    const role = workspaceRoleRepository.items[0]
+    const event = role.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: user.id.toString() })
+  })
 })
