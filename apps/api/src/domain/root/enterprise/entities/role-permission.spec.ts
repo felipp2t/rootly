@@ -61,7 +61,8 @@ describe('RolePermission', () => {
     expect(permissionResource).toContain('item')
     expect(permissionResource).toContain('member')
     expect(permissionResource).toContain('role')
-    expect(permissionResource).toHaveLength(5)
+    expect(permissionResource).toContain('activity')
+    expect(permissionResource).toHaveLength(6)
   })
 
   it('should expose the permissionAction constant with all expected actions', () => {

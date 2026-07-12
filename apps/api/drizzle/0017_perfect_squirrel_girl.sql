@@ -1,0 +1,1 @@
+ALTER TYPE "public"."permission_resource" ADD VALUE 'activity';

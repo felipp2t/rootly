@@ -8,6 +8,7 @@ export const permissionResource = [
   'item',
   'member',
   'role',
+  'activity',
 ] as const
 
 export type PermissionResource = (typeof permissionResource)[number]
