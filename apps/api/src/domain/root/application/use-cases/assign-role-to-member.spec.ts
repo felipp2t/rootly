@@ -165,6 +165,39 @@ describe('AssignRoleToMember', () => {
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
+  it('should tag the role-changed event with the caller as actorId', async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const oldRole = WorkspaceRole.create({
+      name: 'Viewer',
+      workspaceId: workspace.id.toString(),
+    })
+    const newRole = WorkspaceRole.create({
+      name: 'Developer',
+      workspaceId: workspace.id.toString(),
+    })
+    workspaceRoleRepository.items.push(oldRole, newRole)
+
+    const member = makeWorkspaceMember({
+      userId: makeUser().id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: oldRole.id.toString(),
+    })
+    workspaceMemberRepository.items.push(member)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      memberId: member.id.toString(),
+      roleId: newRole.id.toString(),
+    })
+
+    const event = member.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: user.id.toString() })
+  })
+
   it('should return ResourceNotFoundError when the role belongs to a different workspace', async () => {
     const user = makeUser()
     const workspaceA = makeWorkspace({ userId: user.id.toString() })

@@ -74,9 +74,11 @@ describe('GET /workspaces/:workspaceId/activity', () => {
       actorName: 'John Doe',
     })
 
+    // Filtered to 'folder' because creating a workspace also fires a real
+    // (fire-and-forget) member_joined activity log for the owner.
     const response = await app.inject({
       method: 'GET',
-      url: `/api/workspaces/${workspaceId}/activity`,
+      url: `/api/workspaces/${workspaceId}/activity?resourceType=folder`,
       headers: { cookie: cookieHeader },
     })
 

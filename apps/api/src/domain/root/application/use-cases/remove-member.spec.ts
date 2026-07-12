@@ -109,6 +109,28 @@ describe('RemoveMember', () => {
     expect(response.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
+  it('should tag the removed-member event with the caller as actorId', async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    workspaceRepository.items.push(workspace)
+
+    const member = makeWorkspaceMember({
+      userId: makeUser().id.toString(),
+      workspaceId: workspace.id.toString(),
+      roleId: 'any-role-id',
+    })
+    workspaceMemberRepository.items.push(member)
+
+    await sut.execute({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+      memberId: member.id.toString(),
+    })
+
+    const event = member.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: user.id.toString() })
+  })
+
   it('should return NotAllowedError when trying to remove the workspace owner', async () => {
     const owner = makeUser()
     const workspace = makeWorkspace({ userId: owner.id.toString() })

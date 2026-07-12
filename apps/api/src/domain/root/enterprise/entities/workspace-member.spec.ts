@@ -1,4 +1,6 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { MemberRemovedEvent } from '../events/member-removed-event.ts'
+import { MemberRoleChangedEvent } from '../events/member-role-changed-event.ts'
 import { WorkspaceMember } from './workspace-member.ts'
 
 describe('WorkspaceMember', () => {
@@ -78,6 +80,49 @@ describe('WorkspaceMember', () => {
     member.roleId = 'role-new'
 
     expect(member.roleId).toBe('role-new')
-    expect(member.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime())
+    expect(member.updatedAt.getTime()).toBeGreaterThanOrEqual(
+      beforeUpdate.getTime(),
+    )
+  })
+
+  it('should register a MemberRoleChangedEvent with before/after and actorId on changeRole', () => {
+    const member = WorkspaceMember.create(
+      { userId: 'user-1', workspaceId: 'ws-1', roleId: 'role-old' },
+      new UniqueEntityID('member-1'),
+    )
+
+    member.changeRole('role-new', 'actor-1')
+
+    expect(member.domainEvents).toHaveLength(1)
+    const event = member.domainEvents[0] as MemberRoleChangedEvent
+    expect(event).toBeInstanceOf(MemberRoleChangedEvent)
+    expect(event.changes).toEqual({ before: 'role-old', after: 'role-new' })
+    expect(event.actorId).toBe('actor-1')
+    expect(member.roleId).toBe('role-new')
+  })
+
+  it('should not register a MemberRoleChangedEvent when the role does not change', () => {
+    const member = WorkspaceMember.create(
+      { userId: 'user-1', workspaceId: 'ws-1', roleId: 'role-1' },
+      new UniqueEntityID('member-1'),
+    )
+
+    member.changeRole('role-1', 'actor-1')
+
+    expect(member.domainEvents).toHaveLength(0)
+  })
+
+  it('should register a MemberRemovedEvent with actorId on remove', () => {
+    const member = WorkspaceMember.create(
+      { userId: 'user-1', workspaceId: 'ws-1', roleId: 'role-1' },
+      new UniqueEntityID('member-1'),
+    )
+
+    member.remove('actor-1')
+
+    expect(member.domainEvents).toHaveLength(1)
+    const event = member.domainEvents[0] as MemberRemovedEvent
+    expect(event).toBeInstanceOf(MemberRemovedEvent)
+    expect(event.actorId).toBe('actor-1')
   })
 })
