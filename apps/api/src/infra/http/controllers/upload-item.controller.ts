@@ -1,6 +1,6 @@
 import type { MultipartValue } from '@fastify/multipart'
-import { validatorCompiler as zodValidatorCompiler } from 'fastify-type-provider-zod'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
+import { validatorCompiler as zodValidatorCompiler } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeCreateItemUseCase } from '../factories/make-create-item-use-case.ts'
 import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
