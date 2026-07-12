@@ -13,6 +13,7 @@ export const RESOURCES = [
   'item',
   'member',
   'role',
+  'activity',
 ] as const
 
 export const ACTIONS = [
@@ -29,11 +30,17 @@ export const ACTIONS = [
 //   gated by a role.
 // - `invite` only applies to members, so it is disallowed for every other
 //   resource.
+// - Activity logs are an append-only audit trail written internally by the
+//   system, never by a user action, so only `read` is meaningful for it.
 const DISALLOWED_PERMISSIONS: { resource: Resource; action: Action }[] = [
   { resource: 'workspace', action: 'create' },
   ...RESOURCES.filter((resource) => resource !== 'member').map((resource) => ({
     resource,
     action: 'invite' as const,
+  })),
+  ...(['create', 'update', 'delete'] as const).map((action) => ({
+    resource: 'activity' as const,
+    action,
   })),
 ]
 
