@@ -127,6 +127,13 @@
       "when": 1783824995500,
       "tag": "0017_perfect_squirrel_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783829669325,
+      "tag": "0018_nostalgic_stepford_cuckoos",
+      "breakpoints": true
     }
   ]
 }
