@@ -4783,7 +4783,8 @@
               "enum": [
                 "folder",
                 "item",
-                "member"
+                "member",
+                "workspace"
               ]
             },
             "in": "query",
@@ -4823,7 +4824,8 @@
                             "enum": [
                               "folder",
                               "item",
-                              "member"
+                              "member",
+                              "workspace"
                             ]
                           },
                           "resourceId": {
@@ -4846,7 +4848,8 @@
                               "member_invited",
                               "member_joined",
                               "member_role_changed",
-                              "member_removed"
+                              "member_removed",
+                              "workspace_renamed"
                             ]
                           },
                           "actorUserId": {

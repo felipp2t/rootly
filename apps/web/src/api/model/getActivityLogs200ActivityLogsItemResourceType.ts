@@ -12,4 +12,5 @@ export const GetActivityLogs200ActivityLogsItemResourceType = {
   folder: 'folder',
   item: 'item',
   member: 'member',
+  workspace: 'workspace',
 } as const;

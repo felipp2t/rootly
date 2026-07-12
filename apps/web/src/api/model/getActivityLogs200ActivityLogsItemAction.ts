@@ -21,4 +21,5 @@ export const GetActivityLogs200ActivityLogsItemAction = {
   member_joined: 'member_joined',
   member_role_changed: 'member_role_changed',
   member_removed: 'member_removed',
+  workspace_renamed: 'workspace_renamed',
 } as const;
