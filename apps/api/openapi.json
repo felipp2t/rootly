@@ -4784,7 +4784,8 @@
                 "folder",
                 "item",
                 "member",
-                "workspace"
+                "workspace",
+                "role"
               ]
             },
             "in": "query",
@@ -4825,7 +4826,8 @@
                               "folder",
                               "item",
                               "member",
-                              "workspace"
+                              "workspace",
+                              "role"
                             ]
                           },
                           "resourceId": {
@@ -4849,7 +4851,10 @@
                               "member_joined",
                               "member_role_changed",
                               "member_removed",
-                              "workspace_renamed"
+                              "workspace_renamed",
+                              "role_created",
+                              "role_deleted",
+                              "role_permissions_changed"
                             ]
                           },
                           "actorUserId": {

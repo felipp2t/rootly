@@ -22,4 +22,7 @@ export const GetActivityLogs200ActivityLogsItemAction = {
   member_role_changed: 'member_role_changed',
   member_removed: 'member_removed',
   workspace_renamed: 'workspace_renamed',
+  role_created: 'role_created',
+  role_deleted: 'role_deleted',
+  role_permissions_changed: 'role_permissions_changed',
 } as const;

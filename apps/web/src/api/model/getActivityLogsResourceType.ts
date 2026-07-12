@@ -13,4 +13,5 @@ export const GetActivityLogsResourceType = {
   item: 'item',
   member: 'member',
   workspace: 'workspace',
+  role: 'role',
 } as const;
