@@ -13,6 +13,7 @@ import type {
   GetActivityLogs200ActivityLogsItem,
   GetActivityLogs200ActivityLogsItemAction,
 } from '@/api/model'
+import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -152,17 +153,83 @@ function MetadataDiff({
   if (keys.length === 0) return null
 
   return (
-    <div className='flex flex-col gap-0.5'>
-      {keys.map((key) => (
-        <span
-          key={key}
-          className='flex items-center gap-1 font-mono text-[11px] text-muted-foreground'
+    <div className='flex flex-col gap-1 min-w-0 max-w-full'>
+      {keys.map((key) => {
+        const beforeValue = before[key]
+        const afterValue = after[key]
+
+        if (Array.isArray(beforeValue) || Array.isArray(afterValue)) {
+          return (
+            <ListMetadataDiff
+              key={key}
+              label={key}
+              before={Array.isArray(beforeValue) ? beforeValue : []}
+              after={Array.isArray(afterValue) ? afterValue : []}
+            />
+          )
+        }
+
+        return (
+          <span
+            key={key}
+            className='flex flex-wrap items-center gap-1 min-w-0 max-w-full font-mono text-[11px] text-muted-foreground'
+          >
+            <span className='shrink-0'>{key}:</span>
+            <span className='line-through break-all'>
+              {String(beforeValue ?? '—')}
+            </span>
+            <ArrowRightIcon className='size-2.5 shrink-0' />
+            <span className='text-foreground break-all'>
+              {String(afterValue ?? '—')}
+            </span>
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
+/**
+ * Array-valued metadata (e.g. a role's permission list) can grow large
+ * enough that a single joined string would overflow the card, so it's
+ * rendered as a wrapping added/removed diff instead of a full snapshot.
+ */
+function ListMetadataDiff({
+  label,
+  before,
+  after,
+}: {
+  label: string
+  before: unknown[]
+  after: unknown[]
+}) {
+  const beforeItems = before.map(String)
+  const afterItems = after.map(String)
+  const beforeSet = new Set(beforeItems)
+  const afterSet = new Set(afterItems)
+  const removed = beforeItems.filter((value) => !afterSet.has(value))
+  const added = afterItems.filter((value) => !beforeSet.has(value))
+
+  if (removed.length === 0 && added.length === 0) return null
+
+  return (
+    <div className='flex flex-wrap items-center gap-1 min-w-0 max-w-full font-mono text-[11px] text-muted-foreground'>
+      <span className='shrink-0'>{label}:</span>
+      {removed.map((value) => (
+        <Badge
+          key={`removed-${value}`}
+          className='border-red-500/25 bg-red-500/10 text-red-500 line-through'
         >
-          {key}:
-          <span className='line-through'>{String(before[key] ?? '—')}</span>
-          <ArrowRightIcon className='size-2.5 shrink-0' />
-          <span className='text-foreground'>{String(after[key] ?? '—')}</span>
-        </span>
+          {value}
+        </Badge>
+      ))}
+      {added.map((value) => (
+        <Badge
+          key={`added-${value}`}
+          className='border-emerald-500/25 bg-emerald-500/10 text-emerald-600'
+        >
+          {value}
+        </Badge>
       ))}
     </div>
   )
