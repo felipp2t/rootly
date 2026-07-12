@@ -1,0 +1,1 @@
+ALTER TYPE "public"."activity_action" ADD VALUE 'folder_renamed' BEFORE 'folder_deleted';

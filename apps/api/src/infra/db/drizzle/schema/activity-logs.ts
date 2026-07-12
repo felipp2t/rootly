@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
+import type { ActivityLogMetadata } from '@/domain/activity/enterprise/entities/activity-log.ts'
 import { nanoid } from '@/infra/db/drizzle/helpers/nanoid.ts'
 import { workspaces } from './workspaces.ts'
 
@@ -16,6 +17,7 @@ export const activityResourceTypeEnum = pgEnum('activity_resource_type', [
 
 export const activityActionEnum = pgEnum('activity_action', [
   'folder_created',
+  'folder_renamed',
   'folder_deleted',
   'item_created',
   'item_updated',
@@ -23,11 +25,6 @@ export const activityActionEnum = pgEnum('activity_action', [
   'item_restored',
   'item_deleted',
 ])
-
-export type ActivityLogMetadata = {
-  before?: Record<string, unknown>
-  after?: Record<string, unknown>
-}
 
 export const activityLogs = pgTable(
   'activity_logs',
