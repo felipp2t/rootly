@@ -28,7 +28,7 @@ export class UpdateWorkspaceUseCase {
       return left(new ResourceNotFoundError('Workspace'))
     }
 
-    workspace.name = name
+    workspace.rename(name, userId)
 
     await this.workspaceRepository.save(workspace)
 
