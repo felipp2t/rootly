@@ -57,7 +57,7 @@ export class RevokeInviteUseCase {
       return left(new NotAllowedError('Only pending invites can be revoked'))
     }
 
-    invite.revoke()
+    invite.revoke(userId)
 
     await this.workspaceInviteRepository.save(invite)
 

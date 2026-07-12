@@ -3,6 +3,8 @@ export const INVITE_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000
 import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { InviteDeclinedEvent } from '../events/invite-declined-event.ts'
+import { InviteRevokedEvent } from '../events/invite-revoked-event.ts'
 import { UserInvitedEvent } from '../events/user-invited-event.ts'
 
 export const workspaceInviteStatus = {
@@ -73,14 +75,18 @@ export class WorkspaceInvite extends AggregateRoot<WorkspaceInviteProps> {
     this.touch()
   }
 
-  decline() {
+  decline(actorId?: string) {
     this.props.status = workspaceInviteStatus.DECLINED
     this.touch()
+
+    this.addDomainEvent(new InviteDeclinedEvent(this, actorId))
   }
 
-  revoke() {
+  revoke(actorId?: string) {
     this.props.status = workspaceInviteStatus.REVOKED
     this.touch()
+
+    this.addDomainEvent(new InviteRevokedEvent(this, actorId))
   }
 
   static create(

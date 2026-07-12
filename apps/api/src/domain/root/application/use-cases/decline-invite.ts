@@ -39,10 +39,12 @@ export class DeclineInviteUseCase {
     }
 
     if (workspaceInvite.invitedUserId !== userId) {
-      return left(new NotAllowedError('User is not allowed to decline this invite'))
+      return left(
+        new NotAllowedError('User is not allowed to decline this invite'),
+      )
     }
 
-    workspaceInvite.decline()
+    workspaceInvite.decline(userId)
 
     await this.workspaceInviteRepository.save(workspaceInvite)
 
