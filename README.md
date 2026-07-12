@@ -3,70 +3,71 @@
 [![CI](https://github.com/felipp2t/rootly/actions/workflows/ci.yml/badge.svg)](https://github.com/felipp2t/rootly/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Rootly é uma plataforma de organização de conhecimento em equipe. Workspaces compartilhados onde
-times podem criar pastas, salvar links, documentos, segredos e anotações — tudo em um só lugar,
-com controle de acesso por papéis e um log de auditoria completo.
+Rootly is a team knowledge organization platform. Shared workspaces where teams can create
+folders, save links, documents, secrets and notes — all in one place, with role-based access
+control and a full audit log.
 
-Full-stack TypeScript monorepo escrito com **Clean Architecture + DDD** no backend e
-**React + TanStack** no frontend — projeto de portfólio focado em profundidade de arquitetura,
-não só em CRUD.
+Full-stack TypeScript monorepo built with **Clean Architecture + DDD** on the backend and
+**React + TanStack** on the frontend — a portfolio project focused on architectural depth, not
+just CRUD.
 
-## Funcionalidades
+## Features
 
-- **Workspaces** — espaços de trabalho colaborativos, multi-tenant, com convites e roles
-- **RBAC granular** — roles customizáveis por workspace, permissões por recurso/ação (`read`,
+- **Workspaces** — collaborative, multi-tenant workspaces with invites and roles
+- **Granular RBAC** — custom roles per workspace, permissions per resource/action (`read`,
   `create`, `update`, `delete`, `invite`, `all`)
-- **Pastas e itens** — organize conteúdo em hierarquias de pastas; tipos de item: link, documento,
-  segredo e texto
-- **Upload de arquivos** — itens do tipo documento podem ser enviados como arquivo, armazenados em
-  object storage (MinIO/S3)
-- **Log de atividades** — auditoria completa de quem fez o quê e quando, cobrindo pastas, itens,
-  membros, workspaces e roles
-- **Notificações em tempo real** — via WebSocket
-- **Autenticação** — registro, login e sessões seguras via JWT (cookies HTTP-only) + Argon2
-- **Documentação de API interativa** — Swagger UI gerado a partir dos schemas Zod das rotas
+- **Folders & items** — organize content in folder hierarchies; item types: link, document,
+  secret and text
+- **File upload** — document items can be uploaded as files, stored in object storage
+  (MinIO/S3)
+- **Activity log** — full audit trail of who did what and when, covering folders, items,
+  members, workspaces and roles
+- **Real-time notifications** — pushed over WebSocket
+- **Authentication** — registration, login and secure sessions via JWT (HTTP-only cookies) +
+  Argon2
+- **Interactive API docs** — Swagger UI generated from the routes' Zod schemas
 
 ## Apps
 
-| App | Descrição | README |
+| App | Description | README |
 |-----|-----------|--------|
-| `apps/api` | API REST (Fastify + Drizzle + PostgreSQL) | [apps/api/README.md](apps/api/README.md) |
-| `apps/web` | Interface web (React + Vite + TanStack) | [apps/web/README.md](apps/web/README.md) |
+| `apps/api` | REST API (Fastify + Drizzle + PostgreSQL) | [apps/api/README.md](apps/api/README.md) |
+| `apps/web` | Web interface (React + Vite + TanStack) | [apps/web/README.md](apps/web/README.md) |
 
-## Qualidade
+## Quality
 
-- **625 testes automatizados** (529 unitários com repositórios em memória + 96 e2e contra um
-  Postgres real via Testcontainers), 97%+ de cobertura de statements na API
-- **CI** rodando lint, typecheck, build e a suíte completa de testes a cada push/PR
-- Domínio isolado de infraestrutura (Clean Architecture): entidades e casos de uso não conhecem
-  Fastify, Drizzle ou HTTP
+- **625 automated tests** (529 unit tests with in-memory repositories + 96 e2e tests against a
+  real Postgres via Testcontainers), 97%+ statement coverage on the API
+- **CI** running lint, typecheck, build and the full test suite on every push/PR
+- Domain isolated from infrastructure (Clean Architecture): entities and use cases know nothing
+  about Fastify, Drizzle or HTTP
 
-## Início rápido
+## Quick start
 
 ```bash
-# instalar dependências
+# install dependencies
 pnpm install
 
-# subir Postgres + MinIO (ver apps/api/README.md para detalhes de configuração)
+# start Postgres + MinIO (see apps/api/README.md for configuration details)
 cd apps/api && cp .env.example .env && docker compose up -d && pnpm db:migrate
 cd ../..
 
-# rodar API + Web simultaneamente
+# run API + Web together
 pnpm dev
 
-# ou separadamente
+# or separately
 pnpm dev:api
 pnpm dev:web
 ```
 
-API em `http://localhost:3333` (docs em `/docs`), web em `http://localhost:5173`.
+API at `http://localhost:3333` (docs at `/docs`), web at `http://localhost:5173`.
 
-Para popular o banco com dados de demonstração (usuários, workspaces, roles, pastas e itens
-fake): `pnpm --filter api db:seed`.
+To seed the database with demo data (users, workspaces, roles, folders and fake items):
+`pnpm --filter api db:seed`.
 
-Para detalhes de configuração, arquitetura e comandos de cada app, consulte o `README.md` dentro
-de cada pasta em `apps/`.
+For configuration, architecture and command details for each app, see the `README.md` inside
+each folder under `apps/`.
 
-## Licença
+## License
 
 [MIT](LICENSE)
