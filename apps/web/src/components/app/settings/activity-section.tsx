@@ -1,4 +1,4 @@
-import { FolderIcon, ShieldOffIcon, TextIcon } from 'lucide-react'
+import { FolderIcon, ShieldOffIcon, TextIcon, UserIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { useGetActivityLogsSuspense } from '@/api/activity/activity'
 import type {
@@ -20,6 +20,10 @@ const ACTION_LABELS: Record<GetActivityLogs200ActivityLogsItemAction, string> =
     item_archived: 'archived item',
     item_restored: 'restored item',
     item_deleted: 'deleted item',
+    member_invited: 'invited',
+    member_joined: 'joined the workspace',
+    member_role_changed: 'changed role for',
+    member_removed: 'removed',
   }
 
 export function ActivitySection({ workspaceId }: { workspaceId: string }) {
@@ -77,7 +81,14 @@ function ActivityLogRow({
   log: GetActivityLogs200ActivityLogsItem
   striped: boolean
 }) {
-  const Icon = log.resourceType === 'folder' ? FolderIcon : TextIcon
+  const Icon =
+    log.resourceType === 'folder'
+      ? FolderIcon
+      : log.resourceType === 'member'
+        ? UserIcon
+        : TextIcon
+
+  const isSelfAction = log.action === 'member_joined'
 
   return (
     <div
@@ -94,8 +105,13 @@ function ActivityLogRow({
           <span className='font-semibold uppercase'>{log.actorName}</span>{' '}
           <span className='text-muted-foreground'>
             {ACTION_LABELS[log.action]}
-          </span>{' '}
-          <span className='font-semibold'>"{log.resourceName}"</span>
+          </span>
+          {!isSelfAction && (
+            <>
+              {' '}
+              <span className='font-semibold'>"{log.resourceName}"</span>
+            </>
+          )}
         </span>
         <MetadataDiff metadata={log.metadata} />
         <span className='font-mono text-xs text-muted-foreground'>
