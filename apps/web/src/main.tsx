@@ -3,6 +3,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { ThemeProvider } from 'next-themes'
 import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
+import { AccentProvider } from '@/lib/accent.tsx'
 import { AuthProvider, useAuth } from '@/lib/auth.tsx'
 import { STORAGE_KEYS } from '@/lib/storage.ts'
 import './globals.css'
@@ -40,12 +41,14 @@ createRoot(document.getElementById('root')!).render(
       enableSystem
       storageKey={STORAGE_KEYS.THEME}
     >
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <App />
-          <Toaster richColors />
-        </AuthProvider>
-      </QueryClientProvider>
+      <AccentProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <App />
+            <Toaster richColors />
+          </AuthProvider>
+        </QueryClientProvider>
+      </AccentProvider>
     </ThemeProvider>
   </StrictMode>,
 )

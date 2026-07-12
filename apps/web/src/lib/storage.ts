@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
   THEME: 'vite-ui-theme',
+  ACCENT: 'vite-ui-accent',
 } as const
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS]

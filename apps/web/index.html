@@ -6,16 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>web</title>
     <script>
-      // Key must match STORAGE_KEYS.THEME in src/lib/storage.ts
+      // Keys must match STORAGE_KEYS.THEME / STORAGE_KEYS.ACCENT in src/lib/storage.ts
       ;(() => {
-        var stored = localStorage.getItem('vite-ui-theme') || 'dark'
-        var resolved =
-          stored === 'system'
+        var storedTheme = localStorage.getItem('vite-ui-theme') || 'dark'
+        var resolvedTheme =
+          storedTheme === 'system'
             ? window.matchMedia('(prefers-color-scheme: dark)').matches
               ? 'dark'
               : 'light'
-            : stored
-        document.documentElement.classList.add(resolved)
+            : storedTheme
+        document.documentElement.classList.add(resolvedTheme)
+
+        var storedAccent = localStorage.getItem('vite-ui-accent') || 'green'
+        document.documentElement.setAttribute('data-accent', storedAccent)
       })()
     </script>
   </head>

@@ -90,6 +90,111 @@
   --sidebar-ring: oklch(0.899 0.222 153);
 }
 
+/* Accent color overrides — light mode uses a -600 shade with white
+   foreground, dark mode a -400 shade with black foreground, matching the
+   contrast pattern of the default green accent above. */
+[data-accent="blue"] {
+  --primary: var(--color-blue-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-blue-600);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-blue-600);
+}
+.dark[data-accent="blue"] {
+  --primary: var(--color-blue-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-blue-400);
+  --sidebar-primary: var(--color-blue-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-blue-400);
+}
+
+[data-accent="purple"] {
+  --primary: var(--color-purple-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-purple-600);
+  --sidebar-primary: var(--color-purple-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-purple-600);
+}
+.dark[data-accent="purple"] {
+  --primary: var(--color-purple-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-purple-400);
+  --sidebar-primary: var(--color-purple-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-purple-400);
+}
+
+[data-accent="orange"] {
+  --primary: var(--color-orange-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-orange-600);
+  --sidebar-primary: var(--color-orange-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-orange-600);
+}
+.dark[data-accent="orange"] {
+  --primary: var(--color-orange-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-orange-400);
+  --sidebar-primary: var(--color-orange-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-orange-400);
+}
+
+[data-accent="red"] {
+  --primary: var(--color-red-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-red-600);
+  --sidebar-primary: var(--color-red-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-red-600);
+}
+.dark[data-accent="red"] {
+  --primary: var(--color-red-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-red-400);
+  --sidebar-primary: var(--color-red-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-red-400);
+}
+
+[data-accent="pink"] {
+  --primary: var(--color-pink-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-pink-600);
+  --sidebar-primary: var(--color-pink-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-pink-600);
+}
+.dark[data-accent="pink"] {
+  --primary: var(--color-pink-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-pink-400);
+  --sidebar-primary: var(--color-pink-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-pink-400);
+}
+
+[data-accent="cyan"] {
+  --primary: var(--color-cyan-600);
+  --primary-foreground: var(--color-white);
+  --ring: var(--color-cyan-600);
+  --sidebar-primary: var(--color-cyan-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-ring: var(--color-cyan-600);
+}
+.dark[data-accent="cyan"] {
+  --primary: var(--color-cyan-400);
+  --primary-foreground: var(--color-black);
+  --ring: var(--color-cyan-400);
+  --sidebar-primary: var(--color-cyan-400);
+  --sidebar-primary-foreground: var(--color-black);
+  --sidebar-ring: var(--color-cyan-400);
+}
+
 @theme inline {
     --font-sans: 'JetBrains Mono', monospace;
     --color-sidebar-ring: var(--sidebar-ring);
