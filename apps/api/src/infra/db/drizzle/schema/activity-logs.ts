@@ -13,6 +13,7 @@ import { workspaces } from './workspaces.ts'
 export const activityResourceTypeEnum = pgEnum('activity_resource_type', [
   'folder',
   'item',
+  'member',
 ])
 
 export const activityActionEnum = pgEnum('activity_action', [
@@ -24,6 +25,10 @@ export const activityActionEnum = pgEnum('activity_action', [
   'item_archived',
   'item_restored',
   'item_deleted',
+  'member_invited',
+  'member_joined',
+  'member_role_changed',
+  'member_removed',
 ])
 
 export const activityLogs = pgTable(
