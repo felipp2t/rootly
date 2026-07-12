@@ -2,6 +2,8 @@ import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 import { MemberJoinedEvent } from '../events/member-joined-event.ts'
+import { MemberRemovedEvent } from '../events/member-removed-event.ts'
+import { MemberRoleChangedEvent } from '../events/member-role-changed-event.ts'
 
 export interface WorkspaceMemberProps {
   userId: string
@@ -39,6 +41,21 @@ export class WorkspaceMember extends AggregateRoot<WorkspaceMemberProps> {
 
   private touch() {
     this.props.updatedAt = new Date()
+  }
+
+  changeRole(roleId: string, actorId?: string) {
+    if (roleId === this.props.roleId) return
+
+    const before = this.props.roleId
+    this.roleId = roleId
+
+    this.addDomainEvent(
+      new MemberRoleChangedEvent(this, { before, after: roleId }, actorId),
+    )
+  }
+
+  remove(actorId?: string) {
+    this.addDomainEvent(new MemberRemovedEvent(this, actorId))
   }
 
   static create(

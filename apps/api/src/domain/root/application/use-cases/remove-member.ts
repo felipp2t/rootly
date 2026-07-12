@@ -43,6 +43,8 @@ export class RemoveMemberUseCase {
       return left(new NotAllowedError('Cannot remove the workspace owner'))
     }
 
+    member.remove(userId)
+
     await this.workspaceMemberRepository.delete(memberId)
 
     return right(null)

@@ -48,7 +48,7 @@ export class AssignRoleToMemberUseCase {
       return left(new ResourceNotFoundError('Role'))
     }
 
-    member.roleId = roleId
+    member.changeRole(roleId, userId)
 
     await this.workspaceMemberRepository.save(member)
 
