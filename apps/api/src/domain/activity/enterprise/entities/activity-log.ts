@@ -2,7 +2,7 @@ import { Entity } from '@/core/entities/entity.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 
-export type ActivityResourceType = 'folder' | 'item' | 'member'
+export type ActivityResourceType = 'folder' | 'item' | 'member' | 'workspace'
 
 export type ActivityAction =
   | 'folder_created'
@@ -17,6 +17,7 @@ export type ActivityAction =
   | 'member_joined'
   | 'member_role_changed'
   | 'member_removed'
+  | 'workspace_renamed'
 
 export interface ActivityLogMetadata {
   before?: Record<string, unknown>

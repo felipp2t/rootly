@@ -21,7 +21,9 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
         }),
         querystring: z.object({
           resourceId: z.string().optional(),
-          resourceType: z.enum(['folder', 'item', 'member']).optional(),
+          resourceType: z
+            .enum(['folder', 'item', 'member', 'workspace'])
+            .optional(),
         }),
         response: {
           200: z.object({
@@ -29,7 +31,7 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
               z.object({
                 id: z.string(),
                 workspaceId: z.string(),
-                resourceType: z.enum(['folder', 'item', 'member']),
+                resourceType: z.enum(['folder', 'item', 'member', 'workspace']),
                 resourceId: z.string(),
                 resourceName: z.string(),
                 action: z.enum([
@@ -45,6 +47,7 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
                   'member_joined',
                   'member_role_changed',
                   'member_removed',
+                  'workspace_renamed',
                 ]),
                 actorUserId: z.string(),
                 actorName: z.string(),

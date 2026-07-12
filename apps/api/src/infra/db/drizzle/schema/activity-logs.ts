@@ -14,6 +14,7 @@ export const activityResourceTypeEnum = pgEnum('activity_resource_type', [
   'folder',
   'item',
   'member',
+  'workspace',
 ])
 
 export const activityActionEnum = pgEnum('activity_action', [
@@ -29,6 +30,7 @@ export const activityActionEnum = pgEnum('activity_action', [
   'member_joined',
   'member_role_changed',
   'member_removed',
+  'workspace_renamed',
 ])
 
 export const activityLogs = pgTable(
