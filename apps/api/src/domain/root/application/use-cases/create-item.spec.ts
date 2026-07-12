@@ -361,7 +361,9 @@ describe('CreateFolder', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(storageRepository.uploads[0].mimeType).toBe('application/octet-stream')
+    expect(storageRepository.uploads[0].mimeType).toBe(
+      'application/octet-stream',
+    )
   })
 
   it('should use application/octet-stream as mimeType when fileName has an unknown extension', {
@@ -383,6 +385,25 @@ describe('CreateFolder', () => {
     })
 
     expect(response.isRight()).toBe(true)
-    expect(storageRepository.uploads[0].mimeType).toBe('application/octet-stream')
+    expect(storageRepository.uploads[0].mimeType).toBe(
+      'application/octet-stream',
+    )
+  })
+
+  it('should tag the created item with the provided actorId', {
+    tags: ['create-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
+    await sut.execute({
+      workspaceId: workspace.id.toString(),
+      title: 'Test Item',
+      type: 'text',
+      actorId: 'user-1',
+    })
+
+    const event = itemRepository.items[0].domainEvents[0]
+    expect(event).toMatchObject({ actorId: 'user-1' })
   })
 })

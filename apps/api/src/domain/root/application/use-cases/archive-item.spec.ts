@@ -54,4 +54,18 @@ describe('ArchiveItem', () => {
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ItemAlreadyArchivedError)
   })
+
+  it('should tag the archived-item event with the provided actorId', {
+    tags: ['archive-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const item = makeItem({ workspaceId: workspace.id.toString() })
+    await itemRepository.create(item)
+
+    await sut.execute({ itemId: item.id.toString(), actorId: 'user-1' })
+
+    const event = itemRepository.items[0].domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: 'user-1' })
+  })
 })

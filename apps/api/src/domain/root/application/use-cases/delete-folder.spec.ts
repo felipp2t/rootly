@@ -106,4 +106,18 @@ describe('DeleteFolder', () => {
     expect(response.value).toBeNull()
     expect(folderRepository.items).toHaveLength(0)
   })
+
+  it('should tag the deleted-folder event with the provided actorId', {
+    tags: ['delete-folder'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const folder = makeFolder({ workspaceId: workspace.id.toString() })
+    await folderRepository.create(folder)
+
+    await sut.execute({ folderId: folder.id.toString(), actorId: 'user-1' })
+
+    const event = folder.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: 'user-1' })
+  })
 })

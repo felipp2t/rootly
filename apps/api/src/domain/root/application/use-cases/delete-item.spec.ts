@@ -125,4 +125,22 @@ describe('DeleteItem', () => {
     expect(response.isRight()).toBe(true)
     expect(deleteSpy).not.toHaveBeenCalled()
   })
+
+  it('should tag the deleted-item event with the provided actorId', {
+    tags: ['delete-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const item = makeItem({
+      workspaceId: workspace.id.toString(),
+      type: 'text',
+    })
+    item.archive()
+    await itemRepository.create(item)
+
+    await sut.execute({ itemId: item.id.toString(), actorId: 'user-1' })
+
+    const event = item.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: 'user-1' })
+  })
 })

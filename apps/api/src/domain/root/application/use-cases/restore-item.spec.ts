@@ -54,4 +54,19 @@ describe('RestoreItem', () => {
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ItemNotArchivedError)
   })
+
+  it('should tag the restored-item event with the provided actorId', {
+    tags: ['restore-item'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+    const item = makeItem({ workspaceId: workspace.id.toString() })
+    item.archive()
+    await itemRepository.create(item)
+
+    await sut.execute({ itemId: item.id.toString(), actorId: 'user-1' })
+
+    const event = itemRepository.items[0].domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: 'user-1' })
+  })
 })

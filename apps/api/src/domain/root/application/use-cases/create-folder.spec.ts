@@ -3,9 +3,9 @@ import { makeWorkspace } from '@test/factories/make-workspace.ts'
 import { InMemoryFolderRepository } from '@test/repositories/in-memory-folder-repository.ts'
 import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
 import { Folder } from '../../enterprise/entities/folder.ts'
+import { CreateFolderUseCase } from './create-folder.ts'
 import { FolderAlreadyExistsError } from './errors/folder-already-exists-error.ts'
 import { InvalidFolderNameError } from './errors/invalid-folder-name-error.ts'
-import { CreateFolderUseCase } from './create-folder.ts'
 
 let folderRepository: InMemoryFolderRepository
 let sut: CreateFolderUseCase
@@ -207,5 +207,21 @@ describe('CreateFolder', () => {
         workspaceId: workspace.id.toString(),
       }),
     ).rejects.toThrow('Unexpected database error')
+  })
+
+  it('should tag the created folder with the provided actorId', {
+    tags: ['create-folder'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
+    await sut.execute({
+      name: 'Test Folder',
+      workspaceId: workspace.id.toString(),
+      actorId: 'user-1',
+    })
+
+    const event = folderRepository.items[0].domainEvents[0]
+    expect(event).toMatchObject({ actorId: 'user-1' })
   })
 })
