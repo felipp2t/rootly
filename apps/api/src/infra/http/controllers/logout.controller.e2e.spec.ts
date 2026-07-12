@@ -31,9 +31,12 @@ describe('DELETE /sessions', () => {
       payload: { email: 'john@example.com', password: '123456' },
     })
 
-    const sessionCookies = Array.isArray(sessionResponse.headers['set-cookie'])
-      ? sessionResponse.headers['set-cookie']
-      : [sessionResponse.headers['set-cookie']]
+    const rawCookies = sessionResponse.headers['set-cookie']
+    const sessionCookies = Array.isArray(rawCookies)
+      ? rawCookies
+      : rawCookies
+        ? [rawCookies]
+        : []
 
     const cookieHeader = sessionCookies.map((c) => c.split(';')[0]).join('; ')
 
@@ -48,12 +51,10 @@ describe('DELETE /sessions', () => {
       : [response.headers['set-cookie']]
 
     expect(response.statusCode).toBe(204)
-    expect(
-      responseCookies.some((c) => c?.includes('accessToken=;')),
-    ).toBe(true)
-    expect(
-      responseCookies.some((c) => c?.includes('refreshToken=;')),
-    ).toBe(true)
+    expect(responseCookies.some((c) => c?.includes('accessToken=;'))).toBe(true)
+    expect(responseCookies.some((c) => c?.includes('refreshToken=;'))).toBe(
+      true,
+    )
   })
 
   it('should return 401 when no refreshToken cookie is sent', async () => {

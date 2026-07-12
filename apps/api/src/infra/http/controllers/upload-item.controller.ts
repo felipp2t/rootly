@@ -21,7 +21,9 @@ export const uploadItemController: FastifyPluginCallbackZod = async (app) => {
       validatorCompiler: (opts) =>
         opts.httpPart === 'body'
           ? () => ({ value: undefined })
-          : zodValidatorCompiler(opts),
+          : zodValidatorCompiler(
+              opts as unknown as Parameters<typeof zodValidatorCompiler>[0],
+            ),
       schema: {
         summary: 'Upload Item',
         description:

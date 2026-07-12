@@ -31,9 +31,12 @@ describe('POST /sessions/refresh', () => {
       payload: { email: 'john@example.com', password: '123456' },
     })
 
-    const sessionCookies = Array.isArray(sessionResponse.headers['set-cookie'])
-      ? sessionResponse.headers['set-cookie']
-      : [sessionResponse.headers['set-cookie']]
+    const rawCookies = sessionResponse.headers['set-cookie']
+    const sessionCookies = Array.isArray(rawCookies)
+      ? rawCookies
+      : rawCookies
+        ? [rawCookies]
+        : []
 
     const cookieHeader = sessionCookies.map((c) => c.split(';')[0]).join('; ')
 

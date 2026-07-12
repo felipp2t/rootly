@@ -1,5 +1,6 @@
 import { makeRefreshToken } from '@test/factories/make-refresh-token.ts'
 import { InMemoryRefreshTokenRepository } from '@test/repositories/in-memory-refresh-token-repository.ts'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { InvalidRefreshTokenError } from './errors/invalid-refresh-token-error.ts'
 import { LogoutUseCase } from './logout.ts'
 
@@ -15,7 +16,9 @@ describe('Logout', () => {
   it('should be able to logout and delete the refresh token', {
     tags: ['logout'],
   }, async () => {
-    const refreshToken = makeRefreshToken()
+    const refreshToken = makeRefreshToken({
+      userId: new UniqueEntityID().toString(),
+    })
     inMemoryRefreshTokenRepository.items.push(refreshToken)
 
     const result = await sut.execute({ refreshToken: refreshToken.token })
@@ -27,7 +30,9 @@ describe('Logout', () => {
   it('should remove the refresh token from the repository on success', {
     tags: ['logout'],
   }, async () => {
-    const refreshToken = makeRefreshToken()
+    const refreshToken = makeRefreshToken({
+      userId: new UniqueEntityID().toString(),
+    })
     inMemoryRefreshTokenRepository.items.push(refreshToken)
 
     await sut.execute({ refreshToken: refreshToken.token })

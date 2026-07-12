@@ -8,7 +8,10 @@ import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-worksp
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
-import { workspaceInviteStatus } from '../../enterprise/entities/workspace-invite.ts'
+import {
+  type WorkspaceInviteStatus,
+  workspaceInviteStatus,
+} from '../../enterprise/entities/workspace-invite.ts'
 import { RevokeInviteUseCase } from './revoke-invite.ts'
 
 let workspaceInviteRepository: InMemoryWorkspaceInviteRepository
@@ -35,7 +38,7 @@ describe('RevokeInvite', () => {
   })
 
   function seedOwnedWorkspaceWithInvite(
-    status = workspaceInviteStatus.PENDING,
+    status: WorkspaceInviteStatus = workspaceInviteStatus.PENDING,
   ) {
     const ownerId = new UniqueEntityID().toString()
     const workspace = makeWorkspace({ userId: ownerId })
