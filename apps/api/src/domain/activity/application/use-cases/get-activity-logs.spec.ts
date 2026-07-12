@@ -1,0 +1,170 @@
+import { makeWorkspace } from '@test/factories/make-workspace.ts'
+import { InMemoryActivityLogRepository } from '@test/repositories/in-memory-activity-log-repository.ts'
+import { InMemoryRolePermissionRepository } from '@test/repositories/in-memory-role-permission.ts'
+import { InMemoryWorkspaceMemberRepository } from '@test/repositories/in-memory-workspace-member-repository.ts'
+import { InMemoryWorkspaceRepository } from '@test/repositories/in-memory-workspace-repository.ts'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
+import { ActivityLog } from '../../enterprise/entities/activity-log.ts'
+import { GetActivityLogsUseCase } from './get-activity-logs.ts'
+
+let workspaceRepository: InMemoryWorkspaceRepository
+let workspaceMemberRepository: InMemoryWorkspaceMemberRepository
+let rolePermissionRepository: InMemoryRolePermissionRepository
+let activityLogRepository: InMemoryActivityLogRepository
+let sut: GetActivityLogsUseCase
+
+describe('GetActivityLogs', () => {
+  beforeEach(() => {
+    workspaceRepository = new InMemoryWorkspaceRepository()
+    workspaceMemberRepository = new InMemoryWorkspaceMemberRepository()
+    rolePermissionRepository = new InMemoryRolePermissionRepository()
+    activityLogRepository = new InMemoryActivityLogRepository()
+    sut = new GetActivityLogsUseCase(
+      workspaceRepository,
+      workspaceMemberRepository,
+      rolePermissionRepository,
+      activityLogRepository,
+    )
+  })
+
+  it('should list activity logs for the owner ordered by most recent', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    const older = ActivityLog.create({
+      workspaceId: workspace.id.toString(),
+      resourceType: 'folder',
+      resourceId: 'folder-1',
+      resourceName: 'Docs',
+      action: 'folder_created',
+      actorUserId: ownerId,
+      actorName: 'Owner',
+      createdAt: new Date('2024-01-01'),
+    })
+    const newer = ActivityLog.create({
+      workspaceId: workspace.id.toString(),
+      resourceType: 'item',
+      resourceId: 'item-1',
+      resourceName: 'Contract.pdf',
+      action: 'item_created',
+      actorUserId: ownerId,
+      actorName: 'Owner',
+      createdAt: new Date('2024-01-02'),
+    })
+    activityLogRepository.items.push(older, newer)
+
+    const result = await sut.execute({
+      userId: ownerId,
+      workspaceId: workspace.id.toString(),
+    })
+
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.activityLogs.map((log) => log.resourceId)).toEqual([
+        'item-1',
+        'folder-1',
+      ])
+    }
+  })
+
+  it('should filter activity logs by resourceType', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    activityLogRepository.items.push(
+      ActivityLog.create({
+        workspaceId: workspace.id.toString(),
+        resourceType: 'folder',
+        resourceId: 'folder-1',
+        resourceName: 'Docs',
+        action: 'folder_created',
+        actorUserId: ownerId,
+        actorName: 'Owner',
+      }),
+      ActivityLog.create({
+        workspaceId: workspace.id.toString(),
+        resourceType: 'item',
+        resourceId: 'item-1',
+        resourceName: 'Contract.pdf',
+        action: 'item_created',
+        actorUserId: ownerId,
+        actorName: 'Owner',
+      }),
+    )
+
+    const result = await sut.execute({
+      userId: ownerId,
+      workspaceId: workspace.id.toString(),
+      resourceType: 'item',
+    })
+
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.activityLogs).toHaveLength(1)
+      expect(result.value.activityLogs[0].resourceId).toBe('item-1')
+    }
+  })
+
+  it('should filter activity logs by resourceId', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    activityLogRepository.items.push(
+      ActivityLog.create({
+        workspaceId: workspace.id.toString(),
+        resourceType: 'folder',
+        resourceId: 'folder-1',
+        resourceName: 'Docs',
+        action: 'folder_created',
+        actorUserId: ownerId,
+        actorName: 'Owner',
+      }),
+      ActivityLog.create({
+        workspaceId: workspace.id.toString(),
+        resourceType: 'folder',
+        resourceId: 'folder-1',
+        resourceName: 'Docs',
+        action: 'folder_renamed',
+        actorUserId: ownerId,
+        actorName: 'Owner',
+      }),
+      ActivityLog.create({
+        workspaceId: workspace.id.toString(),
+        resourceType: 'folder',
+        resourceId: 'folder-2',
+        resourceName: 'Other',
+        action: 'folder_created',
+        actorUserId: ownerId,
+        actorName: 'Owner',
+      }),
+    )
+
+    const result = await sut.execute({
+      userId: ownerId,
+      workspaceId: workspace.id.toString(),
+      resourceId: 'folder-1',
+    })
+
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.activityLogs).toHaveLength(2)
+      expect(
+        result.value.activityLogs.every((log) => log.resourceId === 'folder-1'),
+      ).toBe(true)
+    }
+  })
+
+  it('should return ResourceNotFoundError when the workspace is not accessible', async () => {
+    const result = await sut.execute({
+      userId: new UniqueEntityID().toString(),
+      workspaceId: new UniqueEntityID().toString(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+})
