@@ -33,6 +33,10 @@ import type {
   CreateFolder409,
   CreateFolder500,
   CreateFolderBody,
+  DeleteFolder401,
+  DeleteFolder404,
+  DeleteFolder409,
+  DeleteFolder500,
   GetFolders200,
   GetFolders401,
   GetFolders500,
@@ -527,3 +531,108 @@ export function useResolveFolderPathSuspense<TData = Awaited<ReturnType<typeof r
 
 
 
+/**
+ * Permanently delete an empty folder
+ * @summary Delete Folder
+ */
+export type deleteFolderResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteFolderResponse401 = {
+  data: DeleteFolder401
+  status: 401
+}
+
+export type deleteFolderResponse404 = {
+  data: DeleteFolder404
+  status: 404
+}
+
+export type deleteFolderResponse409 = {
+  data: DeleteFolder409
+  status: 409
+}
+
+export type deleteFolderResponse500 = {
+  data: DeleteFolder500
+  status: 500
+}
+
+export type deleteFolderResponseSuccess = (deleteFolderResponse204) & {
+  headers: Headers;
+};
+export type deleteFolderResponseError = (deleteFolderResponse401 | deleteFolderResponse404 | deleteFolderResponse409 | deleteFolderResponse500) & {
+  headers: Headers;
+};
+
+export type deleteFolderResponse = (deleteFolderResponseSuccess | deleteFolderResponseError)
+
+export const getDeleteFolderUrl = (folderId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/folders/${folderId}`
+}
+
+export const deleteFolder = async (folderId: string, options?: RequestInit): Promise<deleteFolderResponse> => {
+  
+  return fetchWithAuth<deleteFolderResponse>(getDeleteFolderUrl(folderId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteFolderMutationOptions = <TError = DeleteFolder401 | DeleteFolder404 | DeleteFolder409 | DeleteFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFolder>>, TError,{folderId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFolder>>, TError,{folderId: string}, TContext> => {
+
+const mutationKey = ['deleteFolder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFolder>>, {folderId: string}> = (props) => {
+          const {folderId} = props ?? {};
+
+          return  deleteFolder(folderId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteFolderMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFolder>>>
+    
+    export type DeleteFolderMutationError = DeleteFolder401 | DeleteFolder404 | DeleteFolder409 | DeleteFolder500
+
+    /**
+ * @summary Delete Folder
+ */
+export const useDeleteFolder = <TError = DeleteFolder401 | DeleteFolder404 | DeleteFolder409 | DeleteFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFolder>>, TError,{folderId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteFolder>>,
+        TError,
+        {folderId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteFolderMutationOptions(options), queryClient);
+    }
+    

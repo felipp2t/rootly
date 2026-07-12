@@ -5,8 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetItemsParams = {
-parentId?: string;
-workspaceId?: string;
-includeArchived?: boolean;
+export type DeleteItem409 = {
+  message: string;
 };

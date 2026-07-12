@@ -27,16 +27,28 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ArchiveItem401,
+  ArchiveItem404,
+  ArchiveItem409,
+  ArchiveItem500,
   CreateItem201,
   CreateItem400,
   CreateItem401,
   CreateItem409,
   CreateItem500,
   CreateItemBody,
+  DeleteItem401,
+  DeleteItem404,
+  DeleteItem409,
+  DeleteItem500,
   GetItems200,
   GetItems401,
   GetItems500,
   GetItemsParams,
+  RestoreItem401,
+  RestoreItem404,
+  RestoreItem409,
+  RestoreItem500,
   UploadItem201,
   UploadItem400,
   UploadItem401,
@@ -451,5 +463,317 @@ export const useUploadItem = <TError = UploadItem400 | UploadItem401 | UploadIte
         TContext
       > => {
       return useMutation(getUploadItemMutationOptions(options), queryClient);
+    }
+    /**
+ * Archive an item, hiding it from the default view
+ * @summary Archive Item
+ */
+export type archiveItemResponse204 = {
+  data: void
+  status: 204
+}
+
+export type archiveItemResponse401 = {
+  data: ArchiveItem401
+  status: 401
+}
+
+export type archiveItemResponse404 = {
+  data: ArchiveItem404
+  status: 404
+}
+
+export type archiveItemResponse409 = {
+  data: ArchiveItem409
+  status: 409
+}
+
+export type archiveItemResponse500 = {
+  data: ArchiveItem500
+  status: 500
+}
+
+export type archiveItemResponseSuccess = (archiveItemResponse204) & {
+  headers: Headers;
+};
+export type archiveItemResponseError = (archiveItemResponse401 | archiveItemResponse404 | archiveItemResponse409 | archiveItemResponse500) & {
+  headers: Headers;
+};
+
+export type archiveItemResponse = (archiveItemResponseSuccess | archiveItemResponseError)
+
+export const getArchiveItemUrl = (itemId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/items/${itemId}/archive`
+}
+
+export const archiveItem = async (itemId: string, options?: RequestInit): Promise<archiveItemResponse> => {
+  
+  return fetchWithAuth<archiveItemResponse>(getArchiveItemUrl(itemId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+  
+
+
+
+export const getArchiveItemMutationOptions = <TError = ArchiveItem401 | ArchiveItem404 | ArchiveItem409 | ArchiveItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof archiveItem>>, TError,{itemId: string}, TContext> => {
+
+const mutationKey = ['archiveItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof archiveItem>>, {itemId: string}> = (props) => {
+          const {itemId} = props ?? {};
+
+          return  archiveItem(itemId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ArchiveItemMutationResult = NonNullable<Awaited<ReturnType<typeof archiveItem>>>
+    
+    export type ArchiveItemMutationError = ArchiveItem401 | ArchiveItem404 | ArchiveItem409 | ArchiveItem500
+
+    /**
+ * @summary Archive Item
+ */
+export const useArchiveItem = <TError = ArchiveItem401 | ArchiveItem404 | ArchiveItem409 | ArchiveItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof archiveItem>>,
+        TError,
+        {itemId: string},
+        TContext
+      > => {
+      return useMutation(getArchiveItemMutationOptions(options), queryClient);
+    }
+    /**
+ * Restore a previously archived item
+ * @summary Restore Item
+ */
+export type restoreItemResponse204 = {
+  data: void
+  status: 204
+}
+
+export type restoreItemResponse401 = {
+  data: RestoreItem401
+  status: 401
+}
+
+export type restoreItemResponse404 = {
+  data: RestoreItem404
+  status: 404
+}
+
+export type restoreItemResponse409 = {
+  data: RestoreItem409
+  status: 409
+}
+
+export type restoreItemResponse500 = {
+  data: RestoreItem500
+  status: 500
+}
+
+export type restoreItemResponseSuccess = (restoreItemResponse204) & {
+  headers: Headers;
+};
+export type restoreItemResponseError = (restoreItemResponse401 | restoreItemResponse404 | restoreItemResponse409 | restoreItemResponse500) & {
+  headers: Headers;
+};
+
+export type restoreItemResponse = (restoreItemResponseSuccess | restoreItemResponseError)
+
+export const getRestoreItemUrl = (itemId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/items/${itemId}/restore`
+}
+
+export const restoreItem = async (itemId: string, options?: RequestInit): Promise<restoreItemResponse> => {
+  
+  return fetchWithAuth<restoreItemResponse>(getRestoreItemUrl(itemId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+  
+
+
+
+export const getRestoreItemMutationOptions = <TError = RestoreItem401 | RestoreItem404 | RestoreItem409 | RestoreItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof restoreItem>>, TError,{itemId: string}, TContext> => {
+
+const mutationKey = ['restoreItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restoreItem>>, {itemId: string}> = (props) => {
+          const {itemId} = props ?? {};
+
+          return  restoreItem(itemId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestoreItemMutationResult = NonNullable<Awaited<ReturnType<typeof restoreItem>>>
+    
+    export type RestoreItemMutationError = RestoreItem401 | RestoreItem404 | RestoreItem409 | RestoreItem500
+
+    /**
+ * @summary Restore Item
+ */
+export const useRestoreItem = <TError = RestoreItem401 | RestoreItem404 | RestoreItem409 | RestoreItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof restoreItem>>,
+        TError,
+        {itemId: string},
+        TContext
+      > => {
+      return useMutation(getRestoreItemMutationOptions(options), queryClient);
+    }
+    /**
+ * Permanently delete an archived item
+ * @summary Delete Item
+ */
+export type deleteItemResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteItemResponse401 = {
+  data: DeleteItem401
+  status: 401
+}
+
+export type deleteItemResponse404 = {
+  data: DeleteItem404
+  status: 404
+}
+
+export type deleteItemResponse409 = {
+  data: DeleteItem409
+  status: 409
+}
+
+export type deleteItemResponse500 = {
+  data: DeleteItem500
+  status: 500
+}
+
+export type deleteItemResponseSuccess = (deleteItemResponse204) & {
+  headers: Headers;
+};
+export type deleteItemResponseError = (deleteItemResponse401 | deleteItemResponse404 | deleteItemResponse409 | deleteItemResponse500) & {
+  headers: Headers;
+};
+
+export type deleteItemResponse = (deleteItemResponseSuccess | deleteItemResponseError)
+
+export const getDeleteItemUrl = (itemId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/items/${itemId}`
+}
+
+export const deleteItem = async (itemId: string, options?: RequestInit): Promise<deleteItemResponse> => {
+  
+  return fetchWithAuth<deleteItemResponse>(getDeleteItemUrl(itemId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteItemMutationOptions = <TError = DeleteItem401 | DeleteItem404 | DeleteItem409 | DeleteItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteItem>>, TError,{itemId: string}, TContext> => {
+
+const mutationKey = ['deleteItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteItem>>, {itemId: string}> = (props) => {
+          const {itemId} = props ?? {};
+
+          return  deleteItem(itemId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteItemMutationResult = NonNullable<Awaited<ReturnType<typeof deleteItem>>>
+    
+    export type DeleteItemMutationError = DeleteItem401 | DeleteItem404 | DeleteItem409 | DeleteItem500
+
+    /**
+ * @summary Delete Item
+ */
+export const useDeleteItem = <TError = DeleteItem401 | DeleteItem404 | DeleteItem409 | DeleteItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteItem>>, TError,{itemId: string}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteItem>>,
+        TError,
+        {itemId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteItemMutationOptions(options), queryClient);
     }
     
