@@ -89,8 +89,10 @@ Thumbs.db
 .tern-port
 build/Release
 
-# claude
+# claude (local/session state stays untracked; skills are shared project knowledge)
 .claude/**
+!.claude/skills/
+!.claude/skills/**
 
 # notes
 .notes/

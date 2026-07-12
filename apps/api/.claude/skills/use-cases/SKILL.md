@@ -1,6 +1,11 @@
+---
+name: use-cases
+description: Conventions for writing use cases in the Rootly API's application layer (apps/api/src/domain/*/application/use-cases). Covers the Request/Response/Either pattern, error conventions, dependency injection against abstractions, and unit testing with in-memory repositories and the `sut` naming convention. Use when creating or modifying a use case.
+---
+
 # Use Cases
 
-Business logic for the root domain. Each use case represents a single, well-defined action.
+Business logic for a domain. Each use case represents a single, well-defined action.
 
 ## Pattern
 
@@ -65,11 +70,13 @@ export class UserAlreadyExistsError extends Error implements BaseError {
 }
 ```
 
-Use errors without a context parameter when leaking information is a security risk (e.g. `WrongCredentialsError` does not reveal whether the email or password was wrong).
+Use errors without a context parameter when leaking information is a security risk (e.g.
+`WrongCredentialsError` does not reveal whether the email or password was wrong).
 
 ## Dependency Injection
 
-Use cases depend on **abstractions** (abstract classes or interfaces), never on concrete implementations.
+Use cases depend on **abstractions** (abstract classes or interfaces), never on concrete
+implementations.
 
 ```typescript
 // correct — depends on the abstraction
@@ -79,7 +86,18 @@ constructor(private userRepository: UserRepository) {}
 constructor(private userRepository: DrizzleUserRepository) {}
 ```
 
-Concrete implementations are wired in infra factories at `src/infra/http/factories/`.
+Concrete implementations are wired in infra factories at `src/infra/http/factories/` — see the
+`http-layer` skill for the factory pattern.
+
+## Domain events
+
+When a use case's mutation should be recorded (e.g. for an audit log), fire the event from the
+entity's mutator method (`this.addDomainEvent(...)`, see the `domain-entities` skill), thread an
+optional `actorId` from the controller's authenticated user through the use case into that
+method call, and let the repository's `create`/`save`/`delete` call
+`DomainEvents.dispatchEventsForAggregate(...)` after the write succeeds. Double-check every new
+or modified repository implementation actually calls `dispatchEventsForAggregate` — it's easy to
+add a new repository method and forget it, silently dropping the events.
 
 ## Testing
 
@@ -118,3 +136,6 @@ describe('Register User', () => {
 - Happy path — `isRight()` and shape of the success value
 - Each error case — `isLeft()` and `toBeInstanceOf(SpecificError)`
 - Side effects — assert state on the in-memory repository after execution
+- If the use case fires a domain event with an `actorId`, assert the event carries it (e.g.
+  `entity.domainEvents.at(-1)` matches `{ actorId: ... }`) — see the `test-conventions` skill for
+  the full pattern used for subscriber/event tests.

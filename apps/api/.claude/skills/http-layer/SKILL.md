@@ -1,10 +1,17 @@
+---
+name: http-layer
+description: Conventions for Fastify controllers and factories in the Rootly API (apps/api/src/infra/http). Covers route/controller structure with Zod schemas, JWT/cookie auth, error-to-HTTP-status mapping, and the factory pattern for wiring concrete repository implementations into use cases. Use when creating or modifying a controller or a factory.
+---
+
 # HTTP Layer
 
-Fastify controllers and factories. This layer is responsible for receiving HTTP requests, validating input, calling use cases, and mapping results to HTTP responses.
+Fastify controllers and factories. This layer is responsible for receiving HTTP requests,
+validating input, calling use cases, and mapping results to HTTP responses.
 
 ## Controllers
 
-Controllers are Fastify plugins typed as `FastifyPluginCallbackZod` (from `fastify-type-provider-zod`). Each controller registers one route.
+Controllers are Fastify plugins typed as `FastifyPluginCallbackZod` (from
+`fastify-type-provider-zod`). Each controller registers one route.
 
 ### Structure
 
@@ -58,39 +65,37 @@ export const someController: FastifyPluginCallbackZod = async (app) => {
 ### Conventions
 
 - One file per controller, named `<action>-<resource>.controller.ts`.
-- The exported variable name matches the file: `createFolderController`, `registerUserController`, etc.
+- The exported variable name matches the file: `createFolderController`, `registerUserController`,
+  etc.
 - Always instantiate the use case **inside the handler** via the factory — never at module level.
 - Use a `switch` on `error.constructor.name` to map domain errors to HTTP status codes.
 - Always include a `default` case returning `500`.
 - Input validation is done by Zod in the `schema` — do not repeat it manually in the handler.
-- Always declare `operationId` (camelCase) and `response` schemas in every route's `schema` object.
+- Always declare `operationId` (camelCase) and `response` schemas in every route's `schema`
+  object.
 
 ### Protected Routes (JWT)
 
-Routes that require authentication must manually verify the JWT from the `accessToken` cookie using `verifyJwt` from `../verify-jwt.ts`. There is no Fastify hook/decorator — each protected handler does this explicitly at the top.
+Protected routes use the `verifyJwtHook` from `../middleware/verify-jwt-hook.ts` as the route's
+`onRequest` hook, which decorates `request.userId` from the `accessToken` cookie.
 
 ```typescript
-import { verifyJwt } from '../verify-jwt.ts'
+import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
-// inside handler:
-const token = request.cookies.accessToken
-
-if (!token) {
-  return reply.status(401).send({ message: 'Unauthorized' })
-}
-
-const payload = await verifyJwt(token)
-
-if (!payload) {
-  return reply.status(401).send({ message: 'Unauthorized' })
-}
-
-// payload.userId is now available
+app.post(
+  '/route',
+  {
+    onRequest: verifyJwtHook,
+    schema: { /* ... */ },
+  },
+  async (request, reply) => {
+    // request.userId is now available
+  },
+)
 ```
 
-`verifyJwt` returns `{ userId: string } | null` (extracted from `payload.sub`). Use `payload.userId` to pass the caller's identity to the use case when needed.
-
-Always include `401: z.object({ message: z.string() })` in the `response` schema of protected routes.
+Always include `401: z.object({ message: z.string() })` in the `response` schema of protected
+routes.
 
 ### Auth Token Conventions
 
@@ -126,7 +131,7 @@ return reply
 | `POST /sessions` | No |
 | `POST /sessions/refresh` | No (uses `refreshToken` cookie directly) |
 | `POST /accounts` | No |
-| All other routes | Yes — verify `accessToken` cookie |
+| All other routes | Yes — `onRequest: verifyJwtHook` |
 
 ### Error → HTTP Status mapping
 
@@ -135,12 +140,14 @@ return reply
 | Resource already exists | `409 Conflict` |
 | Invalid input / business rule violation | `400 Bad Request` |
 | Wrong credentials / unauthorized | `401 Unauthorized` |
+| Missing permission (RBAC) | `403 Forbidden` |
 | Not found | `404 Not Found` |
 | Unhandled / unknown error | `500 Internal Server Error` |
 
 ## Factories
 
-Factories are plain functions that wire concrete implementations to use case constructors. They are the only place where infra classes (repositories, hashers, encrypters) are instantiated.
+Factories are plain functions that wire concrete implementations to use case constructors. They
+are the only place where infra classes (repositories, hashers, encrypters) are instantiated.
 
 ### Structure
 
@@ -163,3 +170,6 @@ export function makeSomeUseCase() {
 - One file per use case, named `make-<use-case-name>.ts`.
 - Always pass `db` (the Drizzle client) to repository constructors.
 - For auth use cases, pass `ArgonHasher` for hashing and `JwtEncrypter` for token generation.
+- A domain-event subscriber that needs raw repositories beyond `RecordActivityLogUseCase` gets
+  its own `make-on-<resource>-activity.ts` factory; otherwise it's instantiated directly in
+  `src/infra/events/register-subscribers.ts`.
