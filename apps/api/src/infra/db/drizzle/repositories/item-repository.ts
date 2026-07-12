@@ -1,4 +1,5 @@
 import { and, count, eq, isNull } from 'drizzle-orm'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { DomainEvents } from '@/core/events/domain-events.ts'
 import type {
   FindManyItemsOptions,
@@ -99,5 +100,7 @@ export class DrizzleItemRepository implements ItemRepository {
 
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.items).where(eq(schema.items.id, id))
+
+    DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(id))
   }
 }

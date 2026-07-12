@@ -1,4 +1,5 @@
 import { and, count, eq, inArray, isNull } from 'drizzle-orm'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import {
   isPgUniqueViolation,
   UniqueConstraintViolationError,
@@ -188,5 +189,7 @@ export class DrizzleFolderRepository implements FolderRepository {
 
   async delete(id: string): Promise<void> {
     await this.db.delete(schema.folders).where(eq(schema.folders.id, id))
+
+    DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(id))
   }
 }
