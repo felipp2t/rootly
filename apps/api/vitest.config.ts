@@ -67,6 +67,8 @@ export default defineConfig({
       },
       { name: 'get-tags', description: 'Get workspace tags use case' },
       { name: 'logout', description: 'Logout use case' },
+      { name: 'rename-folder', description: 'Rename folder use case' },
+      { name: 'update-item', description: 'Update item use case' },
     ],
   },
   plugins: [tsconfigPaths()],
