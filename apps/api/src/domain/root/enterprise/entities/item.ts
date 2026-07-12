@@ -1,8 +1,16 @@
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
 import { ItemArchivedError } from '../validators/_errors/item-archived-error.ts'
 import { validateTypeAndContent } from '../validators/item-type-validator.ts'
+import { ItemArchivedEvent } from '../events/item-archived-event.ts'
+import { ItemCreatedEvent } from '../events/item-created-event.ts'
+import { ItemDeletedEvent } from '../events/item-deleted-event.ts'
+import { ItemRestoredEvent } from '../events/item-restored-event.ts'
+import {
+  type ItemUpdatedEventFields,
+  ItemUpdatedEvent,
+} from '../events/item-updated-event.ts'
 
 export type ItemType = 'link' | 'document' | 'secret' | 'text'
 
@@ -17,7 +25,7 @@ export interface ItemProps {
   updatedAt: Date
 }
 
-export class Item extends Entity<ItemProps> {
+export class Item extends AggregateRoot<ItemProps> {
   get folderId() {
     return this.props.folderId
   }
@@ -69,11 +77,38 @@ export class Item extends Entity<ItemProps> {
   archive() {
     this.props.archivedAt = new Date()
     this.touch()
+    this.addDomainEvent(new ItemArchivedEvent(this))
   }
 
   restore() {
     this.props.archivedAt = undefined
     this.touch()
+    this.addDomainEvent(new ItemRestoredEvent(this))
+  }
+
+  update(fields: ItemUpdatedEventFields) {
+    const before: ItemUpdatedEventFields = {}
+    const after: ItemUpdatedEventFields = {}
+
+    if (fields.title !== undefined && fields.title !== this.props.title) {
+      before.title = this.props.title
+      this.title = fields.title
+      after.title = fields.title
+    }
+
+    if (fields.content !== undefined && fields.content !== this.props.content) {
+      before.content = this.props.content
+      this.content = fields.content
+      after.content = fields.content
+    }
+
+    if (Object.keys(after).length === 0) return
+
+    this.addDomainEvent(new ItemUpdatedEvent(this, { before, after }))
+  }
+
+  delete() {
+    this.addDomainEvent(new ItemDeletedEvent(this))
   }
 
   private touch() {
@@ -86,7 +121,7 @@ export class Item extends Entity<ItemProps> {
   ) {
     validateTypeAndContent(props.type, props.content)
 
-    return new Item(
+    const item = new Item(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -94,5 +129,11 @@ export class Item extends Entity<ItemProps> {
       },
       id,
     )
+
+    if (!id) {
+      item.addDomainEvent(new ItemCreatedEvent(item))
+    }
+
+    return item
   }
 }

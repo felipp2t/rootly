@@ -1,6 +1,9 @@
-import { Entity } from '@/core/entities/entity.ts'
+import { AggregateRoot } from '@/core/entities/aggregate-root.ts'
 import type { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import type { Optional } from '@/core/types/optional.ts'
+import { FolderCreatedEvent } from '../events/folder-created-event.ts'
+import { FolderDeletedEvent } from '../events/folder-deleted-event.ts'
+import { FolderRenamedEvent } from '../events/folder-renamed-event.ts'
 
 export interface FolderProps {
   name: string
@@ -10,7 +13,7 @@ export interface FolderProps {
   updatedAt: Date
 }
 
-export class Folder extends Entity<FolderProps> {
+export class Folder extends AggregateRoot<FolderProps> {
   get name() {
     return this.props.name
   }
@@ -40,11 +43,24 @@ export class Folder extends Entity<FolderProps> {
     this.props.updatedAt = new Date()
   }
 
+  rename(name: string) {
+    if (name === this.props.name) return
+
+    const before = this.props.name
+    this.name = name
+
+    this.addDomainEvent(new FolderRenamedEvent(this, { before, after: name }))
+  }
+
+  delete() {
+    this.addDomainEvent(new FolderDeletedEvent(this))
+  }
+
   static create(
     props: Optional<FolderProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID,
   ) {
-    return new Folder(
+    const folder = new Folder(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -52,5 +68,11 @@ export class Folder extends Entity<FolderProps> {
       },
       id,
     )
+
+    if (!id) {
+      folder.addDomainEvent(new FolderCreatedEvent(folder))
+    }
+
+    return folder
   }
 }
