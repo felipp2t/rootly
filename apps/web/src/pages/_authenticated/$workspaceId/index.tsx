@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { FolderIcon, PlusIcon } from 'lucide-react'
-import { Suspense } from 'react'
+import { ArchiveIcon, FolderIcon, PlusIcon } from 'lucide-react'
+import { Suspense, useState } from 'react'
 import { useGetFoldersSuspense } from '@/api/folders/folders'
 import { useGetItemsSuspense } from '@/api/items/items'
 import { useGetWorkspaceSuspense } from '@/api/workspaces/workspaces'
@@ -61,9 +61,13 @@ function RouteSuspense() {
 
 function RoutePage() {
   const { workspaceId } = Route.useParams()
+  const [showArchived, setShowArchived] = useState(false)
   const { data: workspaceResult } = useGetWorkspaceSuspense(workspaceId)
   const { data: foldersResult } = useGetFoldersSuspense({ workspaceId })
-  const { data: itemsResult } = useGetItemsSuspense({ workspaceId })
+  const { data: itemsResult } = useGetItemsSuspense({
+    workspaceId,
+    includeArchived: showArchived,
+  })
   const workspace =
     workspaceResult.status === 200 ? workspaceResult.data.workspace : null
   const folders = foldersResult.status === 200 ? foldersResult.data.folders : []
@@ -135,6 +139,7 @@ function RoutePage() {
                   params={{ workspaceId, _splat: folder.id }}
                 >
                   <FolderCard
+                    folderId={folder.id}
                     name={folder.name}
                     itemCount={folder.itemCount}
                     subfolderCount={folder.subfolderCount}
@@ -147,9 +152,21 @@ function RoutePage() {
       )}
 
       <div className='flex flex-col gap-2'>
-        <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
-          ITEMS
-        </h2>
+        <div className='flex items-center justify-between'>
+          <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
+            ITEMS
+          </h2>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='cursor-pointer'
+            onClick={() => setShowArchived((value) => !value)}
+          >
+            <ArchiveIcon className='size-3.5' />
+            {showArchived ? 'Hide archived' : 'Show archived'}
+          </Button>
+        </div>
         {items.length === 0 ? (
           <div className='flex items-center justify-center py-8'>
             <p className='font-mono text-xs text-muted-foreground'>

@@ -1,26 +1,48 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
 import { useQueryClient } from '@tanstack/react-query'
 import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
   FileTextIcon,
   KeyIcon,
   LinkIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
   PilcrowIcon,
   PlusIcon,
   ShieldAlertIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import * as React from 'react'
+import { toast } from 'sonner'
 import z from 'zod'
-import { createItem, getGetItemsQueryKey, uploadItem } from '@/api/items/items'
+import { getGetFoldersQueryKey } from '@/api/folders/folders'
+import {
+  archiveItem,
+  createItem,
+  deleteItem,
+  getGetItemsQueryKey,
+  restoreItem,
+  uploadItem,
+} from '@/api/items/items'
 import type { GetItems200ItemsItem } from '@/api/model'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { FileInput } from './ui/file-input'
 import { Input } from './ui/input'
@@ -91,6 +113,10 @@ interface ItemCardProps extends React.ComponentProps<'div'> {
 function ItemCard({ item, className, ...props }: ItemCardProps) {
   const Icon = itemTypeIconMap[item.type]
   const isSecret = item.type === 'secret'
+  const isArchived = item.archivedAt !== null
+  const queryClient = useQueryClient()
+  const [isMutating, setIsMutating] = React.useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
 
   const contentPreview = isSecret
     ? '••••••••••••'
@@ -100,12 +126,60 @@ function ItemCard({ item, className, ...props }: ItemCardProps) {
         : item.content
       : null
 
+  async function invalidateItemQueries() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: getGetItemsQueryKey() }),
+      queryClient.invalidateQueries({ queryKey: getGetFoldersQueryKey() }),
+    ])
+  }
+
+  async function handleArchive() {
+    setIsMutating(true)
+    const response = await archiveItem(item.id)
+    setIsMutating(false)
+
+    if (response.status === 204) {
+      await invalidateItemQueries()
+      toast.success('Item archived')
+    } else {
+      toast.error('Failed to archive item. Please try again later.')
+    }
+  }
+
+  async function handleRestore() {
+    setIsMutating(true)
+    const response = await restoreItem(item.id)
+    setIsMutating(false)
+
+    if (response.status === 204) {
+      await invalidateItemQueries()
+      toast.success('Item restored')
+    } else {
+      toast.error('Failed to restore item. Please try again later.')
+    }
+  }
+
+  async function handleDelete() {
+    setIsMutating(true)
+    const response = await deleteItem(item.id)
+    setIsMutating(false)
+
+    if (response.status === 204) {
+      await invalidateItemQueries()
+      toast.success('Item deleted permanently')
+      setDeleteDialogOpen(false)
+    } else {
+      toast.error('Failed to delete item. Please try again later.')
+    }
+  }
+
   return (
     <div
       data-slot='item-card'
       className={cn(
         'flex cursor-pointer flex-col justify-between gap-3 border-2 border-border hover:border-primary/50 bg-card p-4 transition-all',
         isSecret && 'hover:border-amber-500/50',
+        isArchived && 'opacity-60',
         className,
       )}
       {...props}
@@ -122,16 +196,61 @@ function ItemCard({ item, className, ...props }: ItemCardProps) {
             {item.title}
           </span>
         </div>
-        <span
-          className={cn(
-            'font-mono text-[10px] font-semibold uppercase px-1.5 py-0.5 shrink-0',
-            isSecret
-              ? 'bg-amber-500/10 text-amber-500'
-              : 'bg-muted text-muted-foreground',
+        <div className='flex items-center gap-1.5 shrink-0'>
+          {isArchived && (
+            <span className='font-mono text-[10px] font-semibold uppercase px-1.5 py-0.5 bg-muted text-muted-foreground border border-border'>
+              Archived
+            </span>
           )}
-        >
-          {item.type}
-        </span>
+          <span
+            className={cn(
+              'font-mono text-[10px] font-semibold uppercase px-1.5 py-0.5',
+              isSecret
+                ? 'bg-amber-500/10 text-amber-500'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
+            {item.type}
+          </span>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              onClick={(e) => e.stopPropagation()}
+              className='cursor-pointer text-muted-foreground outline-none transition-colors hover:text-foreground'
+            >
+              <MoreVerticalIcon className='size-4' />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align='end'
+              onClick={(e) => e.stopPropagation()}
+            >
+              {isArchived ? (
+                <>
+                  <DropdownMenuItem
+                    disabled={isMutating}
+                    onClick={handleRestore}
+                  >
+                    <ArchiveRestoreIcon className='size-3.5' />
+                    Restore
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    variant='destructive'
+                    disabled={isMutating}
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <Trash2Icon className='size-3.5' />
+                    Delete permanently
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem disabled={isMutating} onClick={handleArchive}>
+                  <ArchiveIcon className='size-3.5' />
+                  Archive
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {contentPreview && (
@@ -139,6 +258,34 @@ function ItemCard({ item, className, ...props }: ItemCardProps) {
           {contentPreview}
         </p>
       )}
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Delete item permanently</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. "{item.title}" will be permanently
+              deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter showCloseButton>
+            <Button
+              type='button'
+              variant='destructive'
+              disabled={isMutating}
+              className='cursor-pointer'
+              onClick={handleDelete}
+            >
+              {isMutating ? (
+                <Loader2Icon className='size-4 animate-spin' />
+              ) : (
+                <Trash2Icon className='size-4' />
+              )}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

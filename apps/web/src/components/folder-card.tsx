@@ -1,9 +1,13 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form'
-import { Folder, PlusIcon } from 'lucide-react'
+import { Folder, MoreVerticalIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import * as React from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
-import { createFolder } from '@/api/folders/folders'
+import {
+  createFolder,
+  deleteFolder,
+  getGetFoldersQueryKey,
+} from '@/api/folders/folders'
 import { cn } from '@/lib/utils'
 import { queryClient } from '../lib/query'
 import { Button } from './ui/button'
@@ -11,28 +15,58 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
 
 interface FolderCardProps extends React.ComponentProps<'div'> {
+  folderId: string
   name: string
   itemCount: number
   subfolderCount: number
 }
 
 function FolderCard({
+  folderId,
   name,
   itemCount,
   subfolderCount,
   className,
   ...props
 }: FolderCardProps) {
+  const [isDeleting, setIsDeleting] = React.useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+
+  async function handleDelete() {
+    setIsDeleting(true)
+    const response = await deleteFolder(folderId)
+    setIsDeleting(false)
+
+    if (response.status === 204) {
+      await queryClient.invalidateQueries({
+        queryKey: getGetFoldersQueryKey(),
+      })
+      toast.success('Folder deleted successfully')
+      setDeleteDialogOpen(false)
+    } else if (response.status === 409) {
+      toast.error(response.data.message)
+    } else {
+      toast.error('Failed to delete folder. Please try again later.')
+    }
+  }
+
   return (
     <div
       data-slot='folder-card'
@@ -47,6 +81,26 @@ function FolderCard({
         <span className='font-mono text-sm font-bold tracking-wide text-foreground truncate'>
           {name}
         </span>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            onClick={(e) => e.stopPropagation()}
+            className='ml-auto shrink-0 cursor-pointer text-muted-foreground outline-none transition-colors hover:text-foreground'
+          >
+            <MoreVerticalIcon className='size-4' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuItem
+              variant='destructive'
+              onClick={(e) => {
+                e.stopPropagation()
+                setDeleteDialogOpen(true)
+              }}
+            >
+              <Trash2Icon className='size-3.5' />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className='flex items-center justify-between'>
@@ -62,6 +116,36 @@ function FolderCard({
           )}
         </div>
       </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent
+          onClick={(e) => e.stopPropagation()}
+          className='flex flex-col gap-4'
+        >
+          <DialogHeader>
+            <DialogTitle>Delete folder</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. "{name}" will be permanently
+              deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter showCloseButton>
+            <Button
+              type='button'
+              variant='destructive'
+              disabled={isDeleting}
+              className='cursor-pointer'
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDelete()
+              }}
+            >
+              <Trash2Icon className='size-4' />
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

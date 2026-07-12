@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { FolderIcon, PlusIcon } from 'lucide-react'
-import { Suspense } from 'react'
+import { ArchiveIcon, FolderIcon, PlusIcon } from 'lucide-react'
+import { Suspense, useState } from 'react'
 import {
   useGetFoldersSuspense,
   useResolveFolderPathSuspense,
@@ -67,6 +67,7 @@ function RoutePage() {
 
   const folderPath = (_splat ?? '').split('/').filter(Boolean)
   const currentFolderId = folderPath.at(-1)
+  const [showArchived, setShowArchived] = useState(false)
 
   const { data: workspaceResult } = useGetWorkspaceSuspense(workspaceId)
   const { data: foldersResult } = useGetFoldersSuspense({
@@ -76,6 +77,7 @@ function RoutePage() {
   const { data: itemsResult } = useGetItemsSuspense({
     workspaceId,
     parentId: currentFolderId,
+    includeArchived: showArchived,
   })
   const { data: resolvedPathResult } = useResolveFolderPathSuspense({
     workspaceId,
@@ -201,6 +203,7 @@ function RoutePage() {
                   }}
                 >
                   <FolderCard
+                    folderId={folder.id}
                     name={folder.name}
                     itemCount={folder.itemCount}
                     subfolderCount={folder.subfolderCount}
@@ -213,9 +216,21 @@ function RoutePage() {
       )}
 
       <div className='flex flex-col gap-2'>
-        <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
-          ITEMS
-        </h2>
+        <div className='flex items-center justify-between'>
+          <h2 className='font-mono text-sm font-semibold text-muted-foreground'>
+            ITEMS
+          </h2>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='cursor-pointer'
+            onClick={() => setShowArchived((value) => !value)}
+          >
+            <ArchiveIcon className='size-3.5' />
+            {showArchived ? 'Hide archived' : 'Show archived'}
+          </Button>
+        </div>
         {items.length === 0 ? (
           <div className='flex items-center justify-center py-8'>
             <p className='font-mono text-xs text-muted-foreground'>
