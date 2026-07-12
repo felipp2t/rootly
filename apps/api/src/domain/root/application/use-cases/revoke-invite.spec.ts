@@ -98,4 +98,16 @@ describe('RevokeInvite', () => {
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
+
+  it('should tag the invite-revoked event with the caller as actorId', async () => {
+    const { ownerId, invite } = seedOwnedWorkspaceWithInvite()
+
+    await sut.execute({
+      userId: ownerId,
+      inviteId: invite.id.toString(),
+    })
+
+    const event = invite.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: ownerId })
+  })
 })

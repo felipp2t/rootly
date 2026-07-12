@@ -1,8 +1,8 @@
+import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
+import { InMemoryWorkspaceInviteRepository } from '@test/repositories/in-memory-workspace-invite-repository.ts'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
-import { makeWorkspaceInvite } from '@test/factories/make-workspace-invite.ts'
-import { InMemoryWorkspaceInviteRepository } from '@test/repositories/in-memory-workspace-invite-repository.ts'
 import { workspaceInviteStatus } from '../../enterprise/entities/workspace-invite.ts'
 import { DeclineInviteUseCase } from './decline-invite.ts'
 import { WorkspaceInviteAlreadyAcceptedError } from './errors/workspace-invite-already-accepted-error.ts'
@@ -168,5 +168,32 @@ describe('DeclineInvite', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(NotAllowedError)
+  })
+
+  it('should tag the invite-declined event with the caller as actorId', {
+    tags: ['decline-invite'],
+  }, async () => {
+    const inviteId = new UniqueEntityID()
+    const userId = new UniqueEntityID().toString()
+
+    const invite = makeWorkspaceInvite(
+      {
+        workspaceId: new UniqueEntityID().toString(),
+        invitedUserId: userId,
+        invitedByUserId: new UniqueEntityID().toString(),
+        roleId: new UniqueEntityID().toString(),
+      },
+      inviteId,
+    )
+
+    workspaceInviteRepository.items.push(invite)
+
+    await sut.execute({
+      inviteId: inviteId.toString(),
+      userId,
+    })
+
+    const event = invite.domainEvents.at(-1)
+    expect(event).toMatchObject({ actorId: userId })
   })
 })

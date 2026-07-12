@@ -10,6 +10,18 @@ import { WorkspaceRole } from '@/domain/root/enterprise/entities/workspace-role.
 import { RecordActivityLogUseCase } from '../use-cases/record-activity-log.ts'
 import { OnMemberActivity } from './on-member-activity.ts'
 
+function makeInvite(target: { id: { toString(): string } }) {
+  return WorkspaceInvite.create(
+    {
+      workspaceId: 'ws-1',
+      invitedUserId: target.id.toString(),
+      invitedByUserId: 'inviter-1',
+      roleId: 'role-1',
+    },
+    new UniqueEntityID('invite-1'),
+  )
+}
+
 let activityLogRepository: InMemoryActivityLogRepository
 let userRepository: InMemoryUserRepository
 let workspaceRoleRepository: InMemoryWorkspaceRoleRepository
@@ -180,6 +192,71 @@ describe('OnMemberActivity', () => {
     member.remove()
 
     DomainEvents.dispatchEventsForAggregate(member.id)
+    await flushPromises()
+
+    expect(activityLogRepository.items).toHaveLength(0)
+  })
+
+  it('should record an activity log when an invite is revoked', async () => {
+    const actor = await createUser({ name: 'Admin' })
+    const target = await createUser({ name: 'Target Member' })
+
+    const invite = makeInvite(target)
+    invite.revoke(actor.id.toString())
+
+    DomainEvents.dispatchEventsForAggregate(invite.id)
+    await flushPromises()
+
+    expect(activityLogRepository.items).toHaveLength(1)
+    expect(activityLogRepository.items[0]).toMatchObject({
+      workspaceId: 'ws-1',
+      resourceType: 'member',
+      resourceId: target.id.toString(),
+      resourceName: 'Target Member',
+      action: 'member_invite_revoked',
+      actorUserId: actor.id.toString(),
+    })
+  })
+
+  it('should not record an activity log when an invite is revoked without an actor', async () => {
+    const target = await createUser({ name: 'Target Member' })
+
+    const invite = makeInvite(target)
+    invite.revoke()
+
+    DomainEvents.dispatchEventsForAggregate(invite.id)
+    await flushPromises()
+
+    expect(activityLogRepository.items).toHaveLength(0)
+  })
+
+  it('should record an activity log when an invite is declined', async () => {
+    const target = await createUser({ name: 'Target Member' })
+
+    const invite = makeInvite(target)
+    invite.decline(target.id.toString())
+
+    DomainEvents.dispatchEventsForAggregate(invite.id)
+    await flushPromises()
+
+    expect(activityLogRepository.items).toHaveLength(1)
+    expect(activityLogRepository.items[0]).toMatchObject({
+      workspaceId: 'ws-1',
+      resourceType: 'member',
+      resourceId: target.id.toString(),
+      resourceName: 'Target Member',
+      action: 'member_invite_declined',
+      actorUserId: target.id.toString(),
+    })
+  })
+
+  it('should not record an activity log when an invite is declined without an actor', async () => {
+    const target = await createUser({ name: 'Target Member' })
+
+    const invite = makeInvite(target)
+    invite.decline()
+
+    DomainEvents.dispatchEventsForAggregate(invite.id)
     await flushPromises()
 
     expect(activityLogRepository.items).toHaveLength(0)
