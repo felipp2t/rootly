@@ -3,7 +3,9 @@ import { z } from 'zod'
 import { makeGetRolePermissionsUseCase } from '../factories/make-get-role-permissions-use-case.ts'
 import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
-export const getRolePermissionsController: FastifyPluginCallbackZod = async (app) => {
+export const getRolePermissionsController: FastifyPluginCallbackZod = async (
+  app,
+) => {
   app.get(
     '/workspaces/:workspaceId/roles/:roleId/permissions',
     {
@@ -23,8 +25,22 @@ export const getRolePermissionsController: FastifyPluginCallbackZod = async (app
               z.object({
                 id: z.string(),
                 roleId: z.string(),
-                resource: z.enum(['workspace', 'folder', 'item', 'member', 'role']),
-                action: z.enum(['read', 'create', 'update', 'delete', 'invite', 'all']),
+                resource: z.enum([
+                  'workspace',
+                  'folder',
+                  'item',
+                  'member',
+                  'role',
+                  'activity',
+                ]),
+                action: z.enum([
+                  'read',
+                  'create',
+                  'update',
+                  'delete',
+                  'invite',
+                  'all',
+                ]),
                 createdAt: z.date(),
                 updatedAt: z.date(),
               }),
@@ -40,7 +56,11 @@ export const getRolePermissionsController: FastifyPluginCallbackZod = async (app
       const { workspaceId, roleId } = request.params
 
       const useCase = makeGetRolePermissionsUseCase()
-      const result = await useCase.execute({ userId: request.userId, workspaceId, roleId })
+      const result = await useCase.execute({
+        userId: request.userId,
+        workspaceId,
+        roleId,
+      })
 
       if (result.isLeft()) {
         const error = result.value

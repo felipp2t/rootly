@@ -3,7 +3,14 @@ import { z } from 'zod'
 import { makeSetRolePermissionsUseCase } from '../factories/make-set-role-permissions-use-case.ts'
 import { verifyJwtHook } from '../middleware/verify-jwt-hook.ts'
 
-const permissionResourceSchema = z.enum(['workspace', 'folder', 'item', 'member', 'role'])
+const permissionResourceSchema = z.enum([
+  'workspace',
+  'folder',
+  'item',
+  'member',
+  'role',
+  'activity',
+])
 const permissionActionSchema = z.enum(['read', 'create', 'update', 'delete', 'invite', 'all'])
 
 export const setRolePermissionsController: FastifyPluginCallbackZod = async (app) => {

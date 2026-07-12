@@ -27,6 +27,7 @@ export const getMyWorkspacePermissionsController: FastifyPluginCallbackZod =
                     'item',
                     'member',
                     'role',
+                    'activity',
                   ]),
                   action: z.enum([
                     'create',
@@ -60,7 +61,9 @@ export const getMyWorkspacePermissionsController: FastifyPluginCallbackZod =
             case 'ResourceNotFoundError':
               return reply.status(404).send({ message: error.message })
             default:
-              return reply.status(500).send({ message: 'Internal Server Error' })
+              return reply
+                .status(500)
+                .send({ message: 'Internal Server Error' })
           }
         }
 
