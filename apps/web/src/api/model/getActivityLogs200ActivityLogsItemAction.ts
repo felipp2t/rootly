@@ -17,4 +17,8 @@ export const GetActivityLogs200ActivityLogsItemAction = {
   item_archived: 'item_archived',
   item_restored: 'item_restored',
   item_deleted: 'item_deleted',
+  member_invited: 'member_invited',
+  member_joined: 'member_joined',
+  member_role_changed: 'member_role_changed',
+  member_removed: 'member_removed',
 } as const;

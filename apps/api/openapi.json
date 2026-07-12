@@ -4782,7 +4782,8 @@
               "type": "string",
               "enum": [
                 "folder",
-                "item"
+                "item",
+                "member"
               ]
             },
             "in": "query",
@@ -4821,7 +4822,8 @@
                             "type": "string",
                             "enum": [
                               "folder",
-                              "item"
+                              "item",
+                              "member"
                             ]
                           },
                           "resourceId": {
@@ -4840,7 +4842,11 @@
                               "item_updated",
                               "item_archived",
                               "item_restored",
-                              "item_deleted"
+                              "item_deleted",
+                              "member_invited",
+                              "member_joined",
+                              "member_role_changed",
+                              "member_removed"
                             ]
                           },
                           "actorUserId": {

@@ -11,4 +11,5 @@ export type GetActivityLogsResourceType = typeof GetActivityLogsResourceType[key
 export const GetActivityLogsResourceType = {
   folder: 'folder',
   item: 'item',
+  member: 'member',
 } as const;
