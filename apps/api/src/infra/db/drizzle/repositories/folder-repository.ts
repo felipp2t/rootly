@@ -3,6 +3,7 @@ import {
   isPgUniqueViolation,
   UniqueConstraintViolationError,
 } from '@/core/errors/unique-constraint-violation-error.ts'
+import { DomainEvents } from '@/core/events/domain-events.ts'
 import type {
   FolderRepository,
   FolderWithCounts,
@@ -172,6 +173,8 @@ export class DrizzleFolderRepository implements FolderRepository {
       }
       throw error
     }
+
+    DomainEvents.dispatchEventsForAggregate(folder.id)
   }
 
   async save(folder: Folder): Promise<void> {
@@ -179,6 +182,8 @@ export class DrizzleFolderRepository implements FolderRepository {
       .update(schema.folders)
       .set(DrizzleFolderMapper.toDrizzle(folder))
       .where(eq(schema.folders.id, folder.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(folder.id)
   }
 
   async delete(id: string): Promise<void> {

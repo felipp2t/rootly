@@ -1,4 +1,5 @@
 import { and, count, eq, isNull } from 'drizzle-orm'
+import { DomainEvents } from '@/core/events/domain-events.ts'
 import type {
   FindManyItemsOptions,
   ItemRepository,
@@ -83,6 +84,8 @@ export class DrizzleItemRepository implements ItemRepository {
 
   async create(item: Item): Promise<void> {
     await this.db.insert(schema.items).values(DrizzleItemMapper.toDrizzle(item))
+
+    DomainEvents.dispatchEventsForAggregate(item.id)
   }
 
   async save(item: Item): Promise<void> {
@@ -90,6 +93,8 @@ export class DrizzleItemRepository implements ItemRepository {
       .update(schema.items)
       .set(DrizzleItemMapper.toDrizzle(item))
       .where(eq(schema.items.id, item.id.toString()))
+
+    DomainEvents.dispatchEventsForAggregate(item.id)
   }
 
   async delete(id: string): Promise<void> {
