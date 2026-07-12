@@ -1,0 +1,2 @@
+ALTER TYPE "public"."activity_action" ADD VALUE 'member_invite_revoked' BEFORE 'workspace_renamed';--> statement-breakpoint
+ALTER TYPE "public"."activity_action" ADD VALUE 'member_invite_declined' BEFORE 'workspace_renamed';

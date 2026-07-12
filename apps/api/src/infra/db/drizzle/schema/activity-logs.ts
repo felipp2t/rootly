@@ -31,6 +31,8 @@ export const activityActionEnum = pgEnum('activity_action', [
   'member_joined',
   'member_role_changed',
   'member_removed',
+  'member_invite_revoked',
+  'member_invite_declined',
   'workspace_renamed',
   'role_created',
   'role_deleted',

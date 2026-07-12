@@ -2,6 +2,8 @@ import { DomainEvents } from '@/core/events/domain-events.ts'
 import type { EventHandler } from '@/core/events/event-handler.ts'
 import type { UserRepository } from '@/domain/root/application/repositories/user-repository.ts'
 import type { WorkspaceRoleRepository } from '@/domain/root/application/repositories/workspace-role-repository.ts'
+import { InviteDeclinedEvent } from '@/domain/root/enterprise/events/invite-declined-event.ts'
+import { InviteRevokedEvent } from '@/domain/root/enterprise/events/invite-revoked-event.ts'
 import { MemberJoinedEvent } from '@/domain/root/enterprise/events/member-joined-event.ts'
 import { MemberRemovedEvent } from '@/domain/root/enterprise/events/member-removed-event.ts'
 import { MemberRoleChangedEvent } from '@/domain/root/enterprise/events/member-role-changed-event.ts'
@@ -33,6 +35,14 @@ export class OnMemberActivity implements EventHandler {
     DomainEvents.register(
       this.onMemberRemoved.bind(this),
       MemberRemovedEvent.name,
+    )
+    DomainEvents.register(
+      this.onInviteRevoked.bind(this),
+      InviteRevokedEvent.name,
+    )
+    DomainEvents.register(
+      this.onInviteDeclined.bind(this),
+      InviteDeclinedEvent.name,
     )
   }
 
@@ -110,6 +120,48 @@ export class OnMemberActivity implements EventHandler {
       resourceId: target.id.toString(),
       resourceName: target.name,
       action: 'member_removed',
+      actorUserId: actorId,
+    })
+  }
+
+  private async onInviteRevoked({
+    workspaceInvite,
+    actorId,
+  }: InviteRevokedEvent) {
+    if (!actorId) return
+
+    const target = await this.userRepository.findById(
+      workspaceInvite.invitedUserId,
+    )
+    if (!target) return
+
+    await this.recordActivityLog.execute({
+      workspaceId: workspaceInvite.workspaceId,
+      resourceType: 'member',
+      resourceId: target.id.toString(),
+      resourceName: target.name,
+      action: 'member_invite_revoked',
+      actorUserId: actorId,
+    })
+  }
+
+  private async onInviteDeclined({
+    workspaceInvite,
+    actorId,
+  }: InviteDeclinedEvent) {
+    if (!actorId) return
+
+    const target = await this.userRepository.findById(
+      workspaceInvite.invitedUserId,
+    )
+    if (!target) return
+
+    await this.recordActivityLog.execute({
+      workspaceId: workspaceInvite.workspaceId,
+      resourceType: 'member',
+      resourceId: target.id.toString(),
+      resourceName: target.name,
+      action: 'member_invite_declined',
       actorUserId: actorId,
     })
   }

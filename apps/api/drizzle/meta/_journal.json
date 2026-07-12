@@ -155,6 +155,13 @@
       "when": 1783856443740,
       "tag": "0021_hesitant_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1783857948079,
+      "tag": "0022_mushy_doctor_spectrum",
+      "breakpoints": true
     }
   ]
 }
