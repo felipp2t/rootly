@@ -49,6 +49,12 @@ import type {
   RestoreItem404,
   RestoreItem409,
   RestoreItem500,
+  UpdateItem400,
+  UpdateItem401,
+  UpdateItem404,
+  UpdateItem409,
+  UpdateItem500,
+  UpdateItemBody,
   UploadItem201,
   UploadItem400,
   UploadItem401,
@@ -775,5 +781,116 @@ export const useDeleteItem = <TError = DeleteItem401 | DeleteItem404 | DeleteIte
         TContext
       > => {
       return useMutation(getDeleteItemMutationOptions(options), queryClient);
+    }
+    /**
+ * Update an item's title and/or content.
+ * @summary Update Item
+ */
+export type updateItemResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updateItemResponse400 = {
+  data: UpdateItem400
+  status: 400
+}
+
+export type updateItemResponse401 = {
+  data: UpdateItem401
+  status: 401
+}
+
+export type updateItemResponse404 = {
+  data: UpdateItem404
+  status: 404
+}
+
+export type updateItemResponse409 = {
+  data: UpdateItem409
+  status: 409
+}
+
+export type updateItemResponse500 = {
+  data: UpdateItem500
+  status: 500
+}
+
+export type updateItemResponseSuccess = (updateItemResponse204) & {
+  headers: Headers;
+};
+export type updateItemResponseError = (updateItemResponse400 | updateItemResponse401 | updateItemResponse404 | updateItemResponse409 | updateItemResponse500) & {
+  headers: Headers;
+};
+
+export type updateItemResponse = (updateItemResponseSuccess | updateItemResponseError)
+
+export const getUpdateItemUrl = (itemId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/items/${itemId}`
+}
+
+export const updateItem = async (itemId: string,
+    updateItemBody: UpdateItemBody, options?: RequestInit): Promise<updateItemResponse> => {
+  
+  return fetchWithAuth<updateItemResponse>(getUpdateItemUrl(itemId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateItemBody,)
+  }
+);}
+  
+
+
+
+export const getUpdateItemMutationOptions = <TError = UpdateItem400 | UpdateItem401 | UpdateItem404 | UpdateItem409 | UpdateItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateItem>>, TError,{itemId: string;data: UpdateItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateItem>>, TError,{itemId: string;data: UpdateItemBody}, TContext> => {
+
+const mutationKey = ['updateItem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateItem>>, {itemId: string;data: UpdateItemBody}> = (props) => {
+          const {itemId,data} = props ?? {};
+
+          return  updateItem(itemId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateItemMutationResult = NonNullable<Awaited<ReturnType<typeof updateItem>>>
+    export type UpdateItemMutationBody = UpdateItemBody
+    export type UpdateItemMutationError = UpdateItem400 | UpdateItem401 | UpdateItem404 | UpdateItem409 | UpdateItem500
+
+    /**
+ * @summary Update Item
+ */
+export const useUpdateItem = <TError = UpdateItem400 | UpdateItem401 | UpdateItem404 | UpdateItem409 | UpdateItem500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateItem>>, TError,{itemId: string;data: UpdateItemBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateItem>>,
+        TError,
+        {itemId: string;data: UpdateItemBody},
+        TContext
+      > => {
+      return useMutation(getUpdateItemMutationOptions(options), queryClient);
     }
     

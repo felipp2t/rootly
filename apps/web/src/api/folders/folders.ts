@@ -41,6 +41,12 @@ import type {
   GetFolders401,
   GetFolders500,
   GetFoldersParams,
+  RenameFolder400,
+  RenameFolder401,
+  RenameFolder404,
+  RenameFolder409,
+  RenameFolder500,
+  RenameFolderBody,
   ResolveFolderPath200,
   ResolveFolderPath401,
   ResolveFolderPath404,
@@ -634,5 +640,116 @@ export const useDeleteFolder = <TError = DeleteFolder401 | DeleteFolder404 | Del
         TContext
       > => {
       return useMutation(getDeleteFolderMutationOptions(options), queryClient);
+    }
+    /**
+ * Rename a folder.
+ * @summary Rename Folder
+ */
+export type renameFolderResponse204 = {
+  data: void
+  status: 204
+}
+
+export type renameFolderResponse400 = {
+  data: RenameFolder400
+  status: 400
+}
+
+export type renameFolderResponse401 = {
+  data: RenameFolder401
+  status: 401
+}
+
+export type renameFolderResponse404 = {
+  data: RenameFolder404
+  status: 404
+}
+
+export type renameFolderResponse409 = {
+  data: RenameFolder409
+  status: 409
+}
+
+export type renameFolderResponse500 = {
+  data: RenameFolder500
+  status: 500
+}
+
+export type renameFolderResponseSuccess = (renameFolderResponse204) & {
+  headers: Headers;
+};
+export type renameFolderResponseError = (renameFolderResponse400 | renameFolderResponse401 | renameFolderResponse404 | renameFolderResponse409 | renameFolderResponse500) & {
+  headers: Headers;
+};
+
+export type renameFolderResponse = (renameFolderResponseSuccess | renameFolderResponseError)
+
+export const getRenameFolderUrl = (folderId: string,) => {
+
+
+  
+
+  return `http://localhost:3333/api/folders/${folderId}`
+}
+
+export const renameFolder = async (folderId: string,
+    renameFolderBody: RenameFolderBody, options?: RequestInit): Promise<renameFolderResponse> => {
+  
+  return fetchWithAuth<renameFolderResponse>(getRenameFolderUrl(folderId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      renameFolderBody,)
+  }
+);}
+  
+
+
+
+export const getRenameFolderMutationOptions = <TError = RenameFolder400 | RenameFolder401 | RenameFolder404 | RenameFolder409 | RenameFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameFolder>>, TError,{folderId: string;data: RenameFolderBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+): UseMutationOptions<Awaited<ReturnType<typeof renameFolder>>, TError,{folderId: string;data: RenameFolderBody}, TContext> => {
+
+const mutationKey = ['renameFolder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof renameFolder>>, {folderId: string;data: RenameFolderBody}> = (props) => {
+          const {folderId,data} = props ?? {};
+
+          return  renameFolder(folderId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RenameFolderMutationResult = NonNullable<Awaited<ReturnType<typeof renameFolder>>>
+    export type RenameFolderMutationBody = RenameFolderBody
+    export type RenameFolderMutationError = RenameFolder400 | RenameFolder401 | RenameFolder404 | RenameFolder409 | RenameFolder500
+
+    /**
+ * @summary Rename Folder
+ */
+export const useRenameFolder = <TError = RenameFolder400 | RenameFolder401 | RenameFolder404 | RenameFolder409 | RenameFolder500,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameFolder>>, TError,{folderId: string;data: RenameFolderBody}, TContext>, request?: SecondParameter<typeof fetchWithAuth>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof renameFolder>>,
+        TError,
+        {folderId: string;data: RenameFolderBody},
+        TContext
+      > => {
+      return useMutation(getRenameFolderMutationOptions(options), queryClient);
     }
     
