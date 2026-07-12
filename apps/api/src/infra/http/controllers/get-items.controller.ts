@@ -10,12 +10,14 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
       onRequest: verifyJwtHook,
       schema: {
         summary: 'Get Items',
-        description: 'List items. Optionally filter by parentId or workspaceId.',
+        description:
+          'List items. Optionally filter by parentId or workspaceId.',
         operationId: 'getItems',
         tags: ['Items'],
         querystring: z.object({
           parentId: z.string().optional(),
           workspaceId: z.string().optional(),
+          includeArchived: z.coerce.boolean().optional(),
         }),
         response: {
           200: z.object({
@@ -27,6 +29,7 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
                 content: z.string().nullable(),
                 workspaceId: z.string(),
                 folderId: z.string().nullable(),
+                archivedAt: z.date().nullable(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
               }),
@@ -38,10 +41,15 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const { parentId, workspaceId } = request.query
+      const { parentId, workspaceId, includeArchived } = request.query
 
       const useCase = makeGetItemsUseCase()
-      const result = await useCase.execute({ userId: request.userId, parentId, workspaceId })
+      const result = await useCase.execute({
+        userId: request.userId,
+        parentId,
+        workspaceId,
+        includeArchived,
+      })
 
       if (result.isLeft()) {
         return reply.status(500).send({ message: 'Internal Server Error' })
@@ -55,6 +63,7 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
           content: item.content ?? null,
           workspaceId: item.workspaceId,
           folderId: item.folderId ?? null,
+          archivedAt: item.archivedAt ?? null,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         })),
