@@ -7,6 +7,7 @@ import { FolderNotFoundError } from './errors/folder-not-found-error.ts'
 
 interface DeleteFolderUseCaseRequest {
   folderId: string
+  actorId?: string
 }
 
 type DeleteFolderUseCaseResponse = Either<BaseError, null>
@@ -19,6 +20,7 @@ export class DeleteFolderUseCase {
 
   async execute({
     folderId,
+    actorId,
   }: DeleteFolderUseCaseRequest): Promise<DeleteFolderUseCaseResponse> {
     const folder = await this.folderRepository.findById(folderId)
 
@@ -39,6 +41,8 @@ export class DeleteFolderUseCase {
         new FolderNotEmptyError('Folder contains active or archived items.'),
       )
     }
+
+    folder.delete(actorId)
 
     await this.folderRepository.delete(folderId)
 

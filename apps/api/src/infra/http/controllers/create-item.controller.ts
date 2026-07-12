@@ -40,6 +40,7 @@ export const createItemsController: FastifyPluginCallbackZod = async (app) => {
         title,
         type,
         content,
+        actorId: request.userId,
       })
 
       if (result.isLeft()) {

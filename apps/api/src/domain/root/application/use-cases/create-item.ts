@@ -16,6 +16,7 @@ interface CreateItemUseCaseRequest {
   content?: string
   fileBuffer?: Buffer
   fileName?: string
+  actorId?: string
 }
 
 type CreateItemUseCaseResponse = Either<BaseError, { itemId: string }>
@@ -34,6 +35,7 @@ export class CreateItemUseCase {
     content,
     fileBuffer,
     fileName,
+    actorId,
   }: CreateItemUseCaseRequest): Promise<CreateItemUseCaseResponse> {
     const item = await this.itemRepository.findByTitle(title)
 
@@ -67,7 +69,11 @@ export class CreateItemUseCase {
     }
 
     const newItem = await safeEither(() =>
-      Item.create({ workspaceId, folderId, type, title, content }),
+      Item.create(
+        { workspaceId, folderId, type, title, content },
+        undefined,
+        actorId,
+      ),
     )
 
     if (newItem.isLeft()) {

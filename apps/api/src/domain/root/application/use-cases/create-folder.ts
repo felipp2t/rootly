@@ -10,6 +10,7 @@ interface CreateFolderUseCaseRequest {
   name: string
   parentId?: string
   workspaceId: string
+  actorId?: string
 }
 
 type CreateFolderUseCaseResponse = Either<BaseError, { folderId: string }>
@@ -21,6 +22,7 @@ export class CreateFolderUseCase {
     name,
     parentId,
     workspaceId,
+    actorId,
   }: CreateFolderUseCaseRequest): Promise<CreateFolderUseCaseResponse> {
     const trimmedLength = name.trim().length
 
@@ -38,11 +40,15 @@ export class CreateFolderUseCase {
       return left(new FolderAlreadyExistsError())
     }
 
-    const newFolder = Folder.create({
-      name,
-      parentId,
-      workspaceId,
-    })
+    const newFolder = Folder.create(
+      {
+        name,
+        parentId,
+        workspaceId,
+      },
+      undefined,
+      actorId,
+    )
 
     try {
       await this.folderRepositoy.create(newFolder)

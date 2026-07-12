@@ -29,7 +29,10 @@ export const deleteFolderController: FastifyPluginCallbackZod = async (app) => {
       const { folderId } = request.params
 
       const useCase = makeDeleteFolderUseCase()
-      const result = await useCase.execute({ folderId })
+      const result = await useCase.execute({
+        folderId,
+        actorId: request.userId,
+      })
 
       if (result.isLeft()) {
         const error = result.value

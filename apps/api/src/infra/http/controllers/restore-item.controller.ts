@@ -29,7 +29,10 @@ export const restoreItemController: FastifyPluginCallbackZod = async (app) => {
       const { itemId } = request.params
 
       const useCase = makeRestoreItemUseCase()
-      const result = await useCase.execute({ itemId })
+      const result = await useCase.execute({
+        itemId,
+        actorId: request.userId,
+      })
 
       if (result.isLeft()) {
         const error = result.value

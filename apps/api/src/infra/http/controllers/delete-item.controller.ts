@@ -29,7 +29,10 @@ export const deleteItemController: FastifyPluginCallbackZod = async (app) => {
       const { itemId } = request.params
 
       const useCase = makeDeleteItemUseCase()
-      const result = await useCase.execute({ itemId })
+      const result = await useCase.execute({
+        itemId,
+        actorId: request.userId,
+      })
 
       if (result.isLeft()) {
         const error = result.value

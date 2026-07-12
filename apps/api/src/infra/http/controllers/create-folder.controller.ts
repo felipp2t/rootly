@@ -36,6 +36,7 @@ export const createFolderController: FastifyPluginCallbackZod = async (app) => {
         name,
         parentId,
         workspaceId,
+        actorId: request.userId,
       })
 
       if (result.isLeft()) {

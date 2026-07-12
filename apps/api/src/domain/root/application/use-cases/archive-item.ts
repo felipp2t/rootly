@@ -6,6 +6,7 @@ import { ItemNotFoundError } from './errors/item-not-found-error.ts'
 
 interface ArchiveItemUseCaseRequest {
   itemId: string
+  actorId?: string
 }
 
 type ArchiveItemUseCaseResponse = Either<BaseError, null>
@@ -15,6 +16,7 @@ export class ArchiveItemUseCase {
 
   async execute({
     itemId,
+    actorId,
   }: ArchiveItemUseCaseRequest): Promise<ArchiveItemUseCaseResponse> {
     const item = await this.itemRepository.findById(itemId)
 
@@ -26,7 +28,7 @@ export class ArchiveItemUseCase {
       return left(new ItemAlreadyArchivedError())
     }
 
-    item.archive()
+    item.archive(actorId)
 
     await this.itemRepository.save(item)
 

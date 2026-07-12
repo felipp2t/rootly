@@ -7,6 +7,7 @@ import { ItemNotFoundError } from './errors/item-not-found-error.ts'
 
 interface DeleteItemUseCaseRequest {
   itemId: string
+  actorId?: string
 }
 
 type DeleteItemUseCaseResponse = Either<BaseError, null>
@@ -19,6 +20,7 @@ export class DeleteItemUseCase {
 
   async execute({
     itemId,
+    actorId,
   }: DeleteItemUseCaseRequest): Promise<DeleteItemUseCaseResponse> {
     const item = await this.itemRepository.findById(itemId)
 
@@ -33,6 +35,8 @@ export class DeleteItemUseCase {
     if (item.type === 'document' && item.content) {
       await this.storageRepository.delete(item.content)
     }
+
+    item.delete(actorId)
 
     await this.itemRepository.delete(itemId)
 
