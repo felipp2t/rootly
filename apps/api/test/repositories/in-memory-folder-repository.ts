@@ -1,9 +1,14 @@
 import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
-import type { FolderRepository, FolderWithCounts } from '@/domain/root/application/repositories/folder-repository.ts'
+import type {
+  FolderRepository,
+  FolderWithCounts,
+} from '@/domain/root/application/repositories/folder-repository.ts'
 import type { Folder } from '@/domain/root/enterprise/entities/folder.ts'
+import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 
 export class InMemoryFolderRepository implements FolderRepository {
   items: Folder[] = []
+  itemsInFolders: Item[] = []
   workspaceMembers: { userId: string; workspaceId: string }[] = []
 
   async findById(id: string): Promise<Folder | null> {
@@ -71,9 +76,17 @@ export class InMemoryFolderRepository implements FolderRepository {
     const folders = await this.findMany(userId, parentId, workspaceId)
     return folders.map((folder) => ({
       folder,
-      itemCount: 0,
-      subfolderCount: this.items.filter((f) => f.parentId === folder.id.toString()).length,
+      itemCount: this.itemsInFolders.filter(
+        (item) => item.folderId === folder.id.toString() && !item.isArchived,
+      ).length,
+      subfolderCount: this.items.filter(
+        (f) => f.parentId === folder.id.toString(),
+      ).length,
     }))
+  }
+
+  async hasSubfolders(folderId: string): Promise<boolean> {
+    return this.items.some((folder) => folder.parentId === folderId)
   }
 
   async create(folder: Folder): Promise<void> {
@@ -85,9 +98,7 @@ export class InMemoryFolderRepository implements FolderRepository {
     )
 
     if (conflict) {
-      throw new UniqueConstraintViolationError(
-        'folders_unique_name_per_parent',
-      )
+      throw new UniqueConstraintViolationError('folders_unique_name_per_parent')
     }
 
     this.items.push(folder)

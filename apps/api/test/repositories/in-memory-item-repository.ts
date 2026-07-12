@@ -1,4 +1,7 @@
-import type { ItemRepository } from '@/domain/root/application/repositories/item-repository.ts'
+import type {
+  FindManyItemsOptions,
+  ItemRepository,
+} from '@/domain/root/application/repositories/item-repository.ts'
 import type { Item } from '@/domain/root/enterprise/entities/item.ts'
 
 export class InMemoryItemRepository implements ItemRepository {
@@ -17,13 +20,16 @@ export class InMemoryItemRepository implements ItemRepository {
     userId: string,
     parentId?: string,
     workspaceId?: string,
+    options?: FindManyItemsOptions,
   ): Promise<Item[]> {
     const userWorkspaceIds = this.workspaceMembers
       .filter((m) => m.userId === userId)
       .map((m) => m.workspaceId)
 
-    const scoped = this.items.filter((item) =>
-      userWorkspaceIds.includes(item.workspaceId),
+    const scoped = this.items.filter(
+      (item) =>
+        userWorkspaceIds.includes(item.workspaceId) &&
+        (options?.includeArchived || !item.isArchived),
     )
 
     if (workspaceId !== undefined) {
@@ -34,6 +40,10 @@ export class InMemoryItemRepository implements ItemRepository {
     }
     if (parentId === undefined) return scoped
     return scoped.filter((item) => item.folderId === parentId)
+  }
+
+  async hasItems(folderId: string): Promise<boolean> {
+    return this.items.some((item) => item.folderId === folderId)
   }
 
   async create(item: Item): Promise<void> {

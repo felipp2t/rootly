@@ -1,4 +1,5 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
+import { ItemArchivedError } from '../validators/_errors/item-archived-error.ts'
 import { InvalidItemTypeError } from '../validators/_errors/invalid-item-type.ts'
 import { Item } from './item.ts'
 
@@ -169,5 +170,63 @@ describe('Item', () => {
     expect(item.createdAt.getTime()).toBeLessThanOrEqual(after.getTime())
     expect(item.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime())
     expect(item.updatedAt.getTime()).toBeLessThanOrEqual(after.getTime())
+  })
+
+  it('should not be archived by default', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+
+    expect(item.isArchived).toBe(false)
+    expect(item.archivedAt).toBeUndefined()
+  })
+
+  it('should archive an item and touch updatedAt', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+    const beforeArchive = item.updatedAt
+
+    item.archive()
+
+    expect(item.isArchived).toBe(true)
+    expect(item.archivedAt).toBeInstanceOf(Date)
+    expect(item.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeArchive.getTime())
+  })
+
+  it('should restore an archived item', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+
+    item.archive()
+    item.restore()
+
+    expect(item.isArchived).toBe(false)
+    expect(item.archivedAt).toBeUndefined()
+  })
+
+  it('should throw ItemArchivedError when setting title on an archived item', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+
+    item.archive()
+
+    expect(() => {
+      item.title = 'New title'
+    }).toThrow(ItemArchivedError)
+  })
+
+  it('should throw ItemArchivedError when setting content on an archived item', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+
+    item.archive()
+
+    expect(() => {
+      item.content = 'New content'
+    }).toThrow(ItemArchivedError)
+  })
+
+  it('should allow editing again after restoring an archived item', () => {
+    const item = Item.create({ workspaceId: 'ws-1', type: 'text', title: 'Note' })
+
+    item.archive()
+    item.restore()
+    item.title = 'New title'
+
+    expect(item.title).toBe('New title')
   })
 })

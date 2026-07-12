@@ -14,6 +14,10 @@ export default defineConfig({
         name: 'accept-invite',
         description: 'Accept workspace invite use case',
       },
+      { name: 'archive-item', description: 'Archive item use case' },
+      { name: 'restore-item', description: 'Restore item use case' },
+      { name: 'delete-item', description: 'Delete item use case' },
+      { name: 'delete-folder', description: 'Delete folder use case' },
       {
         name: 'assign-tag-to-folder',
         description: 'Assign tag to folder use case',
