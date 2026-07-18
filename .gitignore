@@ -96,3 +96,6 @@ build/Release
 
 # notes
 .notes/
+
+# Graphify
+graphify-out
