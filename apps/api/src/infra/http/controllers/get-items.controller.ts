@@ -20,6 +20,8 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
           includeArchived: z
             .stringbool({ truthy: ['true', 'yes'], falsy: ['false', 'no'] })
             .optional(),
+          page: z.coerce.number().int().min(1).optional(),
+          limit: z.coerce.number().int().min(1).optional(),
         }),
         response: {
           200: z.object({
@@ -36,6 +38,10 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
                 updatedAt: z.date(),
               }),
             ),
+            page: z.number(),
+            limit: z.number(),
+            total: z.number(),
+            totalPages: z.number(),
           }),
           401: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
@@ -43,7 +49,8 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const { parentId, workspaceId, includeArchived } = request.query
+      const { parentId, workspaceId, includeArchived, page, limit } =
+        request.query
 
       const useCase = makeGetItemsUseCase()
       const result = await useCase.execute({
@@ -51,6 +58,8 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
         parentId,
         workspaceId,
         includeArchived,
+        page,
+        limit,
       })
 
       if (result.isLeft()) {
@@ -69,6 +78,10 @@ export const getItemsController: FastifyPluginCallbackZod = async (app) => {
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         })),
+        page: result.value.page,
+        limit: result.value.limit,
+        total: result.value.total,
+        totalPages: result.value.totalPages,
       })
     },
   )

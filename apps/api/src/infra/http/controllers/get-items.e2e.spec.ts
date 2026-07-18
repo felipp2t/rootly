@@ -118,4 +118,26 @@ describe('GET /items', () => {
     expect(response.statusCode).toBe(200)
     expect(response.json().items).toHaveLength(2)
   })
+
+  it('should paginate items and expose pagination metadata', async () => {
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
+    await createItem(cookieHeader, workspaceId)
+    await createItem(cookieHeader, workspaceId)
+    await createItem(cookieHeader, workspaceId)
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/items?workspaceId=${workspaceId}&page=1&limit=2`,
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    const body = response.json()
+    expect(body.items).toHaveLength(2)
+    expect(body.total).toBe(3)
+    expect(body.page).toBe(1)
+    expect(body.limit).toBe(2)
+    expect(body.totalPages).toBe(2)
+  })
 })

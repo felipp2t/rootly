@@ -68,8 +68,9 @@ describe('InMemoryItemRepository', () => {
 
       const result = await repo.findMany('u-1')
 
-      expect(result).toHaveLength(1)
-      expect(result[0]).toBe(i1)
+      expect(result.items).toHaveLength(1)
+      expect(result.items[0]).toBe(i1)
+      expect(result.total).toBe(1)
     })
 
     it('should return root items (no folderId) filtered by workspaceId', async () => {
@@ -80,8 +81,8 @@ describe('InMemoryItemRepository', () => {
 
       const result = await repo.findMany('u-1', undefined, 'ws-1')
 
-      expect(result).toHaveLength(1)
-      expect(result[0]).toBe(root)
+      expect(result.items).toHaveLength(1)
+      expect(result.items[0]).toBe(root)
     })
 
     it('should return items by folderId (parentId)', async () => {
@@ -94,9 +95,9 @@ describe('InMemoryItemRepository', () => {
 
       const result = await repo.findMany('u-1', 'folder-a')
 
-      expect(result).toHaveLength(2)
-      expect(result).toContain(i1)
-      expect(result).toContain(i2)
+      expect(result.items).toHaveLength(2)
+      expect(result.items).toContain(i1)
+      expect(result.items).toContain(i2)
     })
 
     it('should return empty array when user is not a member of any workspace', async () => {
@@ -105,7 +106,29 @@ describe('InMemoryItemRepository', () => {
 
       const result = await repo.findMany('unknown-user')
 
-      expect(result).toHaveLength(0)
+      expect(result.items).toHaveLength(0)
+      expect(result.total).toBe(0)
+    })
+
+    it('should paginate results according to page and limit', async () => {
+      for (let i = 0; i < 5; i++) {
+        await repo.create(makeItem({ workspaceId: 'ws-1' }))
+      }
+
+      const firstPage = await repo.findMany('u-1', undefined, undefined, {
+        page: 1,
+        limit: 2,
+      })
+      const secondPage = await repo.findMany('u-1', undefined, undefined, {
+        page: 2,
+        limit: 2,
+      })
+
+      expect(firstPage.items).toHaveLength(2)
+      expect(firstPage.total).toBe(5)
+      expect(firstPage.totalPages).toBe(3)
+      expect(secondPage.items).toHaveLength(2)
+      expect(firstPage.items[0]).not.toBe(secondPage.items[0])
     })
   })
 

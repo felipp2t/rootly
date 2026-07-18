@@ -1,3 +1,8 @@
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
   FindManyItemsOptions,
   ItemRepository,
@@ -21,7 +26,7 @@ export class InMemoryItemRepository implements ItemRepository {
     parentId?: string,
     workspaceId?: string,
     options?: FindManyItemsOptions,
-  ): Promise<Item[]> {
+  ): Promise<Paginated<Item>> {
     const userWorkspaceIds = this.workspaceMembers
       .filter((m) => m.userId === userId)
       .map((m) => m.workspaceId)
@@ -32,14 +37,24 @@ export class InMemoryItemRepository implements ItemRepository {
         (options?.includeArchived || !item.isArchived),
     )
 
-    if (workspaceId !== undefined) {
-      return scoped.filter(
-        (item) =>
-          item.workspaceId === workspaceId && item.folderId === undefined,
-      )
-    }
-    if (parentId === undefined) return scoped
-    return scoped.filter((item) => item.folderId === parentId)
+    const filtered =
+      workspaceId !== undefined
+        ? scoped.filter(
+            (item) =>
+              item.workspaceId === workspaceId && item.folderId === undefined,
+          )
+        : parentId === undefined
+          ? scoped
+          : scoped.filter((item) => item.folderId === parentId)
+
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
+
+    return toPaginated(
+      filtered.slice(offset, offset + limit),
+      filtered.length,
+      page,
+      limit,
+    )
   }
 
   async hasItems(folderId: string): Promise<boolean> {

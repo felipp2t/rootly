@@ -1,6 +1,11 @@
-import { and, count, eq, isNull } from 'drizzle-orm'
+import { and, count, countDistinct, eq, isNull } from 'drizzle-orm'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.ts'
 import { DomainEvents } from '@/core/events/domain-events.ts'
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
   FindManyItemsOptions,
   ItemRepository,
@@ -40,7 +45,7 @@ export class DrizzleItemRepository implements ItemRepository {
     parentId?: string,
     workspaceId?: string,
     options?: FindManyItemsOptions,
-  ): Promise<Item[]> {
+  ): Promise<Paginated<Item>> {
     const scopeCondition =
       parentId !== undefined
         ? eq(schema.items.folderId, parentId)
@@ -55,23 +60,46 @@ export class DrizzleItemRepository implements ItemRepository {
       ? undefined
       : isNull(schema.items.archivedAt)
 
-    const rows = await this.db
-      .selectDistinct({ item: schema.items })
-      .from(schema.items)
-      .innerJoin(
-        schema.workspaceMembers,
-        and(
-          eq(schema.workspaceMembers.workspaceId, schema.items.workspaceId),
-          eq(schema.workspaceMembers.userId, userId),
-        ),
-      )
-      .where(
-        scopeCondition && archivedCondition
-          ? and(scopeCondition, archivedCondition)
-          : (scopeCondition ?? archivedCondition),
-      )
+    const whereCondition =
+      scopeCondition && archivedCondition
+        ? and(scopeCondition, archivedCondition)
+        : (scopeCondition ?? archivedCondition)
 
-    return rows.map((row) => DrizzleItemMapper.toDomain(row.item))
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
+
+    const [rows, [{ total }]] = await Promise.all([
+      this.db
+        .selectDistinct({ item: schema.items })
+        .from(schema.items)
+        .innerJoin(
+          schema.workspaceMembers,
+          and(
+            eq(schema.workspaceMembers.workspaceId, schema.items.workspaceId),
+            eq(schema.workspaceMembers.userId, userId),
+          ),
+        )
+        .where(whereCondition)
+        .limit(limit)
+        .offset(offset),
+      this.db
+        .select({ total: countDistinct(schema.items.id) })
+        .from(schema.items)
+        .innerJoin(
+          schema.workspaceMembers,
+          and(
+            eq(schema.workspaceMembers.workspaceId, schema.items.workspaceId),
+            eq(schema.workspaceMembers.userId, userId),
+          ),
+        )
+        .where(whereCondition),
+    ])
+
+    return toPaginated(
+      rows.map((row) => DrizzleItemMapper.toDomain(row.item)),
+      total,
+      page,
+      limit,
+    )
   }
 
   async hasItems(folderId: string): Promise<boolean> {

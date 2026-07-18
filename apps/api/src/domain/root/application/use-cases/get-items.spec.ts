@@ -307,4 +307,37 @@ describe('GetItems', () => {
       expect(response.value.items).toHaveLength(2)
     }
   })
+
+  it('should paginate results and expose pagination metadata', {
+    tags: ['get-items'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
+    itemRepository.workspaceMembers.push({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+    })
+
+    for (let i = 0; i < 3; i++) {
+      await itemRepository.create(
+        makeItem({ workspaceId: workspace.id.toString() }),
+      )
+    }
+
+    const response = await sut.execute({
+      userId: user.id.toString(),
+      page: 1,
+      limit: 2,
+    })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.items).toHaveLength(2)
+      expect(response.value.total).toBe(3)
+      expect(response.value.page).toBe(1)
+      expect(response.value.limit).toBe(2)
+      expect(response.value.totalPages).toBe(2)
+    }
+  })
 })

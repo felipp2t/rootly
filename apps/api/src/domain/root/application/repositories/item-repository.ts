@@ -1,7 +1,10 @@
+import type { Paginated } from '@/core/types/paginated.ts'
 import type { Item } from '../../enterprise/entities/item.ts'
 
 export interface FindManyItemsOptions {
   includeArchived?: boolean
+  page?: number
+  limit?: number
 }
 
 export abstract class ItemRepository {
@@ -12,7 +15,7 @@ export abstract class ItemRepository {
     parentId?: string,
     workspaceId?: string,
     options?: FindManyItemsOptions,
-  ): Promise<Item[]>
+  ): Promise<Paginated<Item>>
   abstract hasItems(folderId: string): Promise<boolean>
   abstract create(item: Item): Promise<void>
   abstract save(item: Item): Promise<void>
