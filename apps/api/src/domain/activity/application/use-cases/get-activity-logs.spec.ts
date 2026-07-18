@@ -67,7 +67,7 @@ describe('GetActivityLogs', () => {
 
     expect(result.isRight()).toBe(true)
     if (result.isRight()) {
-      expect(result.value.activityLogs.map((log) => log.resourceId)).toEqual([
+      expect(result.value.items.map((log) => log.resourceId)).toEqual([
         'item-1',
         'folder-1',
       ])
@@ -108,8 +108,8 @@ describe('GetActivityLogs', () => {
 
     expect(result.isRight()).toBe(true)
     if (result.isRight()) {
-      expect(result.value.activityLogs).toHaveLength(1)
-      expect(result.value.activityLogs[0].resourceId).toBe('item-1')
+      expect(result.value.items).toHaveLength(1)
+      expect(result.value.items[0].resourceId).toBe('item-1')
     }
   })
 
@@ -156,9 +156,9 @@ describe('GetActivityLogs', () => {
 
     expect(result.isRight()).toBe(true)
     if (result.isRight()) {
-      expect(result.value.activityLogs).toHaveLength(2)
+      expect(result.value.items).toHaveLength(2)
       expect(
-        result.value.activityLogs.every((log) => log.resourceId === 'folder-1'),
+        result.value.items.every((log) => log.resourceId === 'folder-1'),
       ).toBe(true)
     }
   })
@@ -194,5 +194,41 @@ describe('GetActivityLogs', () => {
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should paginate results and expose pagination metadata', async () => {
+    const ownerId = new UniqueEntityID().toString()
+    const workspace = makeWorkspace({ userId: ownerId })
+    workspaceRepository.items.push(workspace)
+
+    for (let i = 0; i < 3; i++) {
+      activityLogRepository.items.push(
+        ActivityLog.create({
+          workspaceId: workspace.id.toString(),
+          resourceType: 'folder',
+          resourceId: `folder-${i}`,
+          resourceName: 'Docs',
+          action: 'folder_created',
+          actorUserId: ownerId,
+          actorName: 'Owner',
+        }),
+      )
+    }
+
+    const result = await sut.execute({
+      userId: ownerId,
+      workspaceId: workspace.id.toString(),
+      page: 1,
+      limit: 2,
+    })
+
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.items).toHaveLength(2)
+      expect(result.value.total).toBe(3)
+      expect(result.value.page).toBe(1)
+      expect(result.value.limit).toBe(2)
+      expect(result.value.totalPages).toBe(2)
+    }
   })
 })

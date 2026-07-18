@@ -1,3 +1,8 @@
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
   ActivityLogRepository,
   FindManyActivityLogsOptions,
@@ -14,8 +19,8 @@ export class InMemoryActivityLogRepository implements ActivityLogRepository {
   async findManyByWorkspaceId(
     workspaceId: string,
     options?: FindManyActivityLogsOptions,
-  ): Promise<ActivityLog[]> {
-    return this.items
+  ): Promise<Paginated<ActivityLog>> {
+    const filtered = this.items
       .filter((log) => log.workspaceId === workspaceId)
       .filter(
         (log) => !options?.resourceId || log.resourceId === options.resourceId,
@@ -25,5 +30,14 @@ export class InMemoryActivityLogRepository implements ActivityLogRepository {
           !options?.resourceType || log.resourceType === options.resourceType,
       )
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
+
+    return toPaginated(
+      filtered.slice(offset, offset + limit),
+      filtered.length,
+      page,
+      limit,
+    )
   }
 }

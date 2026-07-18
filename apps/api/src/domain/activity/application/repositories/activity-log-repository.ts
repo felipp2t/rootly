@@ -1,3 +1,4 @@
+import type { Paginated } from '@/core/types/paginated.ts'
 import type {
   ActivityLog,
   ActivityResourceType,
@@ -6,6 +7,8 @@ import type {
 export interface FindManyActivityLogsOptions {
   resourceId?: string
   resourceType?: ActivityResourceType
+  page?: number
+  limit?: number
 }
 
 export abstract class ActivityLogRepository {
@@ -13,5 +16,5 @@ export abstract class ActivityLogRepository {
   abstract findManyByWorkspaceId(
     workspaceId: string,
     options?: FindManyActivityLogsOptions,
-  ): Promise<ActivityLog[]>
+  ): Promise<Paginated<ActivityLog>>
 }

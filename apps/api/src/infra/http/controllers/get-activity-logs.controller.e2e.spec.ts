@@ -96,4 +96,35 @@ describe('GET /workspaces/:workspaceId/activity', () => {
       ],
     })
   })
+
+  it('should paginate the activity log and expose pagination metadata', async () => {
+    const { cookieHeader, userId } = await createUserAndAuthenticate()
+    const workspaceId = await createWorkspace(cookieHeader)
+
+    for (let i = 0; i < 3; i++) {
+      await db.insert(schema.activityLogs).values({
+        workspaceId,
+        resourceType: 'folder',
+        resourceId: `folder-${i}`,
+        resourceName: 'Docs',
+        action: 'folder_created',
+        actorUserId: userId,
+        actorName: 'John Doe',
+      })
+    }
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/workspaces/${workspaceId}/activity?resourceType=folder&page=1&limit=2`,
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    const body = response.json()
+    expect(body.activityLogs).toHaveLength(2)
+    expect(body.total).toBe(3)
+    expect(body.page).toBe(1)
+    expect(body.limit).toBe(2)
+    expect(body.totalPages).toBe(2)
+  })
 })

@@ -1,4 +1,9 @@
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
   ActivityLogRepository,
   FindManyActivityLogsOptions,
@@ -20,7 +25,7 @@ export class DrizzleActivityLogRepository implements ActivityLogRepository {
   async findManyByWorkspaceId(
     workspaceId: string,
     options?: FindManyActivityLogsOptions,
-  ): Promise<ActivityLog[]> {
+  ): Promise<Paginated<ActivityLog>> {
     const conditions = [eq(schema.activityLogs.workspaceId, workspaceId)]
 
     if (options?.resourceId) {
@@ -33,12 +38,28 @@ export class DrizzleActivityLogRepository implements ActivityLogRepository {
       )
     }
 
-    const rows = await this.db
-      .select()
-      .from(schema.activityLogs)
-      .where(and(...conditions))
-      .orderBy(desc(schema.activityLogs.createdAt))
+    const whereCondition = and(...conditions)
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
 
-    return rows.map(DrizzleActivityLogMapper.toDomain)
+    const [rows, [{ total }]] = await Promise.all([
+      this.db
+        .select()
+        .from(schema.activityLogs)
+        .where(whereCondition)
+        .orderBy(desc(schema.activityLogs.createdAt))
+        .limit(limit)
+        .offset(offset),
+      this.db
+        .select({ total: count() })
+        .from(schema.activityLogs)
+        .where(whereCondition),
+    ])
+
+    return toPaginated(
+      rows.map(DrizzleActivityLogMapper.toDomain),
+      total,
+      page,
+      limit,
+    )
   }
 }

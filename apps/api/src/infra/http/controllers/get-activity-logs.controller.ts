@@ -24,6 +24,8 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
           resourceType: z
             .enum(['folder', 'item', 'member', 'workspace', 'role'])
             .optional(),
+          page: z.coerce.number().int().min(1).optional(),
+          limit: z.coerce.number().int().min(1).optional(),
         }),
         response: {
           200: z.object({
@@ -71,6 +73,10 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
                 createdAt: z.date(),
               }),
             ),
+            page: z.number(),
+            limit: z.number(),
+            total: z.number(),
+            totalPages: z.number(),
           }),
           401: z.object({ message: z.string() }),
           403: z.object({ message: z.string() }),
@@ -81,7 +87,7 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
     },
     async (request, reply) => {
       const { workspaceId } = request.params
-      const { resourceId, resourceType } = request.query
+      const { resourceId, resourceType, page, limit } = request.query
 
       const useCase = makeGetActivityLogsUseCase()
       const result = await useCase.execute({
@@ -89,6 +95,8 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
         workspaceId,
         resourceId,
         resourceType,
+        page,
+        limit,
       })
 
       if (result.isLeft()) {
@@ -104,7 +112,7 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
       }
 
       return reply.status(200).send({
-        activityLogs: result.value.activityLogs.map((log) => ({
+        activityLogs: result.value.items.map((log) => ({
           id: log.id.toString(),
           workspaceId: log.workspaceId,
           resourceType: log.resourceType,
@@ -116,6 +124,10 @@ export const getActivityLogsController: FastifyPluginCallbackZod = async (
           metadata: log.metadata ?? null,
           createdAt: log.createdAt,
         })),
+        page: result.value.page,
+        limit: result.value.limit,
+        total: result.value.total,
+        totalPages: result.value.totalPages,
       })
     },
   )

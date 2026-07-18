@@ -2,6 +2,7 @@ import type { BaseError } from '@/core/errors/base-error.ts'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error.ts'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.ts'
 import { type Either, left, right } from '@/core/types/either.ts'
+import type { Paginated } from '@/core/types/paginated.ts'
 import type { RolePermissionRepository } from '@/domain/root/application/repositories/role-permission-repository.ts'
 import type { WorkspaceMemberRepository } from '@/domain/root/application/repositories/workspace-member-repository.ts'
 import type { WorkspaceRepository } from '@/domain/root/application/repositories/workspace-repository.ts'
@@ -17,12 +18,11 @@ interface GetActivityLogsUseCaseRequest {
   workspaceId: string
   resourceId?: string
   resourceType?: ActivityResourceType
+  page?: number
+  limit?: number
 }
 
-type GetActivityLogsUseCaseResponse = Either<
-  BaseError,
-  { activityLogs: ActivityLog[] }
->
+type GetActivityLogsUseCaseResponse = Either<BaseError, Paginated<ActivityLog>>
 
 export class GetActivityLogsUseCase {
   constructor(
@@ -37,6 +37,8 @@ export class GetActivityLogsUseCase {
     workspaceId,
     resourceId,
     resourceType,
+    page,
+    limit,
   }: GetActivityLogsUseCaseRequest): Promise<GetActivityLogsUseCaseResponse> {
     const workspace = await this.workspaceRepository.findById(
       userId,
@@ -57,11 +59,11 @@ export class GetActivityLogsUseCase {
       return left(new NotAllowedError('Missing activity:read permission'))
     }
 
-    const activityLogs = await this.activityLogRepository.findManyByWorkspaceId(
+    const result = await this.activityLogRepository.findManyByWorkspaceId(
       workspaceId,
-      { resourceId, resourceType },
+      { resourceId, resourceType, page, limit },
     )
 
-    return right({ activityLogs })
+    return right(result)
   }
 }
