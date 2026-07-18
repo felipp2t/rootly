@@ -1,4 +1,5 @@
 import { type Either, right } from '@/core/types/either.ts'
+import type { Paginated } from '@/core/types/paginated.ts'
 import type {
   FolderRepository,
   FolderWithCounts,
@@ -8,11 +9,10 @@ interface GetFoldersUseCaseRequest {
   userId: string
   parentId?: string
   workspaceId?: string
+  page?: number
+  limit?: number
 }
-type GetFoldersUseCaseResponse = Either<
-  undefined,
-  { folders: FolderWithCounts[] }
->
+type GetFoldersUseCaseResponse = Either<undefined, Paginated<FolderWithCounts>>
 
 export class GetFoldersUseCase {
   constructor(private readonly folderRepository: FolderRepository) {}
@@ -21,13 +21,16 @@ export class GetFoldersUseCase {
     userId,
     parentId,
     workspaceId,
+    page,
+    limit,
   }: GetFoldersUseCaseRequest): Promise<GetFoldersUseCaseResponse> {
-    const folders = await this.folderRepository.findManyWithCounts(
+    const result = await this.folderRepository.findManyWithCounts(
       userId,
       parentId,
       workspaceId,
+      { page, limit },
     )
 
-    return right({ folders })
+    return right(result)
   }
 }

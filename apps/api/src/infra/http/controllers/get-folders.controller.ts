@@ -17,6 +17,8 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
         querystring: z.object({
           parentId: z.string().optional(),
           workspaceId: z.string().optional(),
+          page: z.coerce.number().int().min(1).optional(),
+          limit: z.coerce.number().int().min(1).optional(),
         }),
         response: {
           200: z.object({
@@ -32,6 +34,10 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
                 updatedAt: z.date(),
               }),
             ),
+            page: z.number(),
+            limit: z.number(),
+            total: z.number(),
+            totalPages: z.number(),
           }),
           401: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
@@ -39,13 +45,15 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const { parentId, workspaceId } = request.query
+      const { parentId, workspaceId, page, limit } = request.query
 
       const useCase = makeGetFoldersUseCase()
       const result = await useCase.execute({
         userId: request.userId,
         parentId,
         workspaceId,
+        page,
+        limit,
       })
 
       if (result.isLeft()) {
@@ -53,7 +61,7 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
       }
 
       return reply.status(200).send({
-        folders: result.value.folders.map(
+        folders: result.value.items.map(
           ({ folder, itemCount, subfolderCount }) => ({
             id: folder.id.toString(),
             name: folder.name,
@@ -65,6 +73,10 @@ export const getFoldersController: FastifyPluginCallbackZod = async (app) => {
             updatedAt: folder.updatedAt,
           }),
         ),
+        page: result.value.page,
+        limit: result.value.limit,
+        total: result.value.total,
+        totalPages: result.value.totalPages,
       })
     },
   )

@@ -1,5 +1,11 @@
 import { UniqueConstraintViolationError } from '@/core/errors/unique-constraint-violation-error.ts'
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
+  FindManyFoldersOptions,
   FolderRepository,
   FolderWithCounts,
 } from '@/domain/root/application/repositories/folder-repository.ts'
@@ -72,17 +78,26 @@ export class InMemoryFolderRepository implements FolderRepository {
     userId: string,
     parentId?: string,
     workspaceId?: string,
-  ): Promise<FolderWithCounts[]> {
-    const folders = await this.findMany(userId, parentId, workspaceId)
-    return folders.map((folder) => ({
-      folder,
-      itemCount: this.itemsInFolders.filter(
-        (item) => item.folderId === folder.id.toString() && !item.isArchived,
-      ).length,
-      subfolderCount: this.items.filter(
-        (f) => f.parentId === folder.id.toString(),
-      ).length,
-    }))
+    options?: FindManyFoldersOptions,
+  ): Promise<Paginated<FolderWithCounts>> {
+    const allFolders = await this.findMany(userId, parentId, workspaceId)
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
+    const folders = allFolders.slice(offset, offset + limit)
+
+    return toPaginated(
+      folders.map((folder) => ({
+        folder,
+        itemCount: this.itemsInFolders.filter(
+          (item) => item.folderId === folder.id.toString() && !item.isArchived,
+        ).length,
+        subfolderCount: this.items.filter(
+          (f) => f.parentId === folder.id.toString(),
+        ).length,
+      })),
+      allFolders.length,
+      page,
+      limit,
+    )
   }
 
   async hasSubfolders(folderId: string): Promise<boolean> {

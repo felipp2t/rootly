@@ -102,4 +102,26 @@ describe('GET /folders', () => {
     expect(response.statusCode).toBe(200)
     expect(response.json().folders).toHaveLength(2)
   })
+
+  it('should paginate folders and expose pagination metadata', async () => {
+    const { cookieHeader, workspaceId } =
+      await createUserAndGetCookieAndWorkspaceId()
+    await createFolder(cookieHeader, workspaceId)
+    await createFolder(cookieHeader, workspaceId)
+    await createFolder(cookieHeader, workspaceId)
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/folders?workspaceId=${workspaceId}&page=1&limit=2`,
+      headers: { cookie: cookieHeader },
+    })
+
+    expect(response.statusCode).toBe(200)
+    const body = response.json()
+    expect(body.folders).toHaveLength(2)
+    expect(body.total).toBe(3)
+    expect(body.page).toBe(1)
+    expect(body.limit).toBe(2)
+    expect(body.totalPages).toBe(2)
+  })
 })

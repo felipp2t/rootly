@@ -38,7 +38,7 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(3)
+      expect(response.value.items).toHaveLength(3)
     }
   })
 
@@ -67,8 +67,8 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].folder.workspaceId).toBe(
+      expect(response.value.items).toHaveLength(1)
+      expect(response.value.items[0].folder.workspaceId).toBe(
         userWorkspace.id.toString(),
       )
     }
@@ -107,9 +107,9 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(2)
+      expect(response.value.items).toHaveLength(2)
       expect(
-        response.value.folders.every(
+        response.value.items.every(
           (f) => f.folder.parentId === parent.id.toString(),
         ),
       ).toBe(true)
@@ -151,8 +151,8 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].folder.parentId).toBe(
+      expect(response.value.items).toHaveLength(1)
+      expect(response.value.items[0].folder.parentId).toBe(
         parentA.id.toString(),
       )
     }
@@ -179,7 +179,7 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(0)
+      expect(response.value.items).toHaveLength(0)
     }
   })
 
@@ -192,7 +192,7 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(0)
+      expect(response.value.items).toHaveLength(0)
     }
   })
 
@@ -223,8 +223,8 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].folder.id.toString()).toBe(
+      expect(response.value.items).toHaveLength(1)
+      expect(response.value.items[0].folder.id.toString()).toBe(
         root.id.toString(),
       )
     }
@@ -256,10 +256,43 @@ describe('GetFolders', () => {
 
     expect(response.isRight()).toBe(true)
     if (response.isRight()) {
-      expect(response.value.folders).toHaveLength(1)
-      expect(response.value.folders[0].folder.workspaceId).toBe(
+      expect(response.value.items).toHaveLength(1)
+      expect(response.value.items[0].folder.workspaceId).toBe(
         workspaceA.id.toString(),
       )
+    }
+  })
+
+  it('should paginate results and expose pagination metadata', {
+    tags: ['get-folders'],
+  }, async () => {
+    const user = makeUser()
+    const workspace = makeWorkspace({ userId: user.id.toString() })
+
+    folderRepository.workspaceMembers.push({
+      userId: user.id.toString(),
+      workspaceId: workspace.id.toString(),
+    })
+
+    for (let i = 0; i < 3; i++) {
+      await folderRepository.create(
+        makeFolder({ workspaceId: workspace.id.toString() }),
+      )
+    }
+
+    const response = await sut.execute({
+      userId: user.id.toString(),
+      page: 1,
+      limit: 2,
+    })
+
+    expect(response.isRight()).toBe(true)
+    if (response.isRight()) {
+      expect(response.value.items).toHaveLength(2)
+      expect(response.value.total).toBe(3)
+      expect(response.value.page).toBe(1)
+      expect(response.value.limit).toBe(2)
+      expect(response.value.totalPages).toBe(2)
     }
   })
 })

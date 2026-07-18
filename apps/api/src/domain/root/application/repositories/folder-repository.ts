@@ -1,9 +1,15 @@
+import type { Paginated } from '@/core/types/paginated.ts'
 import type { Folder } from '../../enterprise/entities/folder.ts'
 
 export interface FolderWithCounts {
   folder: Folder
   itemCount: number
   subfolderCount: number
+}
+
+export interface FindManyFoldersOptions {
+  page?: number
+  limit?: number
 }
 
 export abstract class FolderRepository {
@@ -25,7 +31,8 @@ export abstract class FolderRepository {
     userId: string,
     parentId?: string,
     workspaceId?: string,
-  ): Promise<FolderWithCounts[]>
+    options?: FindManyFoldersOptions,
+  ): Promise<Paginated<FolderWithCounts>>
   abstract hasSubfolders(folderId: string): Promise<boolean>
   abstract create(folder: Folder): Promise<void>
   abstract save(folder: Folder): Promise<void>

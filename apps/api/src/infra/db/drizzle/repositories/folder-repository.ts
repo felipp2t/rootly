@@ -5,7 +5,13 @@ import {
   UniqueConstraintViolationError,
 } from '@/core/errors/unique-constraint-violation-error.ts'
 import { DomainEvents } from '@/core/events/domain-events.ts'
+import {
+  type Paginated,
+  paginate,
+  toPaginated,
+} from '@/core/types/paginated.ts'
 import type {
+  FindManyFoldersOptions,
   FolderRepository,
   FolderWithCounts,
 } from '@/domain/root/application/repositories/folder-repository.ts'
@@ -115,10 +121,16 @@ export class DrizzleFolderRepository implements FolderRepository {
     userId: string,
     parentId?: string,
     workspaceId?: string,
-  ): Promise<FolderWithCounts[]> {
-    const folders = await this.findMany(userId, parentId, workspaceId)
+    options?: FindManyFoldersOptions,
+  ): Promise<Paginated<FolderWithCounts>> {
+    const allFolders = await this.findMany(userId, parentId, workspaceId)
 
-    if (folders.length === 0) return []
+    const { page, limit, offset } = paginate(options?.page, options?.limit)
+    const folders = allFolders.slice(offset, offset + limit)
+
+    if (folders.length === 0) {
+      return toPaginated([], allFolders.length, page, limit)
+    }
 
     const folderIds = folders.map((f) => f.id.toString())
 
@@ -147,11 +159,16 @@ export class DrizzleFolderRepository implements FolderRepository {
       subfolderCounts.map((r) => [r.parentId, r.total]),
     )
 
-    return folders.map((folder) => ({
-      folder,
-      itemCount: itemCountMap[folder.id.toString()] ?? 0,
-      subfolderCount: subfolderCountMap[folder.id.toString()] ?? 0,
-    }))
+    return toPaginated(
+      folders.map((folder) => ({
+        folder,
+        itemCount: itemCountMap[folder.id.toString()] ?? 0,
+        subfolderCount: subfolderCountMap[folder.id.toString()] ?? 0,
+      })),
+      allFolders.length,
+      page,
+      limit,
+    )
   }
 
   async hasSubfolders(folderId: string): Promise<boolean> {
