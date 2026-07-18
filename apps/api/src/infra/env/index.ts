@@ -5,6 +5,7 @@ const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   PORT: z.coerce.number().default(3000),
+  CORS_ORIGIN: z.string().default('http://localhost:5173'),
   DATABASE_URL: z.string('DATABASE_URL is required'),
   JWT_SECRET: z.string('JWT_SECRET is required'),
   MINIO_ENDPOINT: z.string().default('localhost'),

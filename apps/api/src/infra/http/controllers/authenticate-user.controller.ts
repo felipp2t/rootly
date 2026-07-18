@@ -1,6 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeAuthenticateUserUseCase } from '../factories/make-authenticate-user-use-case.ts'
+import { authRateLimit } from '../rate-limit-config.ts'
 
 export const authenticateUserController: FastifyPluginCallbackZod = async (
   app,
@@ -8,6 +9,9 @@ export const authenticateUserController: FastifyPluginCallbackZod = async (
   app.post(
     '/sessions',
     {
+      config: {
+        rateLimit: authRateLimit,
+      },
       schema: {
         summary: 'Authenticate User',
         description: 'Authenticate a user and return a JWT token',

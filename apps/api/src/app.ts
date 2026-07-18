@@ -1,6 +1,8 @@
 import cookie from '@fastify/cookie'
 import cors from '@fastify/cors'
+import helmet from '@fastify/helmet'
 import multipart from '@fastify/multipart'
+import rateLimit from '@fastify/rate-limit'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
 import websocket from '@fastify/websocket'
@@ -11,7 +13,9 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
+import { env } from './infra/env/index.ts'
 import { registerSubscribers } from './infra/events/register-subscribers.ts'
+import { globalRateLimit } from './infra/http/rate-limit-config.ts'
 import { routes } from './infra/http/routes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -21,9 +25,11 @@ app.decorateRequest('userId', '')
 await app.register(cookie)
 await app.register(multipart)
 await app.register(websocket)
+await app.register(helmet)
+await app.register(rateLimit, globalRateLimit)
 
 await app.register(cors, {
-  origin: 'http://localhost:5173',
+  origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
 })

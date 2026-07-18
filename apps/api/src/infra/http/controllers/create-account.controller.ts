@@ -1,6 +1,7 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { makeRegisterUserUseCase } from '../factories/make-register-user-use-case.ts'
+import { authRateLimit } from '../rate-limit-config.ts'
 
 export const createAccountController: FastifyPluginCallbackZod = async (
   app,
@@ -8,6 +9,9 @@ export const createAccountController: FastifyPluginCallbackZod = async (
   app.post(
     '/accounts',
     {
+      config: {
+        rateLimit: authRateLimit,
+      },
       schema: {
         summary: 'Register User',
         description: 'Register a new user',
